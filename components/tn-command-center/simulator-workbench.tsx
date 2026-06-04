@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
 import {
   advanceSimulationRun,
