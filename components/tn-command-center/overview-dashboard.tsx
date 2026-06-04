@@ -1,22 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import {
-  governanceItems,
-  overviewEvents,
-  overviewKpis,
-  roadmap,
-  vendorLayers
-} from "@/lib/tn-ai-data";
+import { overviewEvents, overviewKpis } from "@/lib/tn-ai-data";
 import { useSimulatorLatestRun } from "@/lib/simulator/use-simulator-store";
 import type { RunSummary } from "@/lib/simulator/types";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
-import {
-  ComparisonBlock,
-  Icon,
-  Panel,
-  StatusChip
-} from "@/components/tn-command-center/command-center-primitives";
+import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import Image from "next/image";
 
 export function OverviewDashboard() {
   const { latestRun } = useSimulatorLatestRun();
@@ -27,22 +17,19 @@ export function OverviewDashboard() {
       eventStream={overviewEvents}
       utilityActions={
         <>
-          <ShellActionLink href="/simulator" label="Launch simulator" />
-          {latestRun ? (
-            <ShellActionLink href={`/simulator/${latestRun.id}`} label="Resume latest" tone="secondary" />
-          ) : null}
+          <ShellActionLink href="/simulator" label="Launch Twin Simulator" />
         </>
       }
       rightRail={<OverviewRail latestRun={latestRun} />}
     >
       <OverviewHero latestRun={latestRun} />
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
-        <RoadmapPanel />
-        <RecentRunPanel latestRun={latestRun} />
-      </div>
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <VendorPanel />
-        <GovernancePanel />
+      <DigitalTwinCanvas />
+      <TelemetryBar />
+      
+      <div className="grid gap-3 xl:grid-cols-[1fr_1.5fr_1fr]">
+        <ReplayableScenariosPanel latestRun={latestRun} />
+        <ProductionTraceabilityPanel />
+        <EvidenceLedgerPanel />
       </div>
     </CommandCenterShell>
   );
@@ -50,149 +37,54 @@ export function OverviewDashboard() {
 
 function OverviewHero({ latestRun }: { latestRun: RunSummary | null }) {
   return (
-    <section className="scanline relative overflow-hidden border border-command-line/70 bg-gradient-to-br from-command-panel/90 via-command-panel/70 to-command-panel/90 shadow-command backdrop-blur-2xl">
-      {/* Top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
-
-      {/* Corner accents */}
-      <span className="absolute top-0 left-0 h-3 w-3 border-t-2 border-l-2 border-cyan-400/60" />
-      <span className="absolute top-0 right-0 h-3 w-3 border-t-2 border-r-2 border-cyan-400/60" />
-      <span className="absolute bottom-0 left-0 h-3 w-3 border-b-2 border-l-2 border-cyan-400/60" />
-      <span className="absolute bottom-0 right-0 h-3 w-3 border-b-2 border-r-2 border-cyan-400/60" />
-
-      {/* Decorative glow orb */}
-      <div
-        className="pointer-events-none absolute -top-20 -right-20 h-72 w-72 rounded-full opacity-60"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(0,212,255,0.1) 0%, rgba(155,109,255,0.06) 40%, transparent 70%)",
-          filter: "blur(20px)"
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="grid gap-4 p-5 2xl:grid-cols-[minmax(0,1fr)_340px] xl:p-7">
-        {/* Main copy */}
-        <div className="min-w-0">
-          <div className="mb-5 flex flex-wrap items-center gap-2">
-            <StatusChip status="simulated" />
-            <StatusChip status="advisory" />
-            <StatusChip status="locked" compact />
+    <section className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 p-2">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+          Nakashima-Tsubaki
+        </h2>
+        <h3 className="mt-1 text-2xl font-bold text-cyan-400 drop-shadow-[0_0_8px_rgba(0,212,255,0.6)]">
+          Digital Twin Command Center
+        </h3>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+          Replayable industrial intelligence for precision manufacturing, quality control, and operator-safe workflow decisions.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-4">
+          <div className="flex items-center gap-2 text-xs font-semibold text-cyan-200">
+            <Icon name="flow" className="h-4 w-4" /> DIGITAL TWIN
           </div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-cyan-400/70">
-            Strategic Answer
-          </p>
-          <h2 className="mt-3 max-w-5xl text-3xl font-semibold leading-tight text-white md:text-4xl xl:text-[2.6rem] xl:leading-[1.15]">
-            <span className="gradient-text-hero">
-              Turn the prototype into a replayable cyber-physical twin lab,
-            </span>{" "}
-            <span className="text-slate-300">
-              then harden the same workflow for persistence.
-            </span>
-          </h2>
-          <p className="mt-4 max-w-4xl text-base leading-7 text-slate-400 md:text-lg">
-            The command center now has a stronger v1 target: multiple deterministic incident loops
-            that combine twin state, knowledge retrieval, human review, shadow control outputs, and
-            evidence generation without unsafe automation claims.
-          </p>
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {[
-              {
-                title: "Three scenario lab",
-                detail: "Run quality containment, thermal excursion, and spindle degradation through the same twin workflow.",
-                accent: "cyan"
-              },
-              {
-                title: "Real workflow",
-                detail: "Drive detect, retrieve, review, and record as a replayable state machine.",
-                accent: "violet"
-              },
-              {
-                title: "Backend ready",
-                detail: "Keep local persistence live now and stage the Supabase boundary for the next phase.",
-                accent: "emerald"
-              }
-            ].map(({ title, detail, accent }) => (
-              <div
-                key={title}
-                className={`relative overflow-hidden border p-4 transition-all duration-200 hover:scale-[1.02] ${
-                  accent === "cyan"
-                    ? "border-cyan-400/15 bg-cyan-400/[0.04] hover:border-cyan-400/30"
-                    : accent === "violet"
-                    ? "border-violet-400/15 bg-violet-400/[0.04] hover:border-violet-400/30"
-                    : "border-emerald-400/15 bg-emerald-400/[0.04] hover:border-emerald-400/30"
-                }`}
-              >
-                <div
-                  className={`absolute top-0 left-0 right-0 h-[1px] ${
-                    accent === "cyan"
-                      ? "bg-gradient-to-r from-cyan-400/50 to-transparent"
-                      : accent === "violet"
-                      ? "bg-gradient-to-r from-violet-400/50 to-transparent"
-                      : "bg-gradient-to-r from-emerald-400/50 to-transparent"
-                  }`}
-                />
-                <p className="text-sm font-semibold text-white">{title}</p>
-                <p className="mt-2 text-xs leading-5 text-command-muted">{detail}</p>
-              </div>
-            ))}
+          <div className="flex items-center gap-2 text-xs font-semibold text-cyan-200">
+            <Icon name="play" className="h-4 w-4" /> REPLAYABLE
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-cyan-200">
+            <Icon name="check" className="h-4 w-4" /> QUALITY
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-cyan-200">
+            <Icon name="search" className="h-4 w-4" /> TRACEABILITY
           </div>
         </div>
-
-        {/* Milestone card */}
-        <div className="relative overflow-hidden border border-command-line/80 bg-black/30 p-5 shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-md">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-violet-400/80 shadow-[0_0_8px_rgba(155,109,255,0.8)] opacity-0 animate-[scan_4s_ease-in-out_infinite]" />
-          <span className="absolute top-0 left-0 h-2 w-2 border-t border-l border-violet-400/50" />
-          <span className="absolute bottom-0 right-0 h-2 w-2 border-b border-r border-violet-400/50" />
-
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-command-muted">
-            Active Milestone
-          </p>
-          <div className="mt-4 flex items-start gap-3">
-            <div className="grid h-12 w-12 place-items-center border border-violet-400/30 bg-violet-400/[0.08] shadow-[0_0_16px_rgba(155,109,255,0.2)]">
-              <Icon name="flow" className="h-6 w-6 text-violet-300" />
-            </div>
-            <div>
-              <p className="text-base font-semibold text-white">Quality Hold Simulator V1</p>
-              <p className="mt-0.5 text-xs text-command-muted">Single-user, persisted, advisory-first workflow</p>
-            </div>
+      </div>
+      
+      {/* Active Milestone Block */}
+      <div className="relative w-full max-w-sm overflow-hidden border border-command-line/80 bg-black/40 p-4 shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-command-muted">Active Milestone</p>
+        <div className="mt-3 flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center border border-amber-400/30 bg-amber-400/[0.1]">
+            <Icon name="flow" className="h-5 w-5 text-amber-400" />
           </div>
-          <div className="mt-5 space-y-0 font-mono text-xs">
-            {[
-              { label: "Mode", value: "LOCAL PERSISTENCE" },
-              { label: "Scenario", value: "3 TWIN SCENARIOS" },
-              { label: "Machine authority", value: "NO DIRECT PLC CONTROL" },
-              { label: "Latest run", value: latestRun ? latestRun.lotId : "NONE YET" }
-            ].map(({ label, value }, i) => (
-              <div
-                key={label}
-                className={`flex items-center justify-between gap-3 py-2.5 ${
-                  i < 3 ? "border-b border-command-line/50" : ""
-                }`}
-              >
-                <span className="text-command-steel">{label}</span>
-                <span className="text-right font-medium text-command-text">{value}</span>
-              </div>
-            ))}
+          <div>
+            <p className="text-sm font-bold text-white">Quality Hold Gate – Dimensional</p>
+            <p className="text-[10px] text-command-steel">Lot NT-2025-0517-AX12</p>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Link
-              href="/simulator"
-              className="btn-glow inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-400/[0.1] px-4 py-2 text-sm font-semibold text-cyan-100 transition-all duration-200 hover:bg-cyan-400/[0.18] hover:border-cyan-400/60 hover:shadow-[0_0_20px_rgba(0,212,255,0.25)]"
-            >
-              <Icon name="play" className="h-3.5 w-3.5" />
-              Open launchpad
-            </Link>
-            {latestRun ? (
-              <Link
-                href={`/simulator/${latestRun.id}`}
-                className="btn-glow inline-flex items-center gap-2 border border-command-line bg-white/[0.03] px-4 py-2 text-sm font-semibold text-command-text transition-all duration-200 hover:border-cyan-400/30 hover:bg-white/[0.06]"
-              >
-                <Icon name="arrow" className="h-3.5 w-3.5" />
-                Resume latest
-              </Link>
-            ) : null}
+        </div>
+        <div className="mt-4 space-y-1 font-mono text-[10px]">
+          <div className="flex justify-between">
+            <span className="text-command-steel">Mode</span>
+            <span className="text-white">LOCAL PERSISTENCE</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-command-steel">Scenario</span>
+            <span className="text-white">3 - FINISH TURNING</span>
           </div>
         </div>
       </div>
@@ -200,246 +92,301 @@ function OverviewHero({ latestRun }: { latestRun: RunSummary | null }) {
   );
 }
 
-function RoadmapPanel() {
-  const phaseColors = ["cyan", "violet", "amber", "emerald"] as const;
-
+function DigitalTwinCanvas() {
   return (
-    <Panel
-      title="AI Adoption Roadmap"
-      icon="roadmap"
-      kicker="Execution path from prototype to governed operational layer"
-      action={<StatusChip status="review" compact />}
-      accent="violet"
-    >
-      <div className="space-y-2.5">
-        {roadmap.map((step, i) => {
-          const color = phaseColors[i % phaseColors.length];
-          const borderClass =
-            color === "cyan"
-              ? "border-l-cyan-400/60"
-              : color === "violet"
-              ? "border-l-violet-400/60"
-              : color === "amber"
-              ? "border-l-amber-400/60"
-              : "border-l-emerald-400/60";
-          const textClass =
-            color === "cyan"
-              ? "text-cyan-300"
-              : color === "violet"
-              ? "text-violet-300"
-              : color === "amber"
-              ? "text-amber-300"
-              : "text-emerald-300";
-
-          return (
-            <div
-              key={step.phase}
-              className={`group relative grid gap-3 overflow-hidden border border-command-line/70 border-l-2 bg-black/30 p-4 transition-all duration-300 hover:scale-[1.01] hover:bg-black/50 hover:shadow-[0_0_20px_rgba(0,0,0,0.5)] md:grid-cols-[110px_1fr] ${borderClass}`}
-            >
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <div>
-                <p className={`font-mono text-xs font-semibold drop-shadow-[0_0_5px_currentColor] ${textClass}`}>{step.phase}</p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-command-muted">
-                  {step.horizon}
-                </p>
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-semibold text-white">{step.title}</h3>
-                  <StatusChip status={step.status} compact />
-                </div>
-                <p className="mt-2 text-xs leading-5 text-slate-400">{step.detail}</p>
-                <p className="mt-1.5 text-[10px] text-command-muted">
-                  Evidence: <span className="text-command-steel">{step.proof}</span>
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </Panel>
-  );
-}
-
-function RecentRunPanel({ latestRun }: { latestRun: RunSummary | null }) {
-  return (
-    <Panel
-      title="Simulator Status"
-      icon="play"
-      kicker="Current v1 target"
-      action={<StatusChip status="ready" compact />}
-      accent="emerald"
-    >
-      <div className="space-y-3">
-        <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-emerald-400/30 to-transparent" />
-          <p className="text-sm font-semibold text-white">Working definition</p>
-          <p className="mt-2 text-xs leading-5 text-slate-400">
-            A user can create a twin run from multiple scenario families, progress through the
-            workflow, replay subsystem state, review a recommendation, generate an evidence packet,
-            refresh, and resume the same state.
-          </p>
-        </div>
-        <div className="border border-command-line/70 bg-black/20 p-4">
-          <p className="text-sm font-semibold text-white">Recent activity</p>
-          {latestRun ? (
-            <>
-              <p className="mt-2 text-xs leading-5 text-slate-400">
-                Latest run{" "}
-                <span className="font-mono text-cyan-300">{latestRun.lotId}</span> is saved at
-                step <span className="font-mono text-cyan-300">{latestRun.currentStep}</span>.
-              </p>
-              <Link
-                href={`/simulator/${latestRun.id}`}
-                className="btn-glow mt-3 inline-flex items-center gap-2 border border-command-line bg-white/[0.03] px-3 py-2 text-xs font-semibold text-white transition-all duration-200 hover:border-cyan-400/30"
-              >
-                <Icon name="arrow" className="h-3.5 w-3.5 text-cyan-400" />
-                Resume run
-              </Link>
-            </>
-          ) : (
-            <p className="mt-2 text-xs leading-5 text-slate-400">
-              No saved runs yet. Use the launchpad to create the first deterministic incident.
-            </p>
-          )}
+    <section className="relative mt-2 flex min-h-[450px] w-full flex-col overflow-hidden border border-cyan-400/30 bg-black/50 p-4 shadow-[0_0_30px_rgba(0,212,255,0.05)] backdrop-blur-md">
+      {/* Scanline FX */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)] opacity-0 animate-[scan_4s_ease-in-out_infinite]" />
+      
+      {/* Header */}
+      <div className="relative z-20 flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-400/80">
+          ACTIVE DIGITAL TWIN - CNC MULTI-SPINDLE CELL
+        </p>
+        <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400">
+          <span className="status-ping relative flex h-2 w-2 rounded-full bg-emerald-400" /> LIVE
         </div>
       </div>
-    </Panel>
+
+      {/* 3D Visual Centerpiece */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-80 mix-blend-screen">
+        <img src="/cnc_twin_model.png" alt="Digital Twin 3D Model" className="h-[400px] object-cover drop-shadow-[0_0_15px_rgba(0,212,255,0.3)] animate-[drift_20s_ease-in-out_infinite]" />
+      </div>
+
+      {/* HUD Overlays */}
+      <div className="relative z-10 mt-8 grid grid-cols-2 gap-4 xl:grid-cols-4 xl:w-1/2">
+        <HUDMetric icon="power" label="Spindle Speed" value="12,450" unit="RPM" />
+        <HUDMetric icon="arrow" label="Feed Rate" value="1,250" unit="mm/min" />
+        <HUDMetric icon="shield" label="Coolant Temp" value="20.6" unit="°C" />
+        <HUDMetric icon="chart" label="Power Draw" value="7.8" unit="kW" />
+      </div>
+
+      {/* Center Target Box Overlay */}
+      <div className="absolute top-1/2 left-1/2 z-10 h-32 w-48 -translate-x-1/2 -translate-y-1/2 border border-cyan-400/40 bg-cyan-400/[0.02]" />
+
+      {/* Twin State Score Card */}
+      <div className="absolute bottom-6 right-6 z-20 border border-command-line/80 bg-black/60 p-4 backdrop-blur-xl">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400">Digital Twin State</p>
+        <div className="mt-3 flex items-center gap-4">
+          <div className="grid h-16 w-16 place-items-center rounded-full border-2 border-cyan-400 shadow-[0_0_15px_rgba(0,212,255,0.4)]">
+            <div className="text-center">
+              <span className="text-xl font-bold text-white">96</span>
+              <span className="text-[8px] text-cyan-200">/100</span>
+            </div>
+          </div>
+          <div className="space-y-1 font-mono text-[10px]">
+            <div className="flex justify-between gap-4">
+              <span className="text-command-steel">CONFIDENCE</span>
+              <span className="text-white">98.7%</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-command-steel">LATENCY</span>
+              <span className="text-white">18 ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function VendorPanel() {
+function HUDMetric({ icon, label, value, unit }: { icon: string; label: string; value: string; unit: string }) {
   return (
-    <Panel
-      title="Vendor and Architecture Comparison"
-      icon="stack"
-      kicker="Standards-first industrial stack versus narrow tool adoption"
-      action={<StatusChip status="review" compact />}
-      accent="amber"
-    >
-      <div className="space-y-2.5">
-        {vendorLayers.map((layer) => (
-          <article key={layer.layer} className="border border-command-line/70 bg-black/20 p-4 transition-all duration-200 hover:border-command-line">
-            <h3 className="text-sm font-semibold text-white">{layer.layer}</h3>
-            <div className="mt-3 grid gap-2.5 md:grid-cols-2">
-              <ComparisonBlock label="Standards-first" text={layer.standardsFirst} good />
-              <ComparisonBlock label="Lock-in risk" text={layer.vendorLocked} />
-            </div>
-            <p className="mt-3 text-xs leading-5 text-slate-400">{layer.recommendation}</p>
-          </article>
-        ))}
+    <div className="border border-command-line/40 bg-black/40 p-2 backdrop-blur-md">
+      <div className="flex items-center gap-2">
+        <Icon name={icon as any} className="h-3 w-3 text-cyan-400/60" />
+        <span className="text-[10px] text-command-muted">{label}</span>
       </div>
-    </Panel>
+      <p className="mt-1 font-mono text-lg font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.4)]">
+        {value} <span className="text-[10px] text-cyan-300">{unit}</span>
+      </p>
+    </div>
   );
 }
 
-function GovernancePanel() {
+function TelemetryBar() {
   return (
-    <Panel
-      title="Risk and Governance"
-      icon="shield"
-      kicker="Safety and compliance constraints for the simulator"
-      action={<StatusChip status="locked" compact />}
-    >
-      <div className="space-y-2.5">
-        {governanceItems.map((item) => (
-          <article
-            key={item.title}
-            className="group relative overflow-hidden border border-command-line/70 bg-black/30 p-4 transition-all duration-300 hover:scale-[1.01] hover:border-cyan-400/30 hover:bg-black/50"
-          >
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            <div className="relative flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-white group-hover:text-cyan-100">{item.title}</p>
-              <StatusChip status={item.status} compact />
-            </div>
-            <p className="mt-2 text-xs text-command-muted">{item.control}</p>
-            <p className="mt-2 text-[10px] leading-4 text-slate-400">
-              Evidence: <span className="text-command-steel">{item.evidence}</span>
-            </p>
-          </article>
-        ))}
+    <div className="mt-3 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <TelemetryBlock title="Machine Condition" value="96/100" sub="Excellent" />
+      <TelemetryBlock title="Spindle Thermal Drift" value="+1.8 µm" sub="Stable" />
+      <TelemetryBlock title="Vibration Analysis" value="1.42 mm/s" sub="Normal" />
+      <TelemetryBlock title="Tool Wear" value="12%" sub="Good" />
+      <TelemetryBlock title="Shaft / Bearing Health" value="94/100" sub="Good" />
+      <TelemetryBlock title="Dimensional Quality Hold" value="1.63" sub="Capable" color="emerald" />
+    </div>
+  );
+}
+
+function TelemetryBlock({ title, value, sub, color = "cyan" }: { title: string; value: string; sub: string; color?: string }) {
+  const colorClass = color === "emerald" ? "text-emerald-400" : "text-cyan-400";
+  return (
+    <div className="relative overflow-hidden border border-command-line/70 bg-black/40 p-3 transition-all hover:bg-black/60">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent opacity-0 transition-opacity hover:opacity-100" />
+      <p className="text-[10px] font-semibold text-command-muted">{title}</p>
+      <div className="mt-2 flex items-end justify-between">
+        <div>
+          <p className="font-mono text-lg font-bold text-white">{value}</p>
+          <p className={`text-[10px] ${colorClass}`}>{sub}</p>
+        </div>
+        {/* Fake sparkline graphic */}
+        <svg className="h-6 w-16 opacity-50" viewBox="0 0 100 20" preserveAspectRatio="none">
+          <polyline points="0,15 20,10 40,12 60,5 80,18 100,8" fill="none" stroke={color === "emerald" ? "#10b981" : "#00d4ff"} strokeWidth="2" />
+        </svg>
       </div>
-    </Panel>
+    </div>
+  );
+}
+
+function ReplayableScenariosPanel({ latestRun }: { latestRun: RunSummary | null }) {
+  return (
+    <div className="border border-command-line/70 bg-black/30 p-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Replayable Twin Scenarios</p>
+      <div className="mt-4 space-y-2">
+        <ScenarioRow title="Scenario 1 - Roughing" status="COMPLETED" time="2h ago" />
+        <ScenarioRow title="Scenario 2 - Thermal Stress" status="COMPLETED" time="4h ago" />
+        <ScenarioRow title="Scenario 3 - Finish Turning" status="ACTIVE" time="2 min ago" active />
+        <ScenarioRow title="Scenario 4 - Tool Wear Progression" status="QUEUED" time="--" />
+      </div>
+      <button className="mt-4 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300">View all scenarios &gt;</button>
+    </div>
+  );
+}
+
+function ScenarioRow({ title, status, time, active }: { title: string; status: string; time: string; active?: boolean }) {
+  return (
+    <div className={`flex items-center justify-between border-l-2 p-2 ${active ? "border-amber-400 bg-amber-400/[0.05]" : "border-command-line/40 bg-black/20"}`}>
+      <span className={`text-xs font-semibold ${active ? "text-amber-300" : "text-slate-300"}`}>{title}</span>
+      <div className="flex items-center gap-3">
+        <span className={`text-[9px] font-bold ${status === "COMPLETED" ? "text-emerald-400" : status === "ACTIVE" ? "text-amber-400" : "text-command-steel"}`}>{status}</span>
+        <span className="w-12 text-right text-[10px] text-command-muted">{time}</span>
+      </div>
+    </div>
+  );
+}
+
+function ProductionTraceabilityPanel() {
+  return (
+    <div className="border border-command-line/70 bg-black/30 p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Production Traceability</p>
+        <StatusChip status="simulated" compact />
+      </div>
+      <p className="mt-3 text-sm font-bold text-white">Lot NT-2025-0517-AX12</p>
+      <div className="mt-3 space-y-3 border-l border-command-line/60 ml-2 pl-3 relative">
+        <TraceStep label="Raw Material" value="SUS440C - Heat 9A7721" done />
+        <TraceStep label="Operation" value="Finish Turning - CNC Cell 2" done />
+        <TraceStep label="Inspection" value="In-Process Dimensional" active />
+        <TraceStep label="Final Disposition" value="Pending" />
+      </div>
+    </div>
+  );
+}
+
+function TraceStep({ label, value, done, active }: { label: string; value: string; done?: boolean; active?: boolean }) {
+  return (
+    <div className="relative">
+      <span className={`absolute -left-[17px] top-1 h-2 w-2 rounded-full border ${done ? "bg-cyan-400 border-cyan-400" : active ? "bg-amber-400 border-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" : "bg-black border-command-line"}`} />
+      <p className="text-[10px] text-command-muted">{label}</p>
+      <p className={`text-xs ${active ? "text-amber-300 font-semibold" : "text-white"}`}>{value}</p>
+    </div>
+  );
+}
+
+function EvidenceLedgerPanel() {
+  return (
+    <div className="border border-command-line/70 bg-black/30 p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Evidence Ledger</p>
+        <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1"><Icon name="check" className="h-3 w-3" /> Verifiable</span>
+      </div>
+      <div className="mt-4 space-y-2">
+        <LedgerRow label="Process Data" records="12,450 records" hash="7f3a...9c2b" />
+        <LedgerRow label="Quality Measurements" records="812 records" hash="a91b...d4e1" />
+        <LedgerRow label="Machine Signals" records="4.2M samples" hash="c2d4...1f88" />
+        <LedgerRow label="Operator Actions" records="14 actions" hash="d9e1...7e5f" />
+      </div>
+    </div>
+  );
+}
+
+function LedgerRow({ label, records, hash }: { label: string; records: string; hash: string }) {
+  return (
+    <div className="grid grid-cols-[1fr_100px_30px] items-center gap-2 border-b border-command-line/40 py-2">
+      <div>
+        <p className="text-xs text-white">{label}</p>
+        <p className="text-[9px] text-command-muted">{records}</p>
+      </div>
+      <div>
+        <p className="text-[9px] text-command-muted">HASH</p>
+        <p className="font-mono text-[10px] text-cyan-300">{hash}</p>
+      </div>
+      <Icon name="check" className="h-4 w-4 text-emerald-400 justify-self-end" />
+    </div>
   );
 }
 
 function OverviewRail({ latestRun }: { latestRun: RunSummary | null }) {
   return (
-    <div className="glass-panel relative flex h-full flex-col overflow-hidden">
+    <div className="glass-panel relative flex h-full flex-col overflow-hidden bg-black/40">
       {/* Right accent bar */}
-      <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-violet-400/25 to-transparent" />
+      <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-cyan-400/25 to-transparent" />
 
-      <div className="border-b border-command-line/60 p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-violet-400/60">
-          Command Intelligence
-        </p>
-        <h2 className="mt-2 text-lg font-semibold text-white">Executive Signal Rail</h2>
-        <p className="mt-1.5 text-xs leading-5 text-slate-400">
-          Launch the first real simulator loop, then harden the same boundary for future persistence.
-        </p>
-      </div>
-
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-        {/* Current focus card */}
-        <div className="relative overflow-hidden border border-violet-400/20 bg-violet-400/[0.04] p-4">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-violet-400/50 to-transparent" />
-          <p className="text-[10px] uppercase tracking-[0.2em] text-command-muted">Current Focus</p>
-          <div className="mt-2.5 flex items-center gap-2.5">
-            <div className="grid h-8 w-8 place-items-center border border-violet-400/30 bg-violet-400/[0.1]">
-              <Icon name="flow" className="h-4 w-4 text-violet-300" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-white">Cyber-Physical Twin Lab</p>
-              <p className="text-[10px] text-command-muted">Multi-scenario persisted workflow</p>
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+        
+        {/* Knowledge Retrieval */}
+        <section>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-command-muted">Command Intelligence</p>
+          <h3 className="mt-1.5 text-sm font-semibold text-white">Maintenance Knowledge</h3>
+          <p className="mt-1 text-[10px] text-slate-400">Retrieve proven solutions from operational knowledge base.</p>
+          <div className="mt-3 border border-command-line/70 bg-black/40 p-3">
+            <p className="text-[9px] uppercase text-cyan-400">Top Recommendation</p>
+            <p className="mt-1 text-xs font-semibold text-white">Spindle thermal drift compensation</p>
+            <div className="mt-2 flex justify-between text-[10px]">
+              <div>
+                <span className="text-command-muted">Success rate:</span> <span className="text-emerald-400 font-bold">94%</span>
+              </div>
+              <div>
+                <span className="text-command-muted">Used in:</span> <span className="text-cyan-300 font-bold">128 runs</span>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Operator Actions */}
+        <section>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white">Operator Actions</h3>
+            <StatusChip status="approval" compact />
+          </div>
+          <div className="mt-3 space-y-2">
+            <div className="border border-amber-400/30 bg-amber-400/[0.05] p-3 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-amber-200">Thermal offset update</p>
+                <p className="text-[10px] text-command-muted">Adjust spindle comp. +2.3 µm</p>
+              </div>
+              <button className="border border-amber-400/50 bg-amber-400/10 px-2 py-1 text-[10px] text-amber-400">REVIEW</button>
+            </div>
+          </div>
+        </section>
 
         {/* KPI dashboard */}
         <section>
-          <div className="mb-2.5 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold text-white">KPI Dashboard</h3>
-            <Icon name="chart" className="h-4 w-4 text-cyan-400/60" />
-          </div>
-          <div className="space-y-2.5">
-            {overviewKpis.map((kpi) => (
-              <article
-                key={kpi.label}
-                className="group relative overflow-hidden border border-command-line/70 bg-black/40 px-3 py-3 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-cyan-400/40 hover:bg-black/60 hover:shadow-[0_0_15px_rgba(0,212,255,0.15)]"
-              >
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
-                <div className="relative flex items-start justify-between gap-2">
-                  <p className="text-xs font-semibold text-white group-hover:text-cyan-100">{kpi.label}</p>
-                  <StatusChip status={kpi.status} compact />
-                </div>
-                <div className="relative mt-2.5 flex items-end justify-between gap-3">
-                  <p className="kpi-value text-2xl font-semibold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:text-cyan-50">
-                    {kpi.value}
-                  </p>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-cyan-300">
-                    {kpi.delta}
-                  </p>
-                </div>
-                <p className="relative mt-1.5 text-[10px] leading-4 text-command-muted">{kpi.detail}</p>
-              </article>
-            ))}
+          <h3 className="text-sm font-semibold text-white">KPIs - This Shift</h3>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <KPIBlock label="OEE" value="89.6%" delta="+0.2%" />
+            <KPIBlock label="First Pass Yield" value="98.7%" delta="+2.1%" />
+            <KPIBlock label="Scrap Rate" value="0.32%" delta="-0.18%" />
+            <KPIBlock label="On-Time Delivery" value="99.1%" delta="+1.7%" />
           </div>
         </section>
 
-        {/* Latest run */}
-        <section className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold text-white">Latest saved run</h3>
-            <StatusChip status={latestRun ? "ready" : "locked"} compact />
+        {/* System Alerts */}
+        <section>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white">System Alerts</h3>
+            <span className="text-[10px] text-cyan-400 cursor-pointer">View all</span>
           </div>
-          <p className="mt-2.5 text-xs leading-5 text-slate-400">
-            {latestRun
-              ? `${latestRun.lotId} on ${latestRun.lineId} is saved at step ${latestRun.currentStep}.`
-              : "No simulator runs are stored yet in local persistence."}
-          </p>
+          <div className="mt-3 space-y-2">
+            <div className="flex gap-2">
+              <Icon name="shield" className="h-4 w-4 text-amber-400 shrink-0" />
+              <div>
+                <p className="text-xs text-slate-300">Thermal drift trending up</p>
+                <p className="text-[9px] text-command-muted">Spindle 2 - Monitor</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Icon name="power" className="h-4 w-4 text-red-400 shrink-0" />
+              <div>
+                <p className="text-xs text-slate-300">Vibration anomaly detected</p>
+                <p className="text-[9px] text-command-muted">Bearing B2 - Review</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Next Maintenance */}
+        <section className="border border-cyan-400/30 bg-cyan-400/[0.05] p-4">
+          <p className="text-[10px] font-semibold uppercase text-command-muted">Next Maintenance Window</p>
+          <div className="mt-2 flex items-center gap-3">
+            <Icon name="roadmap" className="h-6 w-6 text-cyan-400" />
+            <div>
+              <p className="text-lg font-bold text-white">In 2d 18h</p>
+              <p className="text-[10px] text-cyan-200">MAY 20, 02:00</p>
+            </div>
+          </div>
         </section>
       </div>
+    </div>
+  );
+}
+
+function KPIBlock({ label, value, delta }: { label: string; value: string; delta: string }) {
+  const isPositive = delta.startsWith("+") || delta.startsWith("-0");
+  return (
+    <div className="border border-command-line/50 bg-black/40 p-2">
+      <p className="text-[10px] text-command-muted">{label}</p>
+      <p className="mt-1 text-lg font-bold text-white">{value}</p>
+      <p className={`text-[9px] ${isPositive ? "text-emerald-400" : "text-amber-400"}`}>{delta}</p>
     </div>
   );
 }
