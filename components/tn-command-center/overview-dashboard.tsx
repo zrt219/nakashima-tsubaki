@@ -140,8 +140,9 @@ function OverviewHero({ latestRun }: { latestRun: RunSummary | null }) {
         </div>
 
         {/* Milestone card */}
-        <div className="relative overflow-hidden border border-command-line/80 bg-black/30 p-5">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-violet-400/30 to-transparent" />
+        <div className="relative overflow-hidden border border-command-line/80 bg-black/30 p-5 shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-md">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-violet-400/80 shadow-[0_0_8px_rgba(155,109,255,0.8)] opacity-0 animate-[scan_4s_ease-in-out_infinite]" />
           <span className="absolute top-0 left-0 h-2 w-2 border-t border-l border-violet-400/50" />
           <span className="absolute bottom-0 right-0 h-2 w-2 border-b border-r border-violet-400/50" />
 
@@ -233,10 +234,11 @@ function RoadmapPanel() {
           return (
             <div
               key={step.phase}
-              className={`grid gap-3 border border-command-line/70 border-l-2 bg-black/20 p-4 transition-all duration-200 hover:bg-black/30 hover:border-command-line md:grid-cols-[110px_1fr] ${borderClass}`}
+              className={`group relative grid gap-3 overflow-hidden border border-command-line/70 border-l-2 bg-black/30 p-4 transition-all duration-300 hover:scale-[1.01] hover:bg-black/50 hover:shadow-[0_0_20px_rgba(0,0,0,0.5)] md:grid-cols-[110px_1fr] ${borderClass}`}
             >
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <div>
-                <p className={`font-mono text-xs font-semibold ${textClass}`}>{step.phase}</p>
+                <p className={`font-mono text-xs font-semibold drop-shadow-[0_0_5px_currentColor] ${textClass}`}>{step.phase}</p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-command-muted">
                   {step.horizon}
                 </p>
@@ -343,10 +345,11 @@ function GovernancePanel() {
         {governanceItems.map((item) => (
           <article
             key={item.title}
-            className="border border-command-line/70 bg-black/20 p-4 transition-all duration-200 hover:border-command-line"
+            className="group relative overflow-hidden border border-command-line/70 bg-black/30 p-4 transition-all duration-300 hover:scale-[1.01] hover:border-cyan-400/30 hover:bg-black/50"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-white">{item.title}</p>
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="relative flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-white group-hover:text-cyan-100">{item.title}</p>
               <StatusChip status={item.status} compact />
             </div>
             <p className="mt-2 text-xs text-command-muted">{item.control}</p>
@@ -398,24 +401,27 @@ function OverviewRail({ latestRun }: { latestRun: RunSummary | null }) {
             <h3 className="text-sm font-semibold text-white">KPI Dashboard</h3>
             <Icon name="chart" className="h-4 w-4 text-cyan-400/60" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {overviewKpis.map((kpi) => (
               <article
                 key={kpi.label}
-                className="group relative overflow-hidden border border-command-line/70 bg-black/20 p-3 transition-all duration-200 hover:border-command-line"
+                className="group relative overflow-hidden border border-command-line/70 bg-black/40 px-3 py-3 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-cyan-400/40 hover:bg-black/60 hover:shadow-[0_0_15px_rgba(0,212,255,0.15)]"
               >
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-xs font-semibold text-white">{kpi.label}</p>
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="relative flex items-start justify-between gap-2">
+                  <p className="text-xs font-semibold text-white group-hover:text-cyan-100">{kpi.label}</p>
                   <StatusChip status={kpi.status} compact />
                 </div>
-                <div className="mt-2.5 flex items-end justify-between gap-3">
-                  <p className="kpi-value text-2xl font-semibold text-white">{kpi.value}</p>
+                <div className="relative mt-2.5 flex items-end justify-between gap-3">
+                  <p className="kpi-value text-2xl font-semibold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:text-cyan-50">
+                    {kpi.value}
+                  </p>
                   <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-cyan-300">
                     {kpi.delta}
                   </p>
                 </div>
-                <p className="mt-1.5 text-[10px] leading-4 text-command-muted">{kpi.detail}</p>
+                <p className="relative mt-1.5 text-[10px] leading-4 text-command-muted">{kpi.detail}</p>
               </article>
             ))}
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { missionAreas, type EvidenceItem } from "@/lib/tn-ai-data";
 import { ButtonLinkLike, Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 
@@ -72,41 +72,69 @@ function CommandHeader({ utilityActions }: { utilityActions?: ReactNode }) {
   return (
     <header className="sticky top-0 z-30 border-b border-command-line/60 bg-command-black/90 px-4 py-3 backdrop-blur-2xl">
       {/* Header top accent line */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+      {/* Animated scanline */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)] opacity-0 animate-[scan_4s_ease-in-out_infinite]" />
 
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         {/* Brand */}
         <div className="flex min-w-0 items-center gap-3">
-          <div className="relative grid h-11 w-11 shrink-0 place-items-center border border-cyan-400/30 bg-cyan-400/[0.07] shadow-[0_0_20px_rgba(0,212,255,0.2)]">
-            <Icon name="mission" className="h-6 w-6 text-cyan-300" />
-            {/* Corner accent */}
-            <span className="absolute top-0 left-0 h-2 w-2 border-t border-l border-cyan-400/70" />
-            <span className="absolute bottom-0 right-0 h-2 w-2 border-b border-r border-cyan-400/70" />
+          <div className="relative grid h-11 w-11 shrink-0 place-items-center border border-cyan-400/30 bg-cyan-400/[0.07] shadow-[0_0_20px_rgba(0,212,255,0.25)] transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)]">
+            <Icon name="mission" className="h-6 w-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
+            <span className="absolute top-0 left-0 h-2 w-2 border-t border-l border-cyan-400/80" />
+            <span className="absolute bottom-0 right-0 h-2 w-2 border-b border-r border-cyan-400/80" />
+            <div className="absolute inset-0 bg-cyan-400/10 opacity-0 transition-opacity duration-300 hover:opacity-100" />
           </div>
           <div className="min-w-0">
             <h1 className="truncate text-lg font-semibold tracking-tight text-white md:text-xl">
               TN Precision AI{" "}
               <span className="gradient-text-cyan text-glow-cyan">Command Center</span>
             </h1>
-            <p className="truncate text-[10px] font-medium uppercase tracking-[0.2em] text-command-muted">
-              RAG · Digital Twins · Blockchain Provenance · Industrial AI
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="truncate text-[10px] font-medium uppercase tracking-[0.2em] text-command-muted">
+                RAG · Digital Twins · Blockchain Provenance · Industrial AI
+              </p>
+              <span className="hidden h-1 w-1 rounded-full bg-cyan-500/50 xl:block" />
+              <LiveClock />
+            </div>
           </div>
         </div>
 
         {/* Actions + status pills */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <StatusChip status="simulated" />
           <StatusChip status="advisory" />
           <StatusChip status="approval" compact />
           <StatusChip status="testnet" compact />
-          <div className="border border-command-line/80 bg-command-panel/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-command-steel backdrop-blur-sm">
-            <span className="text-command-muted">Build:</span> quality-hold simulator v1
+          <div className="relative overflow-hidden border border-command-line/80 bg-command-panel/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-command-steel backdrop-blur-md">
+            <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-400/50" />
+            <span className="text-command-muted">Build:</span>{" "}
+            <span className="text-cyan-100 drop-shadow-[0_0_4px_rgba(0,212,255,0.5)]">q-hold sim v1.0</span>
           </div>
           {utilityActions}
         </div>
       </div>
     </header>
+  );
+}
+
+function LiveClock() {
+  const [time, setTime] = useState<string>("00:00:00 UTC");
+  
+  useEffect(() => {
+    const update = () => {
+      const d = new Date();
+      setTime(d.toISOString().split("T")[1].split(".")[0] + " UTC");
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <span className="hidden font-mono text-[10px] text-cyan-400/60 xl:block">
+      {time}
+    </span>
   );
 }
 
@@ -126,7 +154,7 @@ function MissionRail({ activeAreaId }: { activeAreaId: string }) {
           </p>
         </div>
 
-        <nav className="flex-1 gap-0.5 overflow-y-auto p-2">
+        <nav className="flex-1 gap-2 space-y-1.5 overflow-y-auto p-3">
           {missionAreas.map((area) => {
             const active = area.id === activeAreaId;
 
@@ -135,41 +163,49 @@ function MissionRail({ activeAreaId }: { activeAreaId: string }) {
                 key={area.id}
                 href={area.href}
                 aria-label={`${area.index}. ${area.title}: ${area.descriptor}`}
-                className={`group relative grid grid-cols-[32px_1fr_auto] items-center gap-3 px-3 py-2.5 text-left transition-all duration-200 ${
+                className={`group relative grid grid-cols-[36px_1fr_auto] items-center gap-3 overflow-hidden border p-2.5 text-left transition-all duration-300 hover:scale-[1.01] ${
                   active
-                    ? "nav-active text-white"
-                    : "text-command-muted hover:bg-white/[0.03] hover:text-white"
+                    ? "border-cyan-400/40 bg-cyan-400/[0.08] text-white shadow-[0_0_16px_rgba(0,212,255,0.12)]"
+                    : "border-command-line/50 bg-black/20 text-command-muted hover:border-cyan-400/25 hover:bg-black/40 hover:text-white"
                 }`}
               >
                 {/* Active left indicator */}
                 {active && (
-                  <span className="absolute left-0 top-2 bottom-2 w-[2px] bg-gradient-to-b from-cyan-400/80 via-cyan-300 to-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
+                  <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-cyan-400/80 via-cyan-300 to-cyan-400/80 shadow-[0_0_12px_rgba(0,212,255,0.9)]" />
+                )}
+                {/* Active top gradient */}
+                {active && (
+                  <span className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/60 to-transparent" />
                 )}
 
-                <span className="font-mono text-[10px] text-command-steel">{area.index}</span>
+                <div className={`grid h-9 w-9 place-items-center border transition-colors duration-300 ${active ? "border-cyan-400/30 bg-cyan-400/10" : "border-command-line/50 bg-black/30 group-hover:border-cyan-400/30"}`}>
+                  <span className={`font-mono text-[10px] ${active ? "text-cyan-200" : "text-command-steel"}`}>{area.index}</span>
+                </div>
+                
                 <span className="min-w-0">
                   <span className="flex items-center gap-2 text-sm font-semibold">
                     <Icon
                       name={area.icon as Parameters<typeof Icon>[0]["name"]}
-                      className={`h-3.5 w-3.5 shrink-0 transition-colors duration-200 ${
-                        active ? "text-cyan-300" : "text-command-steel group-hover:text-cyan-400/60"
+                      className={`h-3.5 w-3.5 shrink-0 transition-colors duration-300 ${
+                        active ? "text-cyan-300 drop-shadow-[0_0_5px_rgba(0,212,255,0.8)]" : "text-command-steel group-hover:text-cyan-400/60"
                       }`}
                     />
                     <span className="truncate">{area.title}</span>
                   </span>
-                  <span className="mt-0.5 block truncate text-[11px] text-command-muted">
+                  <span className={`mt-0.5 block truncate text-[10px] uppercase tracking-[0.1em] ${active ? "text-cyan-100/70" : "text-command-muted"}`}>
                     {area.descriptor}
                   </span>
                 </span>
 
                 {/* Active indicator dot */}
                 <span
-                  className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                    active
-                      ? "bg-cyan-300 shadow-[0_0_8px_rgba(0,212,255,0.9)]"
-                      : "bg-command-steel/30"
-                  }`}
-                />
+                  className={`relative flex h-1.5 w-1.5 shrink-0 transition-all duration-300`}
+                >
+                  {active && (
+                    <span className="status-ping absolute inline-flex h-full w-full rounded-full bg-cyan-300 opacity-60" />
+                  )}
+                  <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${active ? "bg-cyan-300 shadow-[0_0_8px_rgba(0,212,255,0.9)]" : "bg-command-steel/30"}`} />
+                </span>
               </Link>
             );
           })}
@@ -216,15 +252,16 @@ function EventStream({ items }: { items: EvidenceItem[] }) {
           {items.map((item) => (
             <article
               key={`${item.timestamp}-${item.event}`}
-              className="event-card relative border border-command-line/70 bg-command-panel/50 px-3 py-2 backdrop-blur-sm hover:border-command-line"
+              className="event-card relative overflow-hidden border border-command-line/70 bg-black/40 px-3 py-2 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-cyan-400/40 hover:bg-black/60 hover:shadow-[0_0_15px_rgba(0,212,255,0.1)]"
             >
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-[10px] text-command-steel">{item.timestamp}</span>
                 <StatusChip status={item.status} compact />
               </div>
-              <p className="mt-1.5 truncate text-xs font-semibold text-white">{item.event}</p>
-              <p className="mt-0.5 truncate text-[10px] text-command-muted">
-                {item.source}: {item.payload}
+              <p className="mt-1.5 truncate text-xs font-semibold text-white group-hover:text-cyan-100">{item.event}</p>
+              <p className="mt-0.5 truncate text-[10px] uppercase tracking-[0.05em] text-command-muted">
+                <span className="text-cyan-400/50">{item.source}</span>: {item.payload}
               </p>
             </article>
           ))}

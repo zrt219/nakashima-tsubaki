@@ -135,8 +135,12 @@ export function SimulatorLaunchpad() {
           </div>
 
           {/* Preview card */}
-          <div className="relative overflow-hidden border border-command-line/80 bg-black/30 p-5">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+          <div
+            key={activeTemplate.id + form.cpk + form.temperatureBand}
+            className="relative overflow-hidden border border-command-line/80 bg-black/30 p-5 shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-md animate-[fadeIn_0.5s_ease-out]"
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-emerald-400/80 shadow-[0_0_8px_rgba(16,185,129,0.8)] opacity-0 animate-[scan_3s_ease-in-out_infinite]" />
             <span className="absolute top-0 left-0 h-2 w-2 border-t border-l border-emerald-400/50" />
             <span className="absolute bottom-0 right-0 h-2 w-2 border-b border-r border-emerald-400/50" />
 
@@ -268,19 +272,22 @@ export function SimulatorLaunchpad() {
                 { value: "critical", label: "Critical" }
               ]}
             />
-            <label className="block">
-              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-400/60">
+            <label className="group block relative">
+              <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-400/60 transition-colors duration-200 group-focus-within:text-cyan-300">
                 Cpk replay
               </span>
-              <input
-                type="number"
-                step="0.01"
-                min="0.8"
-                max="2.0"
-                value={form.cpk}
-                onChange={(event) => updateField("cpk", Number(event.target.value))}
-                className="w-full border-command-line bg-black/24 text-white focus:border-cyan-200 focus:ring-cyan-200"
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.8"
+                  max="2.0"
+                  value={form.cpk}
+                  onChange={(event) => updateField("cpk", Number(event.target.value))}
+                  className="relative z-10 w-full border border-command-line/70 bg-black/40 px-3 py-2 font-mono text-sm text-white shadow-inner transition-all duration-200 focus:border-cyan-400/60 focus:bg-cyan-900/10 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 hover:border-cyan-400/30"
+                />
+                <div className="absolute inset-0 z-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/0 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:via-cyan-400/5 group-focus-within:opacity-100" />
+              </div>
             </label>
             <SelectField
               label="Surface finish"
@@ -394,12 +401,15 @@ export function SimulatorLaunchpad() {
           )}
 
           {/* Recommendation content */}
-          <div className="mb-3 border border-command-line/70 bg-black/20 p-4">
-            <p className="text-sm font-semibold text-white">{previewRecommendation.summary}</p>
+          <div
+            key={previewRecommendation.summary}
+            className="mb-3 border border-command-line/70 bg-black/40 p-4 shadow-inner animate-[fadeIn_0.4s_ease-out]"
+          >
+            <p className="text-sm font-semibold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{previewRecommendation.summary}</p>
             <ul className="mt-3 space-y-1.5">
               {previewRecommendation.actions.map((action) => (
-                <li key={action} className="flex items-start gap-2 text-xs leading-5 text-slate-400">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-400/60" />
+                <li key={action} className="flex items-start gap-2 text-xs leading-5 text-slate-300">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(0,212,255,0.8)]" />
                   {action}
                 </li>
               ))}
@@ -446,15 +456,18 @@ function FormField({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="block">
-      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-400/60">
+    <label className="group block relative">
+      <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-400/60 transition-colors duration-200 group-focus-within:text-cyan-300">
         {label}
       </span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border-command-line bg-black/24 font-mono text-sm text-white focus:border-cyan-200 focus:ring-cyan-200"
-      />
+      <div className="relative">
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="relative z-10 w-full border border-command-line/70 bg-black/40 px-3 py-2 font-mono text-sm text-white shadow-inner transition-all duration-200 focus:border-cyan-400/60 focus:bg-cyan-900/10 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 hover:border-cyan-400/30"
+        />
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/0 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:via-cyan-400/5 group-focus-within:opacity-100" />
+      </div>
     </label>
   );
 }
@@ -471,21 +484,27 @@ function SelectField({
   options: Array<{ value: string; label: string }>;
 }) {
   return (
-    <label className="block">
-      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-400/60">
+    <label className="group block relative">
+      <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-400/60 transition-colors duration-200 group-focus-within:text-cyan-300">
         {label}
       </span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="w-full border-command-line bg-black/24 text-sm text-white focus:border-cyan-200 focus:ring-cyan-200"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="relative z-10 w-full appearance-none border border-command-line/70 bg-black/40 px-3 py-2 text-sm text-white shadow-inner transition-all duration-200 focus:border-cyan-400/60 focus:bg-cyan-900/10 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 hover:border-cyan-400/30"
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value} className="bg-command-black text-white">
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 flex items-center px-3 text-cyan-400/60 group-focus-within:text-cyan-300">
+          <Icon name="triangle" className="h-2 w-2 rotate-180" />
+        </div>
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/0 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:via-cyan-400/5 group-focus-within:opacity-100" />
+      </div>
     </label>
   );
 }
