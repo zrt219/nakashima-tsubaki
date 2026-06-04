@@ -406,7 +406,7 @@ function TwinPanel({ run }: { run: SimulationRun }) {
             <p className="text-xs text-command-muted">{selectedFrame.gatingState}</p>
             <span className={`font-mono text-xs font-bold uppercase ${
               selectedFrame.riskLevel === "critical" ? "text-amber-300" :
-              selectedFrame.riskLevel === "elevated" ? "text-amber-400/80" : "text-emerald-300"
+              selectedFrame.riskLevel === "watch" ? "text-amber-400/80" : "text-emerald-400"
             }`}>
               Risk: {selectedFrame.riskLevel.toUpperCase()}
             </span>
