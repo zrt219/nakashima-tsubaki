@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 import type { StatusKind } from "@/lib/tn-ai-data";
 
 export type IconName =
@@ -174,7 +175,11 @@ export function Panel({
   const ac = accentColors[accent];
 
   return (
-    <section className="corner-accent glass-panel relative overflow-hidden p-4 xl:p-5">
+    <motion.section 
+      whileHover={{ scale: 1.01, y: -2 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      className="corner-accent glass-panel relative overflow-hidden p-4 xl:p-5 bg-black/40 backdrop-blur-xl"
+    >
       {/* Top accent bar */}
       <div className={`absolute top-0 left-0 right-0 h-[1px] ${ac.bar}`} />
 
@@ -195,7 +200,7 @@ export function Panel({
         {action}
       </div>
       {children}
-    </section>
+    </motion.section>
   );
 }
 
@@ -218,11 +223,14 @@ export function ComparisonBlock({
   good?: boolean;
 }) {
   return (
-    <div
-      className={`relative overflow-hidden border p-3 transition-all duration-200 hover:scale-[1.01] ${
+    <motion.div
+      whileHover={{ scale: 1.03, y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      className={`relative overflow-hidden border p-3 backdrop-blur-md ${
         good
-          ? "border-cyan-400/20 bg-cyan-400/[0.05] hover:border-cyan-400/35"
-          : "border-amber-400/20 bg-amber-400/[0.05] hover:border-amber-400/35"
+          ? "border-cyan-400/20 bg-cyan-400/[0.08] hover:border-cyan-400/40"
+          : "border-amber-400/20 bg-amber-400/[0.08] hover:border-amber-400/40"
       }`}
     >
       {good && (
@@ -236,7 +244,7 @@ export function ComparisonBlock({
         {label}
       </p>
       <p className="mt-2 text-xs leading-5 text-slate-300">{text}</p>
-    </div>
+    </motion.div>
   );
 }
 
@@ -253,11 +261,14 @@ export function ButtonLinkLike({
       : "border-command-line bg-white/[0.03] text-command-text hover:border-cyan-400/30 hover:bg-white/[0.06]";
 
   return (
-    <span
-      className={`btn-glow inline-flex items-center gap-2 border px-3 py-2 text-sm font-semibold transition-all duration-200 ${className}`}
+    <motion.span
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className={`btn-glow inline-flex items-center gap-2 border px-3 py-2 text-sm font-semibold backdrop-blur-md ${className}`}
     >
       {children}
-    </span>
+    </motion.span>
   );
 }
 

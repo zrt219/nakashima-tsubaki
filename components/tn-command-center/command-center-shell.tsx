@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { missionAreas, type EvidenceItem } from "@/lib/tn-ai-data";
 import { ButtonLinkLike, Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+
+const DataCoreWebGL = dynamic(() => import("@/components/tn-command-center/data-core-webgl"), { ssr: false });
 
 export function CommandCenterShell({
   activeAreaId,
@@ -20,6 +23,10 @@ export function CommandCenterShell({
 }) {
   return (
     <main className="relative min-h-screen overflow-hidden bg-command-black text-command-text">
+      
+      {/* Global 3D WebGL Background */}
+      <DataCoreWebGL />
+
       {/* Animated background grid */}
       <div className="fixed inset-0 command-grid opacity-100" aria-hidden="true" />
 

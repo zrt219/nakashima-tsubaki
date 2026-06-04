@@ -10,8 +10,6 @@ import type { RunSummary } from "@/lib/simulator/types";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 
-const DataCoreWebGL = dynamic(() => import("@/components/tn-command-center/data-core-webgl"), { ssr: false });
-
 export function OverviewDashboard() {
   const { latestRun } = useSimulatorLatestRun();
 
@@ -126,7 +124,7 @@ function DigitalTwinCanvas() {
   const isCritical = timeline < 30; // Simulate an anomaly in the past
 
   return (
-    <section className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/30 bg-black/50 p-4 shadow-[0_0_30px_rgba(0,212,255,0.05)] backdrop-blur-md">
+    <section className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/20 bg-black/30 p-4 shadow-[0_0_30px_rgba(0,212,255,0.02)] backdrop-blur-md">
       {/* Scanline FX */}
       <div className={`absolute top-0 left-0 right-0 h-[1px] ${isCritical ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)]"} opacity-0 animate-[scan_4s_ease-in-out_infinite]`} />
       
@@ -140,9 +138,9 @@ function DigitalTwinCanvas() {
         </div>
       </div>
 
-      {/* 3D Visual Centerpiece using React Three Fiber */}
+      {/* 3D Visual Centerpiece replaced by Global WebGL */}
       <div className="absolute inset-0 z-0">
-        <DataCoreWebGL isCritical={isCritical} />
+        <div className="w-full h-full border border-cyan-400/10 rounded-full blur-3xl opacity-20 scale-150" />
       </div>
 
       {/* DVR Time Scrubber */}

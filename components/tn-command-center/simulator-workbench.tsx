@@ -193,8 +193,20 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
       }
       rightRail={<WorkbenchRail run={activeRun} recentRuns={recentRuns} runKpis={runKpis} />}
     >
-      <section className="scanline relative overflow-hidden border border-command-line/70 bg-gradient-to-br from-command-panel/90 via-command-panel/70 to-command-panel/90 shadow-command backdrop-blur-2xl">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+      <motion.div
+        className="flex h-full flex-col gap-4 p-4 xl:p-6"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+        }}
+      >
+        <motion.section 
+          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}
+          className="scanline relative overflow-hidden border border-command-line/70 bg-black/20 p-5 shadow-command backdrop-blur-3xl"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
         <span className="absolute top-0 left-0 h-3 w-3 border-t-2 border-l-2 border-cyan-400/60" />
         <span className="absolute top-0 right-0 h-3 w-3 border-t-2 border-r-2 border-cyan-400/60" />
         <span className="absolute bottom-0 left-0 h-3 w-3 border-b-2 border-l-2 border-cyan-400/60" />
@@ -275,8 +287,8 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
             ) : null}
           </div>
         </div>
-      </section>
-      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.18fr)_minmax(380px,0.82fr)]">
+        </motion.section>
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="grid gap-4 2xl:grid-cols-[minmax(0,1.18fr)_minmax(380px,0.82fr)]">
         <TwinPanel
           key={`${activeRun.id}-${activeRun.currentStep}-${activeRun.decision?.verdict ?? "pending"}-${activeRun.evidencePacket?.hash ?? "no-hash"}`}
           run={activeRun}
@@ -287,8 +299,8 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
           retrievedDocuments={activeRun.retrievedDocuments}
           recommendationSummary={activeRun.recommendation.summary}
         />
-      </div>
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.82fr)]">
+      </motion.div>
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.82fr)]">
         <WorkflowPanel
           run={activeRun}
           reviewer={reviewer}
@@ -317,15 +329,16 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
           }
         />
         <QaPanel run={activeRun} qaChecks={qaChecks} />
-      </div>
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+      </motion.div>
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <LedgerPanel run={activeRun} />
         <TwinAssetGraphPanel assets={twinAssetGraph} />
-      </div>
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      </motion.div>
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <ScenarioContextPanel run={activeRun} />
         <ShadowCommandPanel run={activeRun} />
-      </div>
+      </motion.div>
+      </motion.div>
     </CommandCenterShell>
   );
 }
