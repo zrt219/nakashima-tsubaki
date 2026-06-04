@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { type ReactNode, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { missionAreas, type EvidenceItem } from "@/lib/tn-ai-data";
@@ -108,18 +109,52 @@ function CommandHeader({ utilityActions }: { utilityActions?: ReactNode }) {
         </div>
 
         {/* Actions + status pills */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <StatusChip status="simulated" />
-          <StatusChip status="advisory" />
-          <StatusChip status="approval" compact />
-          <StatusChip status="testnet" compact />
-          <div className="relative overflow-hidden border border-command-line/80 bg-command-panel/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-command-steel backdrop-blur-md">
+        <motion.div 
+          className="flex flex-wrap items-center gap-2.5"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+          }}
+        >
+          <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }}>
+            <StatusChip status="simulated" />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }}>
+            <StatusChip status="advisory" />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }}>
+            <StatusChip status="approval" compact />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }}>
+            <StatusChip status="testnet" compact />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }} className="relative overflow-hidden border border-command-line/80 bg-command-panel/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-command-steel backdrop-blur-md">
             <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-400/50" />
             <span className="text-command-muted">Build:</span>{" "}
             <span className="text-cyan-100 drop-shadow-[0_0_4px_rgba(0,212,255,0.5)]">q-hold sim v1.0</span>
-          </div>
-          {utilityActions}
-        </div>
+          </motion.div>
+          <motion.a 
+            href="https://github.com/zrt219" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.6 } } }}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="group relative grid h-[34px] place-items-center gap-2 overflow-hidden border border-cyan-400/30 bg-cyan-400/[0.05] px-3 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-200 transition-all duration-300 hover:border-cyan-400/60 hover:bg-cyan-400/[0.15] hover:text-white hover:shadow-[0_0_20px_rgba(0,212,255,0.3)]"
+          >
+            <div className="flex items-center gap-2">
+              <Icon name="github" className="h-4 w-4 drop-shadow-[0_0_5px_rgba(0,212,255,0.8)]" />
+              <span>@zrt219</span>
+            </div>
+          </motion.a>
+          {utilityActions && (
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }}>
+              {utilityActions}
+            </motion.div>
+          )}
+        </motion.div>
       </div>
     </header>
   );

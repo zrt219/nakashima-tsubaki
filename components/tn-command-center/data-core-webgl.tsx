@@ -83,6 +83,19 @@ function Points({ positions, children, ...props }: any) {
   );
 }
 
+function MouseParallax({ children }: { children: React.ReactNode }) {
+  const groupRef = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const targetX = (state.pointer.x * Math.PI) / 6;
+    const targetY = (state.pointer.y * Math.PI) / 8;
+    // Smooth interpolation (spring-like parallax)
+    groupRef.current.rotation.y += (targetX - groupRef.current.rotation.y) * 0.05;
+    groupRef.current.rotation.x += (-targetY - groupRef.current.rotation.x) * 0.05;
+  });
+  return <group ref={groupRef}>{children}</group>;
+}
+
 export default function DataCoreWebGL({ isCritical = false }: { isCritical?: boolean }) {
   const pathname = usePathname();
   const area = pathname || "/";
@@ -92,9 +105,11 @@ export default function DataCoreWebGL({ isCritical = false }: { isCritical?: boo
     <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen transition-opacity duration-1000">
       <Canvas camera={{ position: [0, 0, area === "/simulator" ? 8 : 6], fov: 60 }}>
         <ambientLight intensity={0.5} />
-        <Float speed={area === "/simulator" ? 3 : 1} rotationIntensity={area === "/simulator" ? 1.5 : 0.5} floatIntensity={area === "/simulator" ? 2 : 1}>
-          <ParticleCore isCritical={isCritical} area={area} />
-        </Float>
+        <MouseParallax>
+          <Float speed={area === "/simulator" ? 3 : 1} rotationIntensity={area === "/simulator" ? 1.5 : 0.5} floatIntensity={area === "/simulator" ? 2 : 1}>
+            <ParticleCore isCritical={isCritical} area={area} />
+          </Float>
+        </MouseParallax>
         <Stars radius={100} depth={50} count={3000} factor={6} saturation={0} fade speed={area === "/simulator" ? 3 : 1} />
         <OrbitControls 
           enableZoom={false} 
