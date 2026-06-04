@@ -2,16 +2,16 @@
 
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
-import { ExecutiveDashboard } from "@/components/tn-command-center/executive-dashboard";
+import { AdvisoryDashboard } from "@/components/tn-command-center/advisory-dashboard";
 
-export default function Home() {
+export default function AdvisoryPage() {
   return (
     <CommandCenterShell
-      activeAreaId="overview"
+      activeAreaId="advisory"
       rightRail={null}
       eventStream={overviewEvents}
     >
-      <ExecutiveDashboard />
+      <AdvisoryDashboard />
     </CommandCenterShell>
   );
 }

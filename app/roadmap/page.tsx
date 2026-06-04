@@ -2,16 +2,16 @@
 
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
-import { ExecutiveDashboard } from "@/components/tn-command-center/executive-dashboard";
+import { RoadmapDashboard } from "@/components/tn-command-center/roadmap-dashboard";
 
-export default function Home() {
+export default function RoadmapPage() {
   return (
     <CommandCenterShell
-      activeAreaId="overview"
-      rightRail={null}
+      activeAreaId="roadmap"
+      rightRail={<div className="p-4">Right Rail Placeholder</div>}
       eventStream={overviewEvents}
     >
-      <ExecutiveDashboard />
+      <RoadmapDashboard />
     </CommandCenterShell>
   );
 }

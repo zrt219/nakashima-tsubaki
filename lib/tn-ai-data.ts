@@ -72,7 +72,7 @@ export const missionAreas: MissionArea[] = [
     title: "AI Adoption Roadmap",
     descriptor: "Standards-first rollout",
     icon: "roadmap",
-    href: "/",
+    href: "/roadmap",
     status: "review"
   },
   {
@@ -81,7 +81,7 @@ export const missionAreas: MissionArea[] = [
     title: "RAG Knowledge Console",
     descriptor: "Approved corpus retrieval",
     icon: "rag",
-    href: "/simulator",
+    href: "/rag",
     status: "simulated"
   },
   {
@@ -99,7 +99,7 @@ export const missionAreas: MissionArea[] = [
     title: "Provenance Ledger",
     descriptor: "Evidence hash registry",
     icon: "hash",
-    href: "/simulator",
+    href: "/ledger",
     status: "testnet"
   },
   {
@@ -108,7 +108,7 @@ export const missionAreas: MissionArea[] = [
     title: "Advisory Automation",
     descriptor: "Operator-approved workflow",
     icon: "flow",
-    href: "/simulator",
+    href: "/advisory",
     status: "approval"
   },
   {
@@ -117,7 +117,7 @@ export const missionAreas: MissionArea[] = [
     title: "Risk and Governance",
     descriptor: "Safety, compliance, audit",
     icon: "shield",
-    href: "/",
+    href: "/governance",
     status: "locked"
   },
   {
@@ -126,7 +126,7 @@ export const missionAreas: MissionArea[] = [
     title: "Vendor Architecture",
     descriptor: "Open stack comparison",
     icon: "stack",
-    href: "/",
+    href: "/architecture",
     status: "review"
   },
   {
@@ -135,7 +135,7 @@ export const missionAreas: MissionArea[] = [
     title: "KPI Dashboard",
     descriptor: "Executive signal board",
     icon: "chart",
-    href: "/",
+    href: "/kpi",
     status: "simulated"
   },
   {
@@ -144,7 +144,7 @@ export const missionAreas: MissionArea[] = [
     title: "QA Evidence Report",
     descriptor: "Verification packet",
     icon: "evidence",
-    href: "/simulator",
+    href: "/qa",
     status: "ready"
   }
 ];

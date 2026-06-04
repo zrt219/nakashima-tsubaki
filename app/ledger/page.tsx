@@ -2,16 +2,16 @@
 
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
-import { ExecutiveDashboard } from "@/components/tn-command-center/executive-dashboard";
+import { LedgerDashboard } from "@/components/tn-command-center/ledger-dashboard";
 
-export default function Home() {
+export default function LedgerPage() {
   return (
     <CommandCenterShell
-      activeAreaId="overview"
+      activeAreaId="ledger"
       rightRail={null}
       eventStream={overviewEvents}
     >
-      <ExecutiveDashboard />
+      <LedgerDashboard />
     </CommandCenterShell>
   );
 }
