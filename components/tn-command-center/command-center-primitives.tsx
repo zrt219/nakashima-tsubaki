@@ -23,7 +23,8 @@ export type IconName =
   | "play"
   | "pause"
   | "database"
-  | "search";
+  | "search"
+  | "power";
 
 const statusMeta: Record<
   StatusKind,
@@ -323,6 +324,12 @@ export function Icon({ name, className = "" }: { name: IconName; className?: str
         <path
           className={common}
           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      )}
+      {name === "power" && (
+        <path
+          className={common}
+          d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"
         />
       )}
     </svg>
