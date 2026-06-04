@@ -382,63 +382,56 @@ function TwinPanel({ run }: { run: SimulationRun }) {
       kicker="Replayable line, lot, control-plane, and evidence state"
       action={<StatusChip status={selectedFrame.status} compact />}
     >
-      <div className="space-y-4">
-        <div className="border border-command-line bg-black/24 p-4">
+      <div className="space-y-3">
+        <div className="relative overflow-hidden border border-command-line/70 bg-black/25 p-4">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/40 via-violet-400/20 to-transparent" />
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-command-muted">
-                Replay frame {String(selectedFrame.index + 1).padStart(2, "0")} of {String(frames.length).padStart(2, "0")}
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-400/60">
+                Replay frame {String(selectedFrame.index + 1).padStart(2, "0")} / {String(frames.length).padStart(2, "0")}
               </p>
               <h3 className="mt-2 text-lg font-semibold text-white">{selectedFrame.label}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-300">{selectedFrame.narrative}</p>
+              <p className="mt-2.5 text-sm leading-6 text-slate-400">{selectedFrame.narrative}</p>
             </div>
-            <div className="shrink-0 space-y-2">
-              <div className="font-mono text-xs uppercase tracking-[0.16em] text-cyan-100">
+            <div className="shrink-0 space-y-2 text-right">
+              <div className="font-mono text-xs font-semibold text-cyan-300">
                 {selectedFrame.timestamp}
               </div>
-              <div className="font-mono text-xs uppercase tracking-[0.16em] text-command-muted">
-                {selectedFrame.mode === "observed" ? "Observed state" : "Forecast state"}
+              <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-command-muted">
+                {selectedFrame.mode === "observed" ? "Observed" : "Forecast"}
               </div>
             </div>
           </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-            <p className="text-sm text-command-muted">{selectedFrame.gatingState}</p>
-            <div className="font-mono text-xs uppercase tracking-[0.16em] text-cyan-100">
-              Risk {selectedFrame.riskLevel.toUpperCase()}
-            </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-command-line/50 pt-3">
+            <p className="text-xs text-command-muted">{selectedFrame.gatingState}</p>
+            <span className={`font-mono text-xs font-bold uppercase ${
+              selectedFrame.riskLevel === "critical" ? "text-amber-300" :
+              selectedFrame.riskLevel === "elevated" ? "text-amber-400/80" : "text-emerald-300"
+            }`}>
+              Risk: {selectedFrame.riskLevel.toUpperCase()}
+            </span>
           </div>
         </div>
-        <div className="border border-command-line bg-black/24 p-4">
+        <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-3">
           <div className="flex flex-wrap items-center gap-2">
             <PlaybackButton
-              label="Previous frame"
+              label="Prev"
               onClick={() => handleFrameSelect(Math.max(selectedFrameIndex - 1, 0))}
               disabled={selectedFrameIndex === 0}
-              icon={
-                <Icon
-                  name="arrow"
-                  className="h-4 w-4 -scale-x-100 transform"
-                />
-              }
+              icon={<Icon name="arrow" className="h-3.5 w-3.5 -scale-x-100 transform" />}
             />
             <PlaybackButton
-              label={isPlaying ? "Pause replay" : "Play replay"}
+              label={isPlaying ? "Pause" : "Play replay"}
               onClick={handleReplayToggle}
-              icon={<Icon name={isPlaying ? "pause" : "play"} className="h-4 w-4" />}
+              icon={<Icon name={isPlaying ? "pause" : "play"} className="h-3.5 w-3.5" />}
             />
             <PlaybackButton
-              label="Next frame"
+              label="Next"
               onClick={() => handleFrameSelect(Math.min(selectedFrameIndex + 1, frames.length - 1))}
               disabled={selectedFrameIndex === frames.length - 1}
-              icon={<Icon name="arrow" className="h-4 w-4" />}
+              icon={<Icon name="arrow" className="h-3.5 w-3.5" />}
             />
-            <div className="min-w-[220px] flex-1">
-              <label
-                htmlFor="twin-frame-slider"
-                className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-command-muted"
-              >
-                Twin replay position
-              </label>
+            <div className="min-w-[180px] flex-1">
               <input
                 id="twin-frame-slider"
                 type="range"
@@ -446,11 +439,12 @@ function TwinPanel({ run }: { run: SimulationRun }) {
                 max={frames.length - 1}
                 value={selectedFrameIndex}
                 onChange={(event) => handleFrameSelect(Number(event.target.value))}
-                className="w-full accent-cyan-200"
+                className="w-full accent-cyan-400"
+                aria-label="Twin replay position"
               />
             </div>
-            <div className="font-mono text-xs uppercase tracking-[0.16em] text-command-muted">
-              Frame {selectedFrameIndex + 1}/{frames.length}
+            <div className="font-mono text-[10px] tabular-nums text-command-muted">
+              {selectedFrameIndex + 1} / {frames.length}
             </div>
           </div>
         </div>
@@ -484,112 +478,131 @@ function TwinPanel({ run }: { run: SimulationRun }) {
         </div>
         <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.12fr)_340px]">
           <div className="space-y-4">
-            <div className="relative min-h-[420px] overflow-hidden border border-command-line bg-black/30">
-              <div className="absolute inset-0 command-grid opacity-40" />
+            <div className="relative min-h-[420px] overflow-hidden border border-command-line/70 bg-black/40">
+              <div className="absolute inset-0 command-grid opacity-60" />
+              {/* Ambient glow */}
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(0,212,255,0.04),transparent)]" />
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M12 36 C22 22 26 20 34 20" fill="none" stroke="rgba(86,212,255,0.35)" strokeWidth="0.55" />
-                <path d="M34 20 C46 18 52 18 60 20" fill="none" stroke="rgba(86,212,255,0.26)" strokeWidth="0.5" />
-                <path d="M34 20 C38 38 40 50 45 60" fill="none" stroke="rgba(246,180,75,0.38)" strokeWidth="0.55" strokeDasharray="2 1.5" />
-                <path d="M45 60 C56 65 60 70 68 76" fill="none" stroke="rgba(237,245,255,0.22)" strokeWidth="0.45" />
-                <path d="M60 20 C71 27 77 34 84 48" fill="none" stroke="rgba(86,212,255,0.28)" strokeWidth="0.45" />
-                <path d="M45 60 C58 56 70 52 84 48" fill="none" stroke="rgba(86,212,255,0.22)" strokeWidth="0.45" />
+                {/* Primary data flows */}
+                <path d="M12 36 C22 22 26 20 34 20" fill="none" stroke="rgba(0,212,255,0.45)" strokeWidth="0.6" />
+                <path d="M34 20 C46 18 52 18 60 20" fill="none" stroke="rgba(0,212,255,0.35)" strokeWidth="0.5" />
+                {/* Warning path */}
+                <path d="M34 20 C38 38 40 50 45 60" fill="none" stroke="rgba(255,184,77,0.5)" strokeWidth="0.6" strokeDasharray="2.5 1.5" />
+                {/* Secondary flows */}
+                <path d="M45 60 C56 65 60 70 68 76" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.45" />
+                <path d="M60 20 C71 27 77 34 84 48" fill="none" stroke="rgba(0,212,255,0.3)" strokeWidth="0.45" />
+                <path d="M45 60 C58 56 70 52 84 48" fill="none" stroke="rgba(155,109,255,0.25)" strokeWidth="0.45" />
+                {/* Node halos */}
+                <circle cx="12" cy="36" r="1.5" fill="rgba(0,212,255,0.2)" />
+                <circle cx="34" cy="20" r="1.5" fill="rgba(0,212,255,0.2)" />
+                <circle cx="60" cy="20" r="1.5" fill="rgba(0,212,255,0.2)" />
+                <circle cx="45" cy="60" r="1.5" fill="rgba(255,184,77,0.3)" />
+                <circle cx="84" cy="48" r="1.5" fill="rgba(0,212,255,0.2)" />
               </svg>
               {selectedFrame.nodes.map((node) => (
                 <div
                   key={node.id}
-                  className="absolute w-[158px] -translate-x-1/2 -translate-y-1/2 border border-command-line bg-command-panel/92 p-3 shadow-command backdrop-blur"
+                  className="absolute w-[162px] -translate-x-1/2 -translate-y-1/2 border border-command-line/80 bg-command-panel/95 p-3 shadow-command backdrop-blur-md transition-all duration-300 hover:border-cyan-400/30 hover:shadow-[0_0_16px_rgba(0,212,255,0.1)]"
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
                 >
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/30 to-transparent" />
                   <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-semibold text-white">{node.label}</p>
+                    <p className="truncate text-xs font-semibold text-white">{node.label}</p>
                     <StatusChip status={node.status} compact />
                   </div>
-                  <p className="mt-2 text-xs text-command-muted">{node.state}</p>
-                  <p className="mt-3 font-mono text-[11px] uppercase text-cyan-100">{node.metric}</p>
+                  <p className="mt-1.5 text-[10px] uppercase tracking-[0.12em] text-command-muted">{node.state}</p>
+                  <p className="mt-2 font-mono text-[10px] font-semibold text-cyan-300">{node.metric}</p>
                   {node.detail ? (
-                    <p className="mt-2 text-[11px] leading-5 text-slate-300">{node.detail}</p>
+                    <p className="mt-1.5 text-[10px] leading-4 text-slate-400">{node.detail}</p>
                   ) : null}
                 </div>
               ))}
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {selectedFrame.telemetry.map((metric) => (
-                <article key={metric.label} className="border border-command-line bg-black/24 p-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-semibold text-white">{metric.label}</p>
+                <article key={metric.label} className="group relative overflow-hidden border border-command-line/70 bg-black/25 p-3 transition-all duration-200 hover:border-command-line">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/25 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-semibold text-white">{metric.label}</p>
                     <StatusChip status={metric.status} compact />
                   </div>
-                  <p className="mt-3 text-2xl font-semibold text-white">{metric.value}</p>
-                  <p className="mt-1 font-mono text-[11px] uppercase text-cyan-100">{metric.trend}</p>
-                  <p className="mt-2 text-xs leading-5 text-command-muted">{metric.detail}</p>
+                  <p className="kpi-value mt-2.5 text-2xl font-semibold text-white">{metric.value}</p>
+                  <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-cyan-300">{metric.trend}</p>
+                  <p className="mt-1.5 text-[10px] leading-4 text-command-muted">{metric.detail}</p>
                 </article>
               ))}
             </div>
           </div>
-          <div className="space-y-4">
-            <div className="border border-command-line bg-black/24 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-white">Subsystem state</h3>
-                <Icon name="database" className="h-4 w-4 text-cyan-100" />
+          <div className="space-y-3">
+            {/* Subsystem state */}
+            <div className="glass-panel relative overflow-hidden p-4">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/40 to-transparent" />
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-white">Subsystem State</h3>
+                <Icon name="database" className="h-4 w-4 text-cyan-400/60" />
               </div>
-              <div className="mt-4 space-y-3">
+              <div className="space-y-2">
                 {selectedFrame.subsystems.map((subsystem) => (
-                  <article key={subsystem.id} className="border border-command-line bg-black/22 p-3">
-                    <div className="flex items-start justify-between gap-3">
+                  <article key={subsystem.id} className="group relative overflow-hidden border border-command-line/60 bg-black/20 p-3 transition-all duration-200 hover:border-command-line">
+                    <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-white">{subsystem.label}</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-command-muted">
-                          {subsystem.state}
-                        </p>
+                        <p className="text-xs font-semibold text-white">{subsystem.label}</p>
+                        <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-command-muted">{subsystem.state}</p>
                       </div>
                       <StatusChip status={subsystem.status} compact />
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{subsystem.detail}</p>
+                    <p className="mt-2 text-xs leading-5 text-slate-400">{subsystem.detail}</p>
                   </article>
                 ))}
               </div>
             </div>
-            <div className="border border-command-line bg-black/24 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-white">Shadow writeback matrix</h3>
-                <Icon name="flow" className="h-4 w-4 text-cyan-100" />
+            {/* Shadow writeback matrix */}
+            <div className="glass-panel relative overflow-hidden p-4">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-violet-400/40 to-transparent" />
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-white">Shadow Writeback Matrix</h3>
+                <Icon name="flow" className="h-4 w-4 text-violet-400/60" />
               </div>
-              <div className="mt-4 space-y-3">
+              <div className="space-y-2">
                 {selectedFrame.writebacks.map((writeback) => (
-                  <article key={`${selectedFrame.id}-${writeback.system}-${writeback.action}`} className="border border-command-line bg-black/22 p-3">
-                    <div className="flex items-start justify-between gap-3">
+                  <article key={`${selectedFrame.id}-${writeback.system}-${writeback.action}`} className="border border-command-line/60 bg-black/20 p-3 transition-all duration-200 hover:border-command-line">
+                    <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-white">{writeback.system}</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-command-muted">
-                          {writeback.action}
-                        </p>
+                        <p className="text-xs font-semibold text-white">{writeback.system}</p>
+                        <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-command-muted">{writeback.action}</p>
                       </div>
                       <StatusChip status={writeback.status} compact />
                     </div>
-                    <p className="mt-3 font-mono text-[11px] uppercase text-cyan-100">
-                      {writeback.mode}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{writeback.detail}</p>
+                    <p className="mt-2 font-mono text-[10px] font-semibold uppercase text-violet-300">{writeback.mode}</p>
+                    <p className="mt-1.5 text-xs leading-5 text-slate-400">{writeback.detail}</p>
                   </article>
                 ))}
               </div>
             </div>
-            <div className="border border-command-line bg-black/24 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-white">Risk alerts</h3>
-                <Icon name="triangle" className="h-4 w-4 text-amber-50" />
+            {/* Risk alerts */}
+            <div className="relative overflow-hidden border border-amber-400/20 bg-amber-400/[0.04] p-4">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-amber-400/50 to-transparent" />
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-white">Risk Alerts</h3>
+                <Icon name="triangle" className="h-4 w-4 text-amber-400/70" />
               </div>
-              <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-300">
+              <ul className="space-y-2">
                 {selectedFrame.alerts.map((alert) => (
-                  <li key={alert}>- {alert}</li>
+                  <li key={alert} className="flex items-start gap-2 text-xs leading-5 text-slate-400">
+                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-amber-400/60" />
+                    {alert}
+                  </li>
                 ))}
               </ul>
             </div>
           </div>
         </div>
-        <p className="text-sm text-command-muted">
-          The twin replays simulated cyber-physical state only. No live equipment, PLC, robot, furnace, grinder, lapper, or safety system is connected or controlled.
-        </p>
+        <div className="flex items-center gap-2 border border-command-line/50 bg-black/20 px-3 py-2">
+          <Icon name="lock" className="h-3.5 w-3.5 shrink-0 text-command-steel" />
+          <p className="text-[10px] text-command-muted">
+            Twin replays simulated cyber-physical state only. No live equipment, PLC, robot, furnace, grinder, lapper, or safety system is connected or controlled.
+          </p>
+        </div>
       </div>
     </Panel>
   );
@@ -636,44 +649,47 @@ function RagPanel({
       icon="rag"
       kicker="Approved corpus retrieval with traceable source cards"
       action={<StatusChip status="simulated" compact />}
+      accent="violet"
     >
       <label
         htmlFor="workbench-query"
-        className="block text-xs font-semibold uppercase tracking-[0.18em] text-command-muted"
+        className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-400/60"
       >
-        Local query input
+        Live query input
       </label>
       <textarea
         id="workbench-query"
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
         rows={3}
-        className="mt-2 w-full resize-none border-command-line bg-black/40 text-sm text-white placeholder:text-command-muted focus:border-cyan-200 focus:ring-cyan-200"
+        className="w-full resize-none border-command-line bg-black/40 font-mono text-xs text-white placeholder:text-command-muted/60 focus:border-violet-400/50 focus:ring-violet-400/20"
         placeholder="Ask about quality, maintenance, compliance, or engineering context..."
       />
-      <div className="mt-4 border border-command-line bg-black/30 p-4">
+      <div className="relative mt-3 overflow-hidden border border-violet-400/20 bg-violet-400/[0.04] p-4">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-violet-400/50 to-transparent" />
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-white">Response summary</p>
+          <p className="text-sm font-semibold text-white">Response Summary</p>
           <StatusChip status="advisory" compact />
         </div>
-        <p className="mt-3 text-sm leading-6 text-slate-300">{recommendationSummary}</p>
+        <p className="mt-2.5 text-xs leading-5 text-slate-400">{recommendationSummary}</p>
       </div>
-      <div className="mt-4 space-y-3">
+      <div className="mt-3 space-y-2">
         {retrievedDocuments.map((document) => (
-          <article key={document.id} className="border border-command-line bg-black/22 p-3">
+          <article key={document.id} className="group relative overflow-hidden border border-command-line/70 bg-black/20 p-3 transition-all duration-200 hover:border-command-line">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-violet-400/0 via-violet-400/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-mono text-[11px] text-command-muted">{document.id}</p>
-                <h3 className="mt-1 text-sm font-semibold text-white">{document.title}</h3>
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] text-command-muted">{document.id}</p>
+                <h3 className="mt-0.5 text-xs font-semibold text-white">{document.title}</h3>
               </div>
-              <span className="border border-cyan-200/50 px-2 py-1 font-mono text-[11px] text-cyan-100">
+              <span className="shrink-0 border border-violet-400/40 bg-violet-400/[0.08] px-2 py-0.5 font-mono text-[10px] font-semibold text-violet-200">
                 {document.confidence}%
               </span>
             </div>
-            <p className="mt-2 text-xs uppercase tracking-[0.14em] text-command-muted">
+            <p className="mt-1.5 text-[10px] uppercase tracking-[0.12em] text-command-muted">
               {document.owner} / {document.type}
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">{document.snippet}</p>
+            <p className="mt-1.5 text-[10px] leading-4 text-slate-400">{document.snippet}</p>
           </article>
         ))}
       </div>
@@ -797,11 +813,15 @@ function WorkflowPanel({
             </div>
           </div>
         ) : run.decision ? (
-          <div className="mt-4 border border-command-line bg-black/24 p-3">
-            <p className="text-sm font-semibold text-white">
-              Decision: {run.decision.verdict.toUpperCase()} by {run.decision.reviewer}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-200">{run.decision.note}</p>
+          <div className="mt-4 relative overflow-hidden border border-cyan-400/20 bg-cyan-400/[0.04] p-3">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-400/40 to-transparent" />
+            <div className="flex items-center gap-2">
+              <Icon name="check" className="h-3.5 w-3.5 shrink-0 text-cyan-300" />
+              <p className="text-xs font-semibold text-white">
+                Decision: <span className="text-cyan-200">{run.decision.verdict.toUpperCase()}</span> by {run.decision.reviewer}
+              </p>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-400">{run.decision.note}</p>
           </div>
         ) : null}
       </div>
@@ -810,33 +830,34 @@ function WorkflowPanel({
 }
 
 function LedgerPanel({ run }: { run: SimulationRun }) {
+  const hasEvidence = !!run.evidencePacket;
   return (
     <Panel
       title="Blockchain Provenance Ledger"
       icon="hash"
       kicker="Approval, lot, and model evidence trace"
-      action={<StatusChip status={run.evidencePacket ? "testnet" : "locked"} compact />}
+      action={<StatusChip status={hasEvidence ? "testnet" : "locked"} compact />}
+      accent={hasEvidence ? "violet" : "cyan"}
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[620px] border-collapse text-left text-sm">
+        <table className="w-full min-w-[580px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-command-line text-[11px] uppercase tracking-[0.16em] text-command-muted">
-              <th className="py-3 pr-3 font-semibold">Time</th>
-              <th className="px-3 py-3 font-semibold">Event</th>
-              <th className="px-3 py-3 font-semibold">Source</th>
-              <th className="px-3 py-3 font-semibold">Status</th>
+            <tr className="border-b border-command-line/70">
+              {["Time", "Event", "Source", "Status"].map((h) => (
+                <th key={h} className="pb-2.5 pr-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-command-muted first:pl-0">{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {run.events.map((event) => (
-              <tr key={event.id} className="border-b border-command-line/70">
-                <td className="py-3 pr-3 font-mono text-xs text-command-muted">{event.timestamp}</td>
-                <td className="px-3 py-3 text-white">
-                  <span className="block font-semibold">{event.event}</span>
-                  <span className="text-xs text-command-muted">{event.payload}</span>
+            {run.events.map((event, i) => (
+              <tr key={event.id} className={`group border-b border-command-line/40 transition-colors hover:bg-white/[0.02] ${i === run.events.length - 1 ? "border-b-0" : ""}`}>
+                <td className="py-2.5 pr-4 font-mono text-[10px] tabular-nums text-command-steel">{event.timestamp}</td>
+                <td className="px-3 py-2.5">
+                  <span className="block text-xs font-semibold text-white">{event.event}</span>
+                  <span className="text-[10px] text-command-muted">{event.payload}</span>
                 </td>
-                <td className="px-3 py-3 text-slate-300">{event.source}</td>
-                <td className="px-3 py-3">
+                <td className="px-3 py-2.5 text-[10px] text-slate-400">{event.source}</td>
+                <td className="py-2.5 pl-3">
                   <StatusChip status={event.status} compact />
                 </td>
               </tr>
@@ -844,17 +865,25 @@ function LedgerPanel({ run }: { run: SimulationRun }) {
           </tbody>
         </table>
       </div>
-      <div className="mt-4 border border-command-line bg-black/24 p-4">
-        <p className="text-sm font-semibold text-white">Evidence packet</p>
+      <div className={`relative mt-4 overflow-hidden border p-4 ${
+        hasEvidence
+          ? "border-violet-400/25 bg-violet-400/[0.05]"
+          : "border-command-line/70 bg-black/20"
+      }`}>
+        {hasEvidence && <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-violet-400/60 to-transparent" />}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-white">Evidence Packet</p>
+          {hasEvidence && <Icon name="hash" className="h-4 w-4 text-violet-300" />}
+        </div>
         {run.evidencePacket ? (
-          <>
-            <p className="mt-2 font-mono text-xs text-cyan-100">{run.evidencePacket.packetId}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">{run.evidencePacket.summary}</p>
-            <p className="mt-2 font-mono text-xs text-slate-300">{run.evidencePacket.hash}</p>
-          </>
+          <div className="mt-3 space-y-2">
+            <p className="font-mono text-[10px] font-semibold text-violet-300">{run.evidencePacket.packetId}</p>
+            <p className="text-xs leading-5 text-slate-400">{run.evidencePacket.summary}</p>
+            <p className="font-mono text-[9px] break-all text-command-steel">{run.evidencePacket.hash}</p>
+          </div>
         ) : (
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            No evidence packet exists yet. Complete operator review and generate the record step.
+          <p className="mt-2.5 text-xs leading-5 text-slate-400">
+            No evidence packet yet. Complete operator review and generate the record step.
           </p>
         )}
       </div>
@@ -863,37 +892,49 @@ function LedgerPanel({ run }: { run: SimulationRun }) {
 }
 
 function QaPanel({ run, qaChecks }: { run: SimulationRun; qaChecks: string[] }) {
+  const isReady = !!run.evidencePacket;
   return (
     <Panel
       title="QA Evidence Report"
       icon="evidence"
       kicker="Verification status for the active simulator run"
-      action={<StatusChip status={run.evidencePacket ? "ready" : "review"} compact />}
+      action={<StatusChip status={isReady ? "ready" : "review"} compact />}
+      accent={isReady ? "emerald" : "amber"}
     >
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-2 md:grid-cols-2">
         {getRunKpis(run).map((kpi) => (
-          <article key={kpi.label} className="border border-command-line bg-black/24 p-3">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-semibold text-white">{kpi.label}</p>
+          <article key={kpi.label} className="group relative overflow-hidden border border-command-line/70 bg-black/20 p-3 transition-all duration-200 hover:border-command-line">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-emerald-400/0 via-emerald-400/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs font-semibold text-white">{kpi.label}</p>
               <StatusChip status={kpi.status} compact />
             </div>
-            <div className="mt-3 flex items-end justify-between gap-3">
-              <p className="text-2xl font-semibold text-white">{kpi.value}</p>
-              <p className="font-mono text-xs uppercase text-cyan-100">{kpi.delta}</p>
+            <div className="mt-2.5 flex items-end justify-between gap-2">
+              <p className="kpi-value text-2xl font-semibold text-white">{kpi.value}</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-emerald-300">{kpi.delta}</p>
             </div>
           </article>
         ))}
       </div>
-      <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-300">
+      <div className="mt-3 space-y-1.5">
         {qaChecks.map((check) => (
-          <li key={check}>- {check}</li>
+          <div key={check} className="flex items-start gap-2 text-xs leading-5 text-slate-400">
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-400/60" />
+            {check}
+          </div>
         ))}
-      </ul>
+      </div>
     </Panel>
   );
 }
 
 function TwinAssetGraphPanel({ assets }: { assets: ReturnType<typeof getTwinAssetGraph> }) {
+  const depthColors: Record<string, string> = {
+    "": "border-l-cyan-400/60",
+    "ml-3": "border-l-violet-400/50",
+    "ml-6": "border-l-amber-400/40",
+    "ml-9": "border-l-emerald-400/40"
+  };
   return (
     <Panel
       title="Twin Asset Graph"
@@ -901,7 +942,7 @@ function TwinAssetGraphPanel({ assets }: { assets: ReturnType<typeof getTwinAsse
       kicker="Facility-to-system hierarchy for the active replay"
       action={<StatusChip status="simulated" compact />}
     >
-      <div className="space-y-3">
+      <div className="space-y-2">
         {assets.map((asset) => {
           const indentClass =
             asset.parentId === null
@@ -913,18 +954,21 @@ function TwinAssetGraphPanel({ assets }: { assets: ReturnType<typeof getTwinAsse
                   : "ml-9";
 
           return (
-            <article key={asset.id} className={`border border-command-line bg-black/24 p-4 ${indentClass}`}>
-              <div className="flex items-start justify-between gap-3">
+            <article
+              key={asset.id}
+              className={`group relative border border-l-2 border-command-line/70 bg-black/20 p-3 transition-all duration-200 hover:border-command-line ${indentClass} ${depthColors[indentClass] ?? "border-l-cyan-400/60"}`}
+            >
+              <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm font-semibold text-white">{asset.label}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-command-muted">
+                  <p className="text-xs font-semibold text-white">{asset.label}</p>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-command-muted">
                     {asset.kind} / {asset.state}
                   </p>
                 </div>
                 <StatusChip status={asset.status} compact />
               </div>
-              <p className="mt-3 font-mono text-[11px] uppercase text-cyan-100">{asset.metric}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">{asset.detail}</p>
+              <p className="mt-2 font-mono text-[10px] font-semibold text-cyan-300">{asset.metric}</p>
+              <p className="mt-1.5 text-xs leading-4 text-slate-400">{asset.detail}</p>
             </article>
           );
         })}
@@ -942,39 +986,44 @@ function ScenarioContextPanel({ run }: { run: SimulationRun }) {
       icon="flow"
       kicker="Twin scenario profile and operating boundary"
       action={<StatusChip status="advisory" compact />}
+      accent="emerald"
     >
-      <div className="space-y-4">
-        <div className="border border-command-line bg-black/24 p-4">
+      <div className="space-y-3">
+        <div className="relative overflow-hidden border border-emerald-400/20 bg-emerald-400/[0.04] p-4">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-emerald-400/50 to-transparent" />
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-white">{scenarioProfile.title}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.14em] text-command-muted">
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-command-muted">
                 {scenarioProfile.subtitle}
               </p>
             </div>
             <StatusChip status="ready" compact />
           </div>
-          <p className="mt-3 text-sm leading-6 text-slate-300">{scenarioProfile.detail}</p>
+          <p className="mt-3 text-xs leading-5 text-slate-400">{scenarioProfile.detail}</p>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <article className="border border-command-line bg-black/24 p-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-command-muted">Focus area</p>
+        <div className="grid gap-2.5 md:grid-cols-2">
+          <article className="border border-command-line/70 bg-black/20 p-4 transition-all duration-200 hover:border-command-line">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-400/60">Focus Area</p>
             <p className="mt-2 text-sm font-semibold text-white">{scenarioProfile.focusArea}</p>
-            <p className="mt-3 text-sm leading-6 text-slate-300">{scenarioProfile.controlBoundary}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-400">{scenarioProfile.controlBoundary}</p>
           </article>
-          <article className="border border-command-line bg-black/24 p-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-command-muted">Operator role</p>
+          <article className="border border-command-line/70 bg-black/20 p-4 transition-all duration-200 hover:border-command-line">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-400/60">Operator Role</p>
             <p className="mt-2 text-sm font-semibold text-white">{scenarioProfile.operatorRole}</p>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Required approvals: {run.recommendation.requiredApprovals.join(", ")}
+            <p className="mt-2 text-xs leading-5 text-slate-400">
+              Approvals: {run.recommendation.requiredApprovals.join(", ")}
             </p>
           </article>
         </div>
-        <article className="border border-command-line bg-black/24 p-4">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-command-muted">Missing context</p>
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+        <article className="border border-amber-400/15 bg-amber-400/[0.03] p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-400/60">Missing Context</p>
+          <ul className="mt-2.5 space-y-1.5">
             {run.recommendation.missingContext.map((item) => (
-              <li key={item}>- {item}</li>
+              <li key={item} className="flex items-start gap-2 text-xs leading-5 text-slate-400">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-amber-400/50" />
+                {item}
+              </li>
             ))}
           </ul>
         </article>
@@ -992,21 +1041,33 @@ function ShadowCommandPanel({ run }: { run: SimulationRun }) {
       icon="twin"
       kicker="Operator-safe control-plane outcomes for the active frame"
       action={<StatusChip status="approval" compact />}
+      accent="amber"
     >
-      <div className="space-y-3">
+      {/* Safety banner */}
+      <div className="mb-3 flex items-center gap-2.5 border border-amber-400/25 bg-amber-400/[0.05] px-3 py-2.5">
+        <Icon name="lock" className="h-3.5 w-3.5 shrink-0 text-amber-400/70" />
+        <p className="text-[10px] font-semibold text-amber-200/80">
+          Shadow mode only — no direct PLC or equipment authority
+        </p>
+      </div>
+      <div className="space-y-2.5">
         {activeFrame.writebacks.map((writeback) => (
-          <article key={`${activeFrame.id}-${writeback.system}-${writeback.action}`} className="border border-command-line bg-black/24 p-4">
-            <div className="flex items-start justify-between gap-3">
+          <article
+            key={`${activeFrame.id}-${writeback.system}-${writeback.action}`}
+            className="group relative overflow-hidden border border-command-line/70 bg-black/20 p-4 transition-all duration-200 hover:border-amber-400/20"
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-amber-400/0 via-amber-400/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-sm font-semibold text-white">{writeback.system}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.14em] text-command-muted">
+                <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-command-muted">
                   {writeback.action}
                 </p>
               </div>
               <StatusChip status={writeback.status} compact />
             </div>
-            <p className="mt-3 font-mono text-[11px] uppercase text-cyan-100">{writeback.mode}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">{writeback.detail}</p>
+            <p className="mt-2.5 font-mono text-[10px] font-semibold uppercase text-amber-300">{writeback.mode}</p>
+            <p className="mt-1.5 text-xs leading-5 text-slate-400">{writeback.detail}</p>
           </article>
         ))}
       </div>
