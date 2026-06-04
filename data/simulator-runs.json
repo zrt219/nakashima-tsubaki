@@ -1,6 +1,7 @@
 {
   "version": 1,
   "recentRunIds": [
+    "qhold-fhpmqa-mpzejr9r",
     "qhold-ejv40b-mpzecm4t",
     "qhold-i0d7mo-mpze5q2t",
     "qhold-3bv7mi-mpze3h04"
@@ -752,6 +753,252 @@
         },
         {
           "id": "qhold-ejv40b-mpzecm4t-detect-2",
+          "timestamp": "08:16",
+          "source": "Containment Shadow",
+          "event": "Lot and genealogy containment staged",
+          "payload": "required sampling and shadow hold prepared for LOT-QH-240603-A",
+          "status": "review"
+        }
+      ]
+    },
+    "qhold-fhpmqa-mpzejr9r": {
+      "id": "qhold-fhpmqa-mpzejr9r",
+      "scenarioName": "Surface Quality Hold",
+      "createdAt": "2026-06-04T11:18:41.103Z",
+      "updatedAt": "2026-06-04T11:18:41.103Z",
+      "currentStep": "detect",
+      "scenarioInput": {
+        "scenarioTemplateId": "quality_hold",
+        "lotId": "LOT-QH-240603-A",
+        "facilityId": "TN-OSAKA-01",
+        "lineId": "GRIND-A1",
+        "machineId": "CELL-A1-SPDL-02",
+        "vibrationBand": "elevated",
+        "temperatureBand": "nominal",
+        "cpk": 1.18,
+        "surfaceFinishStatus": "drift",
+        "sampleExpansion": "required",
+        "operatorShift": "day",
+        "qualityPriority": "containment"
+      },
+      "query": "Quality containment drift surface finish required elevated nominal maintenance approval",
+      "risk": {
+        "score": 8,
+        "riskLevel": "watch",
+        "rationale": [
+          "Spindle vibration crossed the advisory band.",
+          "Cpk is below the preferred release threshold.",
+          "Surface finish drift requires verification before release.",
+          "Expanded sampling is required."
+        ],
+        "kpiImpact": {
+          "retrievalCoverage": 82,
+          "riskStates": 3,
+          "estimatedScrapDelta": 1.2,
+          "evidenceCount": 4
+        }
+      },
+      "recommendation": {
+        "summary": "Contain the lot, expand sampling, and hold release pending reviewed evidence.",
+        "actions": [
+          "Expand inspection coverage on the active lot and adjacent genealogy.",
+          "Schedule spindle inspection and verify maintenance threshold history.",
+          "Attach approved source trace to the quality-hold recommendation.",
+          "Require operator and quality review before any simulated writeback.",
+          "Escalate process parameter review to manufacturing engineering."
+        ],
+        "lotDisposition": "hold",
+        "requiredApprovals": [
+          "Shift Lead",
+          "Quality Lead"
+        ],
+        "confidence": 87,
+        "missingContext": [
+          "No live spindle trend history is connected in this local simulator.",
+          "No MES or QMS writeback occurs in demo mode."
+        ]
+      },
+      "decision": null,
+      "evidencePacket": null,
+      "twinNodes": [
+        {
+          "id": "edge",
+          "label": "Edge Gateway",
+          "state": "Genealogy correlated",
+          "metric": "2.0K EVENTS/MIN",
+          "detail": "OPC UA and MQTT are normalized into the twin event backbone.",
+          "status": "simulated",
+          "x": 12,
+          "y": 36
+        },
+        {
+          "id": "line",
+          "label": "Grinding Cell",
+          "state": "Speed and feed shadow-frozen",
+          "metric": "VIB 0.68 G",
+          "detail": "Surface state: drift.",
+          "status": "simulated",
+          "x": 34,
+          "y": 20
+        },
+        {
+          "id": "lab",
+          "label": "Metrology Lab",
+          "state": "Expanded samples queued",
+          "metric": "CPK 1.18",
+          "detail": "Lab results are replayed into the lot genealogy context.",
+          "status": "simulated",
+          "x": 60,
+          "y": 20
+        },
+        {
+          "id": "qms",
+          "label": "QMS Gate",
+          "state": "Shadow lot hold active",
+          "metric": "APPROVAL GATE",
+          "detail": "Human review gates stay explicit and block all simulated writebacks.",
+          "status": "simulated",
+          "x": 45,
+          "y": 60
+        },
+        {
+          "id": "bridge",
+          "label": "Control Bridge",
+          "state": "2 shadow targets armed",
+          "metric": "4 TARGETS",
+          "detail": "Simulated MES, QMS, and CMMS outputs never control machines.",
+          "status": "locked",
+          "x": 68,
+          "y": 76
+        },
+        {
+          "id": "ledger",
+          "label": "Evidence Ledger",
+          "state": "Containment packet staged",
+          "metric": "HASH PENDING",
+          "detail": "Deterministic local hashing prepares the packet for later persistence layers.",
+          "status": "simulated",
+          "x": 84,
+          "y": 48
+        }
+      ],
+      "retrievedDocuments": [
+        {
+          "id": "SRC-QMS-014",
+          "title": "Grinding line quality escape review",
+          "owner": "Quality Engineering",
+          "type": "QMS procedure",
+          "snippet": "Requires lot hold, inspection sample expansion, root-cause note, and operator signoff before any controlled release.",
+          "tags": [
+            "quality",
+            "lot hold",
+            "surface finish",
+            "approval"
+          ],
+          "control": "Containment and release",
+          "scenarioTemplates": [
+            "quality_hold",
+            "spindle_degradation"
+          ],
+          "matchedTerms": [
+            "quality",
+            "containment",
+            "surface",
+            "finish",
+            "approval",
+            "grind",
+            "lot"
+          ],
+          "relevance": 2.08,
+          "confidence": 97
+        },
+        {
+          "id": "SRC-LAB-041",
+          "title": "Metrology sample expansion protocol",
+          "owner": "Metrology Lab",
+          "type": "Lab work instruction",
+          "snippet": "When surface finish drift is confirmed, expand sampling to adjacent lots and record lot genealogy links in the evidence packet.",
+          "tags": [
+            "metrology",
+            "sample expansion",
+            "lot genealogy",
+            "quality"
+          ],
+          "control": "Sample expansion",
+          "scenarioTemplates": [
+            "quality_hold",
+            "thermal_excursion",
+            "spindle_degradation"
+          ],
+          "matchedTerms": [
+            "quality",
+            "drift",
+            "surface",
+            "finish",
+            "lot"
+          ],
+          "relevance": 1.4500000000000002,
+          "confidence": 97
+        },
+        {
+          "id": "SRC-ENG-088",
+          "title": "Bearing surface finish process window",
+          "owner": "Manufacturing Engineering",
+          "type": "Engineering standard",
+          "snippet": "Surface finish deviations require process parameter review, lab verification, and controlled release notes.",
+          "tags": [
+            "engineering",
+            "surface finish",
+            "process",
+            "verification"
+          ],
+          "control": "Process window",
+          "scenarioTemplates": [
+            "quality_hold",
+            "spindle_degradation"
+          ],
+          "matchedTerms": [
+            "surface",
+            "finish"
+          ],
+          "relevance": 1.0899999999999999,
+          "confidence": 97
+        },
+        {
+          "id": "SRC-MNT-221",
+          "title": "Spindle vibration advisory threshold",
+          "owner": "Maintenance Reliability",
+          "type": "CMMS bulletin",
+          "snippet": "Trend-based inspection should be scheduled when normalized vibration crosses the advisory band for two cycles.",
+          "tags": [
+            "maintenance",
+            "vibration",
+            "spindle",
+            "advisory"
+          ],
+          "control": "Condition-based maintenance",
+          "scenarioTemplates": [
+            "quality_hold",
+            "spindle_degradation"
+          ],
+          "matchedTerms": [
+            "maintenance"
+          ],
+          "relevance": 0.84,
+          "confidence": 95
+        }
+      ],
+      "events": [
+        {
+          "id": "qhold-fhpmqa-mpzejr9r-detect-0",
+          "timestamp": "08:14",
+          "source": "Twin Monitor",
+          "event": "Advisory condition detected",
+          "payload": "GRIND-A1 flagged drift with elevated vibration band",
+          "status": "simulated"
+        },
+        {
+          "id": "qhold-fhpmqa-mpzejr9r-detect-2",
           "timestamp": "08:16",
           "source": "Containment Shadow",
           "event": "Lot and genealogy containment staged",
