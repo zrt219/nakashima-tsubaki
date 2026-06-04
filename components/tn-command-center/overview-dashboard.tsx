@@ -1,12 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { overviewEvents, overviewKpis } from "@/lib/tn-ai-data";
 import { useSimulatorLatestRun } from "@/lib/simulator/use-simulator-store";
 import type { RunSummary } from "@/lib/simulator/types";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
-import Image from "next/image";
+
+const DataCoreWebGL = dynamic(() => import("@/components/tn-command-center/data-core-webgl"), { ssr: false });
 
 export function OverviewDashboard() {
   const { latestRun } = useSimulatorLatestRun();
@@ -22,15 +26,40 @@ export function OverviewDashboard() {
       }
       rightRail={<OverviewRail latestRun={latestRun} />}
     >
-      <OverviewHero latestRun={latestRun} />
-      <DigitalTwinCanvas />
-      <TelemetryBar />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <OverviewHero latestRun={latestRun} />
+      </motion.div>
+
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+      >
+        <DigitalTwinCanvas />
+      </motion.div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+      >
+        <TelemetryBar />
+      </motion.div>
       
-      <div className="grid gap-3 xl:grid-cols-[1fr_1.5fr_1fr]">
+      <motion.div 
+        className="grid gap-3 xl:grid-cols-[1fr_1.5fr_1fr]"
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.6, delay: 0.5, staggerChildren: 0.1, ease: "easeOut" }}
+      >
         <ReplayableScenariosPanel latestRun={latestRun} />
         <ProductionTraceabilityPanel />
         <EvidenceLedgerPanel />
-      </div>
+      </motion.div>
     </CommandCenterShell>
   );
 }
@@ -93,45 +122,58 @@ function OverviewHero({ latestRun }: { latestRun: RunSummary | null }) {
 }
 
 function DigitalTwinCanvas() {
+  const [timeline, setTimeline] = useState(100); // 100 is present, 0 is past
+  const isCritical = timeline < 30; // Simulate an anomaly in the past
+
   return (
-    <section className="relative mt-2 flex min-h-[450px] w-full flex-col overflow-hidden border border-cyan-400/30 bg-black/50 p-4 shadow-[0_0_30px_rgba(0,212,255,0.05)] backdrop-blur-md">
+    <section className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/30 bg-black/50 p-4 shadow-[0_0_30px_rgba(0,212,255,0.05)] backdrop-blur-md">
       {/* Scanline FX */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)] opacity-0 animate-[scan_4s_ease-in-out_infinite]" />
+      <div className={`absolute top-0 left-0 right-0 h-[1px] ${isCritical ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)]"} opacity-0 animate-[scan_4s_ease-in-out_infinite]`} />
       
       {/* Header */}
       <div className="relative z-20 flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-400/80">
-          ACTIVE DIGITAL TWIN - CNC MULTI-SPINDLE CELL
+        <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${isCritical ? "text-red-400" : "text-cyan-400/80"}`}>
+          {isCritical ? "HISTORICAL ANOMALY DETECTED - CNC CELL" : "ACTIVE DIGITAL TWIN - CNC MULTI-SPINDLE CELL"}
         </p>
-        <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400">
-          <span className="status-ping relative flex h-2 w-2 rounded-full bg-emerald-400" /> LIVE
+        <div className={`flex items-center gap-2 text-[10px] font-bold ${isCritical ? "text-red-400" : "text-emerald-400"}`}>
+          <span className={`status-ping relative flex h-2 w-2 rounded-full ${isCritical ? "bg-red-400" : "bg-emerald-400"}`} /> {isCritical ? "REPLAY" : "LIVE"}
         </div>
       </div>
 
-      {/* 3D Visual Centerpiece */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-80 mix-blend-screen">
-        <img src="/cnc_twin_model.png" alt="Digital Twin 3D Model" className="h-[400px] object-cover drop-shadow-[0_0_15px_rgba(0,212,255,0.3)] animate-[drift_20s_ease-in-out_infinite]" />
+      {/* 3D Visual Centerpiece using React Three Fiber */}
+      <div className="absolute inset-0 z-0">
+        <DataCoreWebGL isCritical={isCritical} />
+      </div>
+
+      {/* DVR Time Scrubber */}
+      <div className="absolute top-12 left-1/2 z-20 -translate-x-1/2 w-full max-w-md bg-black/60 px-4 py-2 border border-command-line/80 backdrop-blur-md rounded-full flex items-center gap-4">
+        <Icon name="play" className="h-3 w-3 text-cyan-400/60" />
+        <input 
+          type="range" 
+          min="0" max="100" 
+          value={timeline} 
+          onChange={(e) => setTimeline(parseInt(e.target.value))}
+          className="flex-1 h-1 bg-command-line/50 rounded-full appearance-none outline-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:scale-125 hover:[&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(0,212,255,0.8)] transition-all"
+        />
+        <span className="text-[10px] font-mono text-cyan-300">T-{100 - timeline}m</span>
       </div>
 
       {/* HUD Overlays */}
-      <div className="relative z-10 mt-8 grid grid-cols-2 gap-4 xl:grid-cols-4 xl:w-1/2">
-        <HUDMetric icon="power" label="Spindle Speed" value="12,450" unit="RPM" />
-        <HUDMetric icon="arrow" label="Feed Rate" value="1,250" unit="mm/min" />
-        <HUDMetric icon="shield" label="Coolant Temp" value="20.6" unit="°C" />
-        <HUDMetric icon="chart" label="Power Draw" value="7.8" unit="kW" />
+      <div className="relative z-10 mt-16 grid grid-cols-2 gap-4 xl:grid-cols-4 xl:w-1/2">
+        <HUDMetric icon="power" label="Spindle Speed" value={isCritical ? "14,800" : "12,450"} unit="RPM" critical={isCritical} />
+        <HUDMetric icon="arrow" label="Feed Rate" value={isCritical ? "1,400" : "1,250"} unit="mm/min" critical={isCritical} />
+        <HUDMetric icon="shield" label="Coolant Temp" value={isCritical ? "38.2" : "20.6"} unit="°C" critical={isCritical} />
+        <HUDMetric icon="chart" label="Power Draw" value={isCritical ? "11.4" : "7.8"} unit="kW" critical={isCritical} />
       </div>
-
-      {/* Center Target Box Overlay */}
-      <div className="absolute top-1/2 left-1/2 z-10 h-32 w-48 -translate-x-1/2 -translate-y-1/2 border border-cyan-400/40 bg-cyan-400/[0.02]" />
 
       {/* Twin State Score Card */}
       <div className="absolute bottom-6 right-6 z-20 border border-command-line/80 bg-black/60 p-4 backdrop-blur-xl">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400">Digital Twin State</p>
+        <p className={`text-[10px] font-semibold uppercase tracking-[0.1em] ${isCritical ? "text-red-400" : "text-cyan-400"}`}>Digital Twin State</p>
         <div className="mt-3 flex items-center gap-4">
-          <div className="grid h-16 w-16 place-items-center rounded-full border-2 border-cyan-400 shadow-[0_0_15px_rgba(0,212,255,0.4)]">
+          <div className={`grid h-16 w-16 place-items-center rounded-full border-2 ${isCritical ? "border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]" : "border-cyan-400 shadow-[0_0_15px_rgba(0,212,255,0.4)]"}`}>
             <div className="text-center">
-              <span className="text-xl font-bold text-white">96</span>
-              <span className="text-[8px] text-cyan-200">/100</span>
+              <span className="text-xl font-bold text-white">{isCritical ? "42" : "96"}</span>
+              <span className={`text-[8px] ${isCritical ? "text-red-200" : "text-cyan-200"}`}>/100</span>
             </div>
           </div>
           <div className="space-y-1 font-mono text-[10px]">
@@ -150,17 +192,20 @@ function DigitalTwinCanvas() {
   );
 }
 
-function HUDMetric({ icon, label, value, unit }: { icon: string; label: string; value: string; unit: string }) {
+function HUDMetric({ icon, label, value, unit, critical }: { icon: string; label: string; value: string; unit: string; critical?: boolean }) {
   return (
-    <div className="border border-command-line/40 bg-black/40 p-2 backdrop-blur-md">
+    <motion.div 
+      layout
+      className={`border ${critical ? "border-red-500/50 bg-red-900/20" : "border-command-line/40 bg-black/40"} p-2 backdrop-blur-md`}
+    >
       <div className="flex items-center gap-2">
-        <Icon name={icon as any} className="h-3 w-3 text-cyan-400/60" />
+        <Icon name={icon as any} className={`h-3 w-3 ${critical ? "text-red-400" : "text-cyan-400/60"}`} />
         <span className="text-[10px] text-command-muted">{label}</span>
       </div>
-      <p className="mt-1 font-mono text-lg font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.4)]">
-        {value} <span className="text-[10px] text-cyan-300">{unit}</span>
+      <p className={`mt-1 font-mono text-lg font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.4)]`}>
+        {value} <span className={`text-[10px] ${critical ? "text-red-300" : "text-cyan-300"}`}>{unit}</span>
       </p>
-    </div>
+    </motion.div>
   );
 }
 
