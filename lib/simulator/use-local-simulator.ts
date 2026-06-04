@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import {
   getLatestLocalRun,
   listLocalRunSummaries,
@@ -10,11 +10,14 @@ import {
 
 const emptyRuns: ReturnType<typeof listLocalRunSummaries> = [];
 
+const getServerSnapshotEmptyArray = () => emptyRuns;
+const getServerSnapshotNull = () => null;
+
 export function useLatestLocalRun() {
   return useSyncExternalStore(
     subscribeToLocalSimulatorStore,
     getLatestLocalRun,
-    () => null
+    getServerSnapshotNull
   );
 }
 
@@ -22,14 +25,16 @@ export function useLocalRunSummaries() {
   return useSyncExternalStore(
     subscribeToLocalSimulatorStore,
     listLocalRunSummaries,
-    () => emptyRuns
+    getServerSnapshotEmptyArray
   );
 }
 
 export function useLocalRun(runId: string) {
+  const getSnapshot = useCallback(() => loadLocalRun(runId), [runId]);
+  
   return useSyncExternalStore(
     subscribeToLocalSimulatorStore,
-    () => loadLocalRun(runId),
-    () => null
+    getSnapshot,
+    getServerSnapshotNull
   );
 }

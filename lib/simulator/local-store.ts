@@ -15,13 +15,18 @@ function canUseStorage() {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 }
 
+const emptyStore: SimulatorStore = {
+  version: 1,
+  recentRunIds: [],
+  runs: {}
+};
+
 function getEmptyStore(): SimulatorStore {
-  return {
-    version: 1,
-    recentRunIds: [],
-    runs: {}
-  };
+  return emptyStore;
 }
+
+let cachedRawValue: string | null = null;
+let cachedStore: SimulatorStore | null = null;
 
 function readStore(): SimulatorStore {
   if (!canUseStorage()) {
@@ -30,16 +35,29 @@ function readStore(): SimulatorStore {
 
   const rawValue = window.localStorage.getItem(STORAGE_KEY);
   if (!rawValue) {
+    cachedRawValue = null;
+    cachedStore = null;
     return getEmptyStore();
+  }
+
+  if (rawValue === cachedRawValue && cachedStore) {
+    return cachedStore;
   }
 
   try {
     const parsedValue = JSON.parse(rawValue) as SimulatorStore;
     if (parsedValue.version !== 1 || !parsedValue.runs || !parsedValue.recentRunIds) {
+      cachedRawValue = null;
+      cachedStore = null;
       return getEmptyStore();
     }
+    
+    cachedRawValue = rawValue;
+    cachedStore = parsedValue;
     return parsedValue;
   } catch {
+    cachedRawValue = null;
+    cachedStore = null;
     return getEmptyStore();
   }
 }
@@ -65,14 +83,26 @@ export function createLocalRun(input: ScenarioInput = defaultScenarioInput) {
   return saveRun(createSimulationRun(input));
 }
 
+let cachedSummaries: RunSummary[] | null = null;
+let cachedSummariesStoreRef: SimulatorStore | null = null;
+
 export function listLocalRunSummaries(): RunSummary[] {
   const store = readStore();
 
-  return store.recentRunIds
+  if (cachedSummaries && cachedSummariesStoreRef === store) {
+    return cachedSummaries;
+  }
+
+  const summaries = store.recentRunIds
     .map((runId) => store.runs[runId])
     .filter(Boolean)
     .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
     .map((run) => getRunSummary(run));
+
+  cachedSummariesStoreRef = store;
+  cachedSummaries = summaries;
+
+  return summaries;
 }
 
 export function loadLocalRun(runId: string) {
