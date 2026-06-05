@@ -1,5 +1,8 @@
 # TN Precision AI - Cyber-Physical Operating Layer
 
+![TN Precision AI Banner](public/docs/github_repo_banner.png)
+
+
 Welcome to **Nakashima-Tsubaki**, an advanced industrial AI command center and cyber-physical digital twin simulator.
 
 This repository demonstrates the convergence of modern web frameworks and autonomous AI agents into a single "Sentient Operating System" designed for the manufacturing floor. It provides an interactive, operator-safe digital twin environment to simulate incidents, deploy AI swarms, and securely manage machine workflows.
