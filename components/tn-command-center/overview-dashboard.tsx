@@ -10,7 +10,7 @@ import type { RunSummary } from "@/lib/simulator/types";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 
-export function OverviewDashboard() {
+export function OverviewDashboard({ asset }: { asset?: any }) {
   const { latestRun } = useSimulatorLatestRun();
 
   return (
@@ -29,7 +29,7 @@ export function OverviewDashboard() {
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <OverviewHero latestRun={latestRun} />
+        <OverviewHero latestRun={latestRun} asset={asset} />
       </motion.div>
 
       <motion.div 
@@ -62,7 +62,7 @@ export function OverviewDashboard() {
   );
 }
 
-function OverviewHero({ latestRun }: { latestRun: RunSummary | null }) {
+function OverviewHero({ latestRun, asset }: { latestRun: RunSummary | null, asset?: any }) {
   return (
     <section className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 p-2">
       <div>
@@ -75,6 +75,12 @@ function OverviewHero({ latestRun }: { latestRun: RunSummary | null }) {
         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
           Replayable industrial intelligence for precision manufacturing, quality control, and operator-safe workflow decisions.
         </p>
+        {asset && (
+          <div className="mt-2 inline-flex items-center gap-2 border border-emerald-500/50 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400 backdrop-blur-md">
+             <Icon name="check" className="h-3 w-3" />
+             Connected to Supabase {asset.asset_type}: {asset.name} ({asset.operational_status})
+          </div>
+        )}
         <div className="mt-4 flex flex-wrap gap-4">
           <div className="flex items-center gap-2 text-xs font-semibold text-cyan-200">
             <Icon name="flow" className="h-4 w-4" /> DIGITAL TWIN

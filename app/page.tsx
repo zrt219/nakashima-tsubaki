@@ -1,17 +1,21 @@
-"use client";
-
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
-import { ExecutiveDashboard } from "@/components/tn-command-center/executive-dashboard";
+import { OverviewDashboard } from "@/components/tn-command-center/overview-dashboard";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export const revalidate = 0; // Disable static rendering
+
+export default async function Home() {
+  const supabase = await createClient();
+
+  const { data: asset } = await supabase
+    .schema("topology")
+    .from("assets")
+    .select("*")
+    .eq("name", "Spindle Alpha")
+    .single();
+
   return (
-    <CommandCenterShell
-      activeAreaId="overview"
-      rightRail={null}
-      eventStream={overviewEvents}
-    >
-      <ExecutiveDashboard />
-    </CommandCenterShell>
+    <OverviewDashboard asset={asset} />
   );
 }

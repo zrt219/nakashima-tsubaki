@@ -13,7 +13,7 @@ const springTransition: Transition = {
   mass: 1,
 };
 
-export function KpiDashboard() {
+export function KpiDashboard({ telemetryData = [] }: { telemetryData?: any[] }) {
   return (
     <CommandCenterShell
       activeAreaId="kpis"
@@ -40,7 +40,7 @@ export function KpiDashboard() {
             animate={{ x: 0, opacity: 1 }}
             transition={{ ...springTransition, delay: 0.2 }}
           >
-            <LeftRailTrendMatrices />
+            <LeftRailTrendMatrices telemetryData={telemetryData} />
           </motion.div>
           {/* OPEN CENTER */}
           <div className="flex-1" />
@@ -184,7 +184,21 @@ function TopMetricBox({ label, value, trend, status }: { label: string, value: s
 // ----------------------------------------------------------------------
 // Left Rail Trend Matrices
 // ----------------------------------------------------------------------
-function LeftRailTrendMatrices() {
+function LeftRailTrendMatrices({ telemetryData }: { telemetryData: any[] }) {
+  // Extract and sort real telemetry data
+  const powerData = telemetryData.filter((d) => d.metric_key === "spindle_speed_rpm").map((d) => d.value_numeric).reverse();
+  const tempData = telemetryData.filter((d) => d.metric_key === "coolant_temp_c").map((d) => d.value_numeric).reverse();
+  
+  // Downsample to 20 points for sparklines
+  const downsample = (arr: number[], limit: number) => {
+    if (arr.length <= limit) return arr.length > 0 ? arr : [0];
+    const step = Math.floor(arr.length / limit);
+    return arr.filter((_, i) => i % step === 0).slice(0, limit);
+  };
+
+  const powerDisplay = downsample(powerData, 20);
+  const tempDisplay = downsample(tempData, 20);
+
   return (
     <>
       <div className="border border-command-line/50 bg-black/50 backdrop-blur-md p-3">
@@ -209,9 +223,9 @@ function LeftRailTrendMatrices() {
 
       <div className="border border-command-line/50 bg-black/50 backdrop-blur-md p-3">
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400 mb-2">Telemetry & ML Confidence Bands</p>
-        <Sparkline label="Power Draw (kW)" data={[20,25,22,30,28,35,40,38,42,39,45]} color="cyan" showBands />
+        <Sparkline label="Spindle Speed (RPM)" data={powerDisplay} color="cyan" showBands />
         <div className="h-4" />
-        <Sparkline label="Coolant Temp (°C)" data={[20,21,21,22,23,24,25,26,26,27,27]} color="amber" showBands />
+        <Sparkline label="Coolant Temp (°C)" data={tempDisplay} color="amber" showBands />
       </div>
 
       <SpindleFftAnalyzer />
