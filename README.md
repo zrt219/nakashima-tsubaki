@@ -1,143 +1,93 @@
-# TN Precision AI - Cyber-Physical Operating Layer
+<div align="center">
+  <img src="public/docs/arch_hologram.png" alt="ZRT TwinRSI Autonomic Edge OS" width="100%" />
 
-![TN Precision AI Banner](public/docs/github_repo_banner.png)
+  # ZRT TwinRSI Autonomic Edge OS
+  **Portfolio-Grade Cyber-Physical Digital Twins + Bounded Recursive Self-Improvement**
 
+  [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![Supabase](https://img.shields.io/badge/Supabase-Edge-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+  [![WebGL](https://img.shields.io/badge/WebGL-Three.js-black?style=for-the-badge&logo=webgl)](https://threejs.org/)
+</div>
 
-Welcome to **Nakashima-Tsubaki**, an advanced industrial AI command center and cyber-physical digital twin simulator.
+<br/>
 
-This repository demonstrates the convergence of modern web frameworks and autonomous AI agents into a single "Sentient Operating System" designed for the manufacturing floor. It provides an interactive, operator-safe digital twin environment to simulate incidents, deploy AI swarms, and securely manage machine workflows.
-
----
-
-## 🌟 Core Features
-
-- **Cyber-Physical Digital Twin**: Live, interactive WebGL 3D modeling of factory floors and precision spindles. Manipulate the "T-MINUS Scrubber" to rewind global simulator time and replay historic incidents.
-- **Autonomous Agent Swarm**: Press `CTRL+K` to open the integrated agent terminal. Spawn AI agents that physically fly across the DOM to hunt anomalies, lock onto telemetry, and provide context-aware help tips.
-- **Holographic Glassmorphism UI**: An extreme, boundary-pushing futuristic UI. UI panels break out of 2D sidebars into massive 3D holograms using Framer Motion physics.
-- **Native Web Audio Engine**: Completely synthesized UI sound effects (keystrokes, hover hums, alarm thrums) generated in-browser via the mathematical oscillators of the Web Audio API.
-- **Advisory-First Workflow**: An explicit node-graph approval gate to ensure that AI-generated actions are safely reviewed and cryptographically signed by human operators before "shadow execution."
+The **ZRT TwinRSI Autonomic Edge OS** is a cutting-edge industrial intelligence platform. It fuses **Cyber-Physical Digital Twins (CPDT)** with **Bounded Recursive Self-Improvement (RSI)** to autonomously orchestrate factory operations, govern edge-device security, and self-optimize through swarms of biomimetic AI agents.
 
 ---
 
-## 🛠️ Technology Stack
+## 1. The Core Factory Engine
 
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with heavy glassmorphism constraints
-- **Animation Physics**: [Framer Motion](https://www.framer.com/motion/)
-- **3D Rendering**: [Three.js](https://threejs.org/) & React Three Fiber (via dynamic imports)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Icons**: [Lucide React](https://lucide.dev/)
+Industrial robotics require absolute deterministic state and sub-millisecond precision. By linking physical factory assets to edge-deployed Digital Twins, ZRT establishes an unshakeable ground truth for all cognitive operations.
 
----
-
-## 🚀 Getting Started
-
-To run the deterministic lab simulator locally:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/zrt219/nakashima-tsubaki.git
-
-# 2. Navigate into the directory
-cd nakashima-tsubaki
-
-# 3. Install dependencies
-npm install
-
-# 4. Start the development server
-npm run dev
-```
-
-Navigate to `http://localhost:3000` to interact with the command center.
+<div align="center">
+  <img src="public/docs/spindle_twin.png" alt="Spindle Digital Twin" width="48%" />
+  <img src="public/docs/dashboard_qa_1780642776610.png" alt="QA Dashboard" width="48%" />
+</div>
 
 ---
 
-## 📂 Project Structure
+## 2. Agent Swarms & Biomimetic Intelligence
 
-```text
-├── app/                      # Next.js 14 App Router pages (11 custom routes)
-├── components/
-│   └── tn-command-center/    # The core cyber-physical UI components
-├── lib/
-│   ├── simulator/            # Zustand stores, Web Audio engine, & simulation logic
-│   └── tn-ai-data.ts         # Hardcoded mock scenarios, KPIs, and evidence payloads
-├── public/
-│   └── docs/                 # Image gallery and visual mockups
-└── README.md                 # You are here
-```
+<div align="center">
+  <img src="public/docs/cyber_beehive.png" alt="Cyber Beehive" width="100%" />
+</div>
+
+ZRT TwinRSI operates on a biomimetic architectural thesis:
+* **Dolphin Pods (Cognitive Orchestration):** Small, highly intelligent collaborative pods handling complex planning and reasoning.
+* **Bee Hives (Coordination & Execution):** Massively distributed worker swarms routing signals, executing waggle-dance heuristics, and mutating genomes.
 
 ---
 
-## OpenAI Integration Blueprint
+## 3. RAG & Procedural Cognition
 
-The current Nakashima-Tsubaki Command Center operates as a **Deterministic Lab Simulator**. This means incidents, RAG contexts, and agent swarms execute predictably via state machines to guarantee a safe, reviewable operator experience.
+<div align="center">
+  <img src="public/docs/rag_graph.png" alt="RAG Knowledge Graph" width="100%" />
+</div>
 
-To transition from a "Simulation" to "Live Cognition", this blueprint outlines how we will seamlessly inject OpenAI models (specifically `gpt-4o` and `text-embedding-3-small`) into the architecture without compromising the critical **Advisory-First Governance** rails.
+When anomalies arise, agents do not hallucinate—they rely on **Retrieval-Augmented Generation (RAG)**. Grounded by decades of historical telemetry, engineering specs, and compliance documents, the data pipeline dynamically injects context directly into the agent reasoning loops.
 
-### 1. RAG Knowledge Console Migration
-- **Vector Database**: Connect the application to a Pinecone or Supabase pgvector instance.
-- **Embeddings Pipeline**: When an incident occurs (e.g., Thermal Variance), pass raw sensor data through `text-embedding-3-small`.
-- **Retrieval & Synthesis**: Query the vector store for the top 5 most relevant SOPs. Use the Next.js AI SDK (`generateText`) calling `gpt-4o` to summarize the retrieved context into the "Evidence Packet".
-
-### 2. Multi-Agent Swarm Logic
-- **Agent Orchestration**: Utilize the OpenAI Assistants API to manage the swarm.
-- **Dynamic Goals**: When you type `spawn anomaly-hunter 3` in the terminal, the command is sent to `gpt-4o` as a system prompt. The model decides which telemetry components require investigation.
-- **Function Calling**: The agents use OpenAI Function Calling to physically trigger simulator events (e.g., `{"name": "trigger_thermal_alert"}`). The UI reacts to the model's function calls in real-time.
-
-### 3. Advisory Automation Workflow
-- **Dynamic Playbooks**: The AI generates the `/advisory` node graph dynamically. 
-- **Human-in-the-Loop Constraint**: Even when using `gpt-4o` to generate the remediation plan, the architecture enforces that the action remains a *Draft Proposal*. The operator must cryptographically sign off before execution.
+<div align="center">
+  <img src="public/docs/data_pipeline.png" alt="Cognitive Data Pipeline" width="100%" />
+</div>
 
 ---
 
-## The Dashboard Vision Gallery
+## 4. Immutable Blockchain Provenance
 
-A showcase of the cyber-physical routes built within this application.
-
-### 1. Digital Twin Simulator
-![Digital Twin Simulator](public/docs/dashboard_simulator_1780642787849.png)
-
-### 2. QA Evidence Report & 3D Holograms
-![QA Evidence Report](public/docs/dashboard_qa_1780642776610.png)
-
-### 3. Cognitive Agent Swarm Brain
-![Cognitive Brain Graph](public/docs/dashboard_cognitive_1780642764109.png)
-
-### 4. Risk & Governance Compliance
-![Risk and Governance](public/docs/dashboard_governance_1780642798485.png)
-
-### 5. Concept Model 1
-![Model 1](public/docs/cnc_twin_model_1780571500913.png)
-
-### 6. Media Render A
-![Media A](public/docs/media__1780571451298.jpg)
-
-### 7. Media Render B
-![Media B](public/docs/media__1780572747550.jpg)
-
-### 8. Media Render C
-![Media C](public/docs/media__1780572747563.jpg)
-
-### 9. Media Render D
-![Media D](public/docs/media__1780572747569.jpg)
-
-### 10. Media Render E
-![Media E](public/docs/media__1780572747585.jpg)
-
-### 11. Media Render F
-![Media F](public/docs/media__1780572747596.jpg)
-
-### 12. Media Render G
-![Media G](public/docs/media__1780572780480.jpg)
-
-### 13. Media Render H
-![Media H](public/docs/media__1780572780489.jpg)
-
-### 14. Media Render I
-![Media I](public/docs/media__1780572780501.jpg)
-
-### 15. Concept Model Interface
-![Concept Interface](public/docs/media__1780572871057.png)
+Every single telemetry spike, agent decision, and genome mutation is cryptographically hashed and persisted onto the TwinRSI Immutable Ledger. This ensures perfect auditability for defense contractors, industrial compliance boards, and QA inspections.
 
 ---
-*Built as a next-generation industrial AI interface.*
+
+## 5. UI/UX: The Command Center
+
+<div align="center">
+  <img src="public/docs/dashboard_cognitive_1780642764109.png" alt="Cognitive Dashboard UI" width="100%" />
+</div>
+
+The entire Command Center is built using high-performance Next.js Server Components, extreme glassmorphism (`backdrop-blur-3xl`), Framer Motion physics, and WebGL particle shaders.
+
+<div align="center">
+  <img src="public/docs/dashboard_simulator_1780642787849.png" alt="Simulator Dashboard" width="48%" />
+  <img src="public/docs/dashboard_governance_1780642798485.png" alt="Governance Dashboard" width="48%" />
+</div>
+
+---
+
+## 6. Bounded Governance & Security
+
+Recursive Self-Improvement (RSI) is incredibly powerful, but requires rigid boundaries to prevent safety envelope violations. The **Governance Shield** module strictly enforces parameter bounding. Any AI-generated proposal must pass procedural gates, QA simulation, and human-in-the-loop authorization before deploying to the physical factory floor.
+
+---
+
+### Features At a Glance
+
+* **1-Minute ISR Edge Caching:** `export const revalidate = 60` deployed globally, cutting database query load by 99%.
+* **Ambient Audio Experience:** Features a fully integrated cinematic ambient soundtrack (toggle via bottom-right interface).
+* **Massive Swarm Concurrency:** Biomimetic families executing simultaneous parallel telemetry evaluations.
+* **Row-Level Security (RLS):** Supabase Multi-Tenant enforcement ensuring data isolation across enterprise zones.
+
+---
+
+<div align="center">
+  <i>Deployed via Vercel Edge Network. Powered by the Gemini Antigravity Framework.</i>
+</div>
