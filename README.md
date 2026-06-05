@@ -2,7 +2,68 @@
 
 Welcome to **Nakashima-Tsubaki**, an advanced industrial AI command center and cyber-physical digital twin simulator.
 
-This repository demonstrates the convergence of Next.js, Framer Motion, Three.js WebGL, and autonomous AI agents into a single "Sentient Operating System" designed for the manufacturing floor.
+This repository demonstrates the convergence of modern web frameworks and autonomous AI agents into a single "Sentient Operating System" designed for the manufacturing floor. It provides an interactive, operator-safe digital twin environment to simulate incidents, deploy AI swarms, and securely manage machine workflows.
+
+---
+
+## 🌟 Core Features
+
+- **Cyber-Physical Digital Twin**: Live, interactive WebGL 3D modeling of factory floors and precision spindles. Manipulate the "T-MINUS Scrubber" to rewind global simulator time and replay historic incidents.
+- **Autonomous Agent Swarm**: Press `CTRL+K` to open the integrated agent terminal. Spawn AI agents that physically fly across the DOM to hunt anomalies, lock onto telemetry, and provide context-aware help tips.
+- **Holographic Glassmorphism UI**: An extreme, boundary-pushing futuristic UI. UI panels break out of 2D sidebars into massive 3D holograms using Framer Motion physics.
+- **Native Web Audio Engine**: Completely synthesized UI sound effects (keystrokes, hover hums, alarm thrums) generated in-browser via the mathematical oscillators of the Web Audio API.
+- **Advisory-First Workflow**: An explicit node-graph approval gate to ensure that AI-generated actions are safely reviewed and cryptographically signed by human operators before "shadow execution."
+
+---
+
+## 🛠️ Technology Stack
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with heavy glassmorphism constraints
+- **Animation Physics**: [Framer Motion](https://www.framer.com/motion/)
+- **3D Rendering**: [Three.js](https://threejs.org/) & React Three Fiber (via dynamic imports)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+---
+
+## 🚀 Getting Started
+
+To run the deterministic lab simulator locally:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/zrt219/nakashima-tsubaki.git
+
+# 2. Navigate into the directory
+cd nakashima-tsubaki
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the development server
+npm run dev
+```
+
+Navigate to `http://localhost:3000` to interact with the command center.
+
+---
+
+## 📂 Project Structure
+
+```text
+├── app/                      # Next.js 14 App Router pages (11 custom routes)
+├── components/
+│   └── tn-command-center/    # The core cyber-physical UI components
+├── lib/
+│   ├── simulator/            # Zustand stores, Web Audio engine, & simulation logic
+│   └── tn-ai-data.ts         # Hardcoded mock scenarios, KPIs, and evidence payloads
+├── public/
+│   └── docs/                 # Image gallery and visual mockups
+└── README.md                 # You are here
+```
+
+---
 
 ## OpenAI Integration Blueprint
 
