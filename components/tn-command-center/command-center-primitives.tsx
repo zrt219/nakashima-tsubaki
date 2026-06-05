@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { type ReactNode, useEffect, useState, useRef } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import type { StatusKind } from "@/lib/tn-ai-data";
 
 export type IconName =
@@ -115,23 +115,27 @@ export function StatusChip({
   const isPulsing = status === "ready" || status === "approval";
 
   return (
-    <span
-      className={`inline-flex max-w-full items-center gap-1.5 border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] backdrop-blur-sm transition-all duration-300 ${meta.chipClass}`}
-      title={meta.description}
-    >
-      {/* Animated dot */}
-      <span className="relative inline-flex h-2 w-2 shrink-0">
-        {isPulsing && (
-          <span
-            className={`status-ping absolute inline-flex h-full w-full rounded-full ${meta.dotColor} opacity-60`}
-          />
-        )}
-        <span className={`relative inline-flex h-2 w-2 rounded-full ${meta.dotColor}`} />
-      </span>
-      <span className="truncate">
-        {compact ? meta.label.replace("OPERATOR ", "") : meta.label}
-      </span>
-    </span>
+    <MagneticWrapper intensity={10}>
+      <motion.span
+        whileHover={{ scale: 1.05, filter: "brightness(1.2)" }}
+        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+        className={`cursor-default inline-flex max-w-full items-center gap-1.5 border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] backdrop-blur-sm transition-all duration-300 ${meta.chipClass} hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]`}
+        title={meta.description}
+      >
+        {/* Animated dot */}
+        <span className="relative inline-flex h-2 w-2 shrink-0">
+          {isPulsing && (
+            <span
+              className={`status-ping absolute inline-flex h-full w-full rounded-full ${meta.dotColor} opacity-60`}
+            />
+          )}
+          <span className={`relative inline-flex h-2 w-2 rounded-full ${meta.dotColor}`} />
+        </span>
+        <span className="truncate">
+          {compact ? meta.label.replace("OPERATOR ", "") : meta.label}
+        </span>
+      </motion.span>
+    </MagneticWrapper>
   );
 }
 
@@ -249,6 +253,43 @@ export function ComparisonBlock({
   );
 }
 
+export function MagneticWrapper({ children, intensity = 20 }: { children: ReactNode; intensity?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
+  const springX = useSpring(x, springConfig);
+  const springY = useSpring(y, springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!ref.current) return;
+    const { clientX, clientY } = e;
+    const { width, height, left, top } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    x.set((clientX - centerX) / (width / 2) * intensity);
+    y.set((clientY - centerY) / (height / 2) * intensity);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: springX, y: springY }}
+      className="inline-block relative z-50 cursor-pointer"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export function ButtonLinkLike({
   children,
   tone = "primary"
@@ -258,18 +299,22 @@ export function ButtonLinkLike({
 }) {
   const className =
     tone === "primary"
-      ? "border-cyan-400/40 bg-cyan-400/[0.1] text-cyan-100 hover:bg-cyan-400/[0.18] hover:border-cyan-400/60 shadow-[0_0_12px_rgba(0,212,255,0.1)] hover:shadow-[0_0_20px_rgba(0,212,255,0.25)]"
-      : "border-command-line bg-white/[0.03] text-command-text hover:border-cyan-400/30 hover:bg-white/[0.06]";
+      ? "border-cyan-400/40 bg-cyan-400/[0.1] text-cyan-100 hover:bg-cyan-400/[0.25] hover:border-cyan-400/80 shadow-[0_0_15px_rgba(0,212,255,0.2)] hover:shadow-[0_0_30px_rgba(0,212,255,0.5)]"
+      : "border-command-line bg-white/[0.05] text-command-text hover:border-cyan-400/50 hover:bg-white/[0.1] hover:shadow-[0_0_20px_rgba(0,212,255,0.2)]";
 
   return (
-    <motion.span
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-      className={`btn-glow inline-flex items-center gap-2 border px-3 py-2 text-sm font-semibold backdrop-blur-md ${className}`}
-    >
-      {children}
-    </motion.span>
+    <MagneticWrapper intensity={15}>
+      <motion.span
+        whileHover={{ scale: 1.1, filter: "brightness(1.3)" }}
+        whileTap={{ scale: 0.9, filter: "brightness(0.8)" }}
+        transition={{ type: "spring", stiffness: 400, damping: 15, mass: 0.5 }}
+        className={`btn-glow group relative inline-flex items-center gap-2 overflow-hidden border px-4 py-2.5 text-sm font-bold tracking-widest uppercase backdrop-blur-md transition-colors duration-300 ${className}`}
+      >
+        {/* Animated sweep effect */}
+        <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
+        {children}
+      </motion.span>
+    </MagneticWrapper>
   );
 }
 

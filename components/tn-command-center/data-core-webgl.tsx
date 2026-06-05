@@ -102,7 +102,7 @@ export default function DataCoreWebGL({ isCritical = false }: { isCritical?: boo
 
   // Massive scaling for global background
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen transition-opacity duration-1000">
+    <div className="fixed inset-0 z-0 pointer-events-none mix-blend-screen transition-opacity duration-1000">
       <Canvas camera={{ position: [0, 0, area === "/simulator" ? 8 : 6], fov: 60 }}>
         <ambientLight intensity={0.5} />
         <MouseParallax>
@@ -120,8 +120,8 @@ export default function DataCoreWebGL({ isCritical = false }: { isCritical?: boo
           minPolarAngle={Math.PI / 3}
         />
       </Canvas>
-      {/* Heavy vignette to blend the edges */}
-      <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.8) 80%, black 100%)" }} />
+      {/* Soft vignette to blend the edges without covering too much */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.5) 90%, black 100%)" }} />
     </div>
   );
 }

@@ -54,7 +54,8 @@ const config: Config = {
         "flicker": "flicker 8s ease-in-out infinite",
         "slide-up": "slideUp 0.4s ease-out",
         "fade-in": "fadeIn 0.6s ease-out",
-        "glow-pulse": "glowPulse 3s ease-in-out infinite"
+        "glow-pulse": "glowPulse 3s ease-in-out infinite",
+        shimmer: "shimmer 1.5s infinite"
       },
       keyframes: {
         scan: {
@@ -89,6 +90,9 @@ const config: Config = {
         glowPulse: {
           "0%, 100%": { boxShadow: "0 0 8px rgba(0, 212, 255, 0.15)" },
           "50%": { boxShadow: "0 0 24px rgba(0, 212, 255, 0.45), 0 0 48px rgba(0, 212, 255, 0.2)" }
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" }
         }
       },
       backgroundImage: {
