@@ -10,9 +10,8 @@ import { TutorialOverlay } from "@/components/tn-command-center/tutorial-overlay
 import { AgentTerminal } from "@/components/tn-command-center/agent-terminal";
 import { AgentSwarmCanvas } from "@/components/tn-command-center/agent-swarm-canvas";
 
-import { useSimulatorStore } from "@/lib/simulator/use-simulator-store";
+import { useSimulatorStore } from "@/lib/simulator/store";
 import { audioEngine } from "@/lib/simulator/ui-audio-engine";
-import { WORKFLOW_STEPS } from "@/lib/simulator/types";
 
 const DataCoreWebGL = dynamic(() => import("@/components/tn-command-center/data-core-webgl"), { ssr: false });
 
@@ -33,25 +32,20 @@ export function CommandCenterShell({
   modelOverride?: any;
   signalState?: any;
 }) {
-  const { activeRun } = useSimulatorStore();
-
-  const currentStepIndex = activeRun ? WORKFLOW_STEPS.findIndex(s => s.id === activeRun.currentStep) : -1;
+  const { activeScenarioId, state } = useSimulatorStore();
 
   let computedSignalState = signalState || "normal";
-  if (!signalState && activeRun && currentStepIndex > 0) {
-    const stepId = WORKFLOW_STEPS[currentStepIndex]?.id;
-    if (stepId === "INCIDENT_SEEDED") {
+  if (!signalState && activeScenarioId) {
+    if (state === "INCIDENT_SEEDED" || state === "SHADOW_EXECUTION_RUNNING") {
       computedSignalState = "watch";
-    } else if (stepId === "SIGNAL_DETECTED" || stepId === "CONTEXT_RETRIEVED" || stepId === "RECOMMENDATION_GENERATED") {
+    } else if (state === "SIGNAL_DETECTED" || state === "CONTEXT_RETRIEVING" || state === "RECOMMENDATION_GENERATED") {
       computedSignalState = "warning";
-    } else if (stepId === "APPROVAL_REQUIRED" || stepId === "OPERATOR_REVIEW") {
+    } else if (state === "APPROVAL_REQUIRED" || state === "OPERATOR_REVIEW") {
       computedSignalState = "critical";
-    } else if (stepId === "SHADOW_EXECUTION" || stepId === "OUTCOME_MONITORED") {
-      computedSignalState = "watch";
     }
   }
 
-  const computedModelOverride = modelOverride || (activeRun && currentStepIndex > 0 ? (activeRun.scenarioId as any) : undefined);
+  const computedModelOverride = modelOverride || (activeScenarioId ? activeScenarioId : undefined);
 
   // Global Flashlight Mouse Tracking
   const mouseX = useMotionValue(0);
@@ -378,8 +372,9 @@ function EventStream({ items }: { items: EvidenceItem[] }) {
 }
 
 function TimeScrubber() {
-  const { activeRun, actualActiveRunLength, timeScrubIndex, setTimeScrubIndex } = useSimulatorStore();
+  const { activeScenarioId, events } = useSimulatorStore();
   const [mounted, setMounted] = useState(false);
+  const [scrubIndex, setScrubIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -387,10 +382,10 @@ function TimeScrubber() {
 
   if (!mounted) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
 
-  if (!activeRun || actualActiveRunLength === 0) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
+  if (!activeScenarioId || events.length === 0) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
 
-  const maxIndex = actualActiveRunLength - 1;
-  const currentIndex = timeScrubIndex !== null ? timeScrubIndex : maxIndex;
+  const maxIndex = events.length - 1;
+  const currentIndex = scrubIndex !== null ? scrubIndex : maxIndex;
 
   return (
     <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden">
@@ -406,7 +401,7 @@ function TimeScrubber() {
           min={0} 
           max={maxIndex} 
           value={currentIndex}
-          onChange={(e) => setTimeScrubIndex(Number(e.target.value) === maxIndex ? null : Number(e.target.value))}
+          onChange={(e) => setScrubIndex(Number(e.target.value) === maxIndex ? null : Number(e.target.value))}
           className="w-full h-1 bg-cyan-900/50 appearance-none rounded-full outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
         />
       </div>
@@ -416,11 +411,11 @@ function TimeScrubber() {
 
 function OperatorComms() {
   const [levels, setLevels] = useState<number[]>(Array(10).fill(10));
-  const { activeRun } = useSimulatorStore();
+  const { state } = useSimulatorStore();
 
   useEffect(() => {
     // Simulate radio chatter intensity based on simulator state
-    const isCritical = activeRun?.currentStep === "APPROVAL_REQUIRED" || activeRun?.currentStep === "SIGNAL_DETECTED";
+    const isCritical = state === "APPROVAL_REQUIRED" || state === "SIGNAL_DETECTED";
     
     const interval = setInterval(() => {
       setLevels(prev => prev.map(() => {
@@ -431,7 +426,7 @@ function OperatorComms() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [activeRun?.currentStep]);
+  }, [state]);
 
   return (
     <div className="w-48 border border-amber-500/30 bg-amber-900/10 p-2 backdrop-blur-md flex items-center gap-2">

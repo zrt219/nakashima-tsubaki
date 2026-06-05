@@ -2,26 +2,31 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SCENARIOS } from "@/lib/simulator/simulator-scenarios";
 import { motion } from "framer-motion";
-import { useSimulatorStore } from "@/lib/simulator/use-simulator-store";
+import { SCENARIOS } from "@/lib/simulator/scenarios";
+import { useSimulatorStore } from "@/lib/simulator/store";
 import { tutorialStore } from "@/lib/simulator/tutorial-store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, Panel, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 
 export function SimulatorLaunchpad() {
   const router = useRouter();
-  const { startScenario } = useSimulatorStore();
-  const [selectedId, setSelectedId] = useState(SCENARIOS[0].id);
+  const { loadScenario } = useSimulatorStore();
+  const [selectedId, setSelectedId] = useState<string | null>(SCENARIOS[0].id);
+  const [isStarting, setIsStarting] = useState(false);
 
   const activeScenario = SCENARIOS.find(s => s.id === selectedId)!;
 
-  function handleCreateRun() {
-    const runId = startScenario(selectedId);
-    if (runId) {
-      router.push(`/simulator/${runId}`);
-    }
-  }
+  const handleStart = () => {
+    if (!selectedId) return;
+    setIsStarting(true);
+    
+    // Slight delay for effect
+    setTimeout(() => {
+      const runId = loadScenario(selectedId);
+      router.push(`/simulator?runId=${runId}`);
+    }, 600);
+  };
 
   return (
     <CommandCenterShell
@@ -139,12 +144,12 @@ export function SimulatorLaunchpad() {
                   <div className="mt-6 flex flex-wrap gap-3">
                     <button
                       id="create-simulator-run"
-                      type="button"
-                      onClick={handleCreateRun}
-                      className="btn-glow inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-400/[0.1] px-5 py-2.5 text-sm font-semibold text-cyan-100 transition-all duration-200 hover:bg-cyan-400/[0.18] hover:border-cyan-400/60 hover:shadow-[0_0_24px_rgba(0,212,255,0.3)]"
+                      onClick={handleStart}
+                      disabled={isStarting}
+                      className="btn-glow flex items-center justify-center gap-2 border border-cyan-400/50 bg-cyan-400/[0.15] py-3 px-5 text-sm font-bold text-cyan-50 transition-all hover:bg-cyan-400/30 hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] disabled:opacity-50"
                     >
-                      <Icon name="play" className="h-3.5 w-3.5" />
-                      Create simulator run
+                      <Icon name="play" className="h-4 w-4" />
+                      {isStarting ? "Initializing Model..." : "Seed Scenario into Twin"}
                     </button>
                   </div>
                 </Panel>

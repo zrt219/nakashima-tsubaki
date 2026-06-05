@@ -1,17 +1,27 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { overviewEvents, overviewKpis } from "@/lib/tn-ai-data";
-import { useSimulatorLatestRun } from "@/lib/simulator/use-simulator-store";
-import type { RunSummary } from "@/lib/simulator/types";
+import { useSimulatorStore } from "@/lib/simulator/store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 
-export function OverviewDashboard({ asset }: { asset?: any }) {
-  const { latestRun } = useSimulatorLatestRun();
+export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?: any, telemetryData?: any, scenarios?: any[] }) {
+  const { runId: latestRunId, state: latestRunState } = useSimulatorStore();
+  const latestRun = { id: latestRunId, state: latestRunState };
+  const router = useRouter();
+
+  useEffect(() => {
+    // Poll for new live data every 5 seconds
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [router]);
 
   return (
     <CommandCenterShell
@@ -37,7 +47,7 @@ export function OverviewDashboard({ asset }: { asset?: any }) {
         animate={{ opacity: 1, scale: 1 }} 
         transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
       >
-        <DigitalTwinCanvas />
+        <DigitalTwinCanvas telemetryData={telemetryData} />
       </motion.div>
 
       <motion.div 
@@ -45,7 +55,7 @@ export function OverviewDashboard({ asset }: { asset?: any }) {
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
       >
-        <TelemetryBar />
+        <TelemetryBar telemetryData={telemetryData} />
       </motion.div>
       
       <motion.div 
@@ -54,15 +64,15 @@ export function OverviewDashboard({ asset }: { asset?: any }) {
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.6, delay: 0.5, staggerChildren: 0.1, ease: "easeOut" }}
       >
-        <ReplayableScenariosPanel latestRun={latestRun} />
-        <ProductionTraceabilityPanel />
-        <EvidenceLedgerPanel />
+        <ReplayableScenariosPanel latestRun={latestRun} scenarios={scenarios} />
+        <ProductionTraceabilityPanel latestRun={latestRun} />
+        <LiveEventLedgerPanel />
       </motion.div>
     </CommandCenterShell>
   );
 }
 
-function OverviewHero({ latestRun, asset }: { latestRun: RunSummary | null, asset?: any }) {
+function OverviewHero({ latestRun, asset }: { latestRun: { id: string, state: string } | null, asset?: any }) {
   return (
     <section className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 p-2">
       <div>
@@ -125,9 +135,42 @@ function OverviewHero({ latestRun, asset }: { latestRun: RunSummary | null, asse
   );
 }
 
-function DigitalTwinCanvas() {
+function NetworkPing() {
+  const [latency, setLatency] = useState(18);
+  const [throughput, setThroughput] = useState(14.2);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLatency(12 + Math.floor(Math.random() * 15));
+      setThroughput(14 + (Math.random() * 8));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="absolute top-6 left-6 z-20 flex gap-4 font-mono text-[10px]">
+      <div className="flex items-center gap-1">
+        <Icon name="arrow" className="h-3 w-3 text-cyan-400" />
+        <span className="text-command-steel">LATENCY:</span>
+        <span className="text-cyan-300 font-bold">{latency} ms</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <Icon name="database" className="h-3 w-3 text-cyan-400" />
+        <span className="text-command-steel">IO:</span>
+        <span className="text-cyan-300 font-bold">{throughput.toFixed(1)} MB/s</span>
+      </div>
+    </div>
+  );
+}
+
+function DigitalTwinCanvas({ telemetryData }: { telemetryData?: any }) {
   const [timeline, setTimeline] = useState(100); // 100 is present, 0 is past
   const isCritical = timeline < 30; // Simulate an anomaly in the past
+
+  // Fallback values if real data isn't available
+  const currentSpeed = telemetryData?.speed?.value_numeric ? Math.round(telemetryData.speed.value_numeric).toLocaleString() : "12,450";
+  const currentTemp = telemetryData?.temp?.value_numeric ? Number(telemetryData.temp.value_numeric).toFixed(1) : "20.6";
+  const currentVib = telemetryData?.vib?.value_numeric ? Number(telemetryData.vib.value_numeric).toFixed(2) : "1.42";
 
   return (
     <section className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/20 bg-black/30 p-4 shadow-[0_0_30px_rgba(0,212,255,0.02)] backdrop-blur-md">
@@ -143,6 +186,8 @@ function DigitalTwinCanvas() {
           <span className={`status-ping relative flex h-2 w-2 rounded-full ${isCritical ? "bg-red-400" : "bg-emerald-400"}`} /> {isCritical ? "REPLAY" : "LIVE"}
         </div>
       </div>
+
+      <NetworkPing />
 
       {/* 3D Visual Centerpiece replaced by Global WebGL */}
       <div className="absolute inset-0 z-0">
@@ -164,9 +209,9 @@ function DigitalTwinCanvas() {
 
       {/* HUD Overlays */}
       <div className="relative z-10 mt-16 grid grid-cols-2 gap-4 xl:grid-cols-4 xl:w-1/2">
-        <HUDMetric icon="power" label="Spindle Speed" value={isCritical ? "14,800" : "12,450"} unit="RPM" critical={isCritical} />
+        <HUDMetric icon="power" label="Spindle Speed" value={isCritical ? "14,800" : currentSpeed} unit="RPM" critical={isCritical || telemetryData?.speed?.quality !== 'GOOD'} />
         <HUDMetric icon="arrow" label="Feed Rate" value={isCritical ? "1,400" : "1,250"} unit="mm/min" critical={isCritical} />
-        <HUDMetric icon="shield" label="Coolant Temp" value={isCritical ? "38.2" : "20.6"} unit="°C" critical={isCritical} />
+        <HUDMetric icon="shield" label="Coolant Temp" value={isCritical ? "38.2" : currentTemp} unit="°C" critical={isCritical || telemetryData?.temp?.quality !== 'GOOD'} />
         <HUDMetric icon="chart" label="Power Draw" value={isCritical ? "11.4" : "7.8"} unit="kW" critical={isCritical} />
       </div>
 
@@ -213,16 +258,41 @@ function HUDMetric({ icon, label, value, unit, critical }: { icon: string; label
   );
 }
 
-function TelemetryBar() {
+function TelemetryBar({ telemetryData }: { telemetryData?: any }) {
+  const currentTemp = telemetryData?.temp?.value_numeric ? `+${(Number(telemetryData.temp.value_numeric) - 20.0).toFixed(1)} µm` : "+1.8 µm";
+  const currentVib = telemetryData?.vib?.value_numeric ? `${Number(telemetryData.vib.value_numeric).toFixed(2)} mm/s` : "1.42 mm/s";
+
   return (
     <div className="mt-3 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
       <TelemetryBlock title="Machine Condition" value="96/100" sub="Excellent" />
-      <TelemetryBlock title="Spindle Thermal Drift" value="+1.8 µm" sub="Stable" />
-      <TelemetryBlock title="Vibration Analysis" value="1.42 mm/s" sub="Normal" />
+      <TelemetryBlock title="Spindle Thermal Drift" value={currentTemp} sub={telemetryData?.temp?.quality === 'GOOD' ? 'Stable' : 'Warning'} />
+      <TelemetryBlock title="Vibration Analysis" value={currentVib} sub={telemetryData?.vib?.quality === 'GOOD' ? 'Normal' : 'High'} />
       <TelemetryBlock title="Tool Wear" value="12%" sub="Good" />
       <TelemetryBlock title="Shaft / Bearing Health" value="94/100" sub="Good" />
       <TelemetryBlock title="Dimensional Quality Hold" value="1.63" sub="Capable" color="emerald" />
     </div>
+  );
+}
+
+function LiveSparkline({ color }: { color: string }) {
+  const [points, setPoints] = useState(() => Array.from({ length: 20 }, () => Math.random() * 15));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPoints(prev => {
+        const next = [...prev.slice(1), Math.random() * 15];
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const polylineStr = points.map((p, i) => `${i * 5},${18 - p}`).join(" ");
+
+  return (
+    <svg className="h-6 w-16 opacity-70" viewBox="0 0 100 20" preserveAspectRatio="none">
+      <polyline points={polylineStr} fill="none" stroke={color} strokeWidth="1.5" className="transition-all duration-300 ease-linear" />
+    </svg>
   );
 }
 
@@ -237,24 +307,27 @@ function TelemetryBlock({ title, value, sub, color = "cyan" }: { title: string; 
           <p className="font-mono text-lg font-bold text-white">{value}</p>
           <p className={`text-[10px] ${colorClass}`}>{sub}</p>
         </div>
-        {/* Fake sparkline graphic */}
-        <svg className="h-6 w-16 opacity-50" viewBox="0 0 100 20" preserveAspectRatio="none">
-          <polyline points="0,15 20,10 40,12 60,5 80,18 100,8" fill="none" stroke={color === "emerald" ? "#10b981" : "#00d4ff"} strokeWidth="2" />
-        </svg>
+        <LiveSparkline color={color === "emerald" ? "#10b981" : "#00d4ff"} />
       </div>
     </div>
   );
 }
 
-function ReplayableScenariosPanel({ latestRun }: { latestRun: RunSummary | null }) {
+function ReplayableScenariosPanel({ latestRun, scenarios }: { latestRun: { id: string, state: string } | null, scenarios?: any[] }) {
   return (
     <div className="border border-command-line/70 bg-black/30 p-4">
       <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Replayable Twin Scenarios</p>
       <div className="mt-4 space-y-2">
-        <ScenarioRow title="Scenario 1 - Roughing" status="COMPLETED" time="2h ago" />
-        <ScenarioRow title="Scenario 2 - Thermal Stress" status="COMPLETED" time="4h ago" />
-        <ScenarioRow title="Scenario 3 - Finish Turning" status="ACTIVE" time="2 min ago" active />
-        <ScenarioRow title="Scenario 4 - Tool Wear Progression" status="QUEUED" time="--" />
+        {scenarios && scenarios.length > 0 ? scenarios.map((s, idx) => (
+          <ScenarioRow key={s.id} title={`Scenario ${idx + 1} - ${s.name}`} status={idx === 0 ? "ACTIVE" : "QUEUED"} time={idx === 0 ? "2 min ago" : "--"} active={idx === 0} />
+        )) : (
+          <>
+            <ScenarioRow title="Scenario 1 - Roughing" status="COMPLETED" time="2h ago" />
+            <ScenarioRow title="Scenario 2 - Thermal Stress" status="COMPLETED" time="4h ago" />
+            <ScenarioRow title="Scenario 3 - Finish Turning" status="ACTIVE" time="2 min ago" active />
+            <ScenarioRow title="Scenario 4 - Tool Wear Progression" status="QUEUED" time="--" />
+          </>
+        )}
       </div>
       <button className="mt-4 text-[10px] font-semibold text-cyan-400 hover:text-cyan-300">View all scenarios &gt;</button>
     </div>
@@ -262,23 +335,40 @@ function ReplayableScenariosPanel({ latestRun }: { latestRun: RunSummary | null 
 }
 
 function ScenarioRow({ title, status, time, active }: { title: string; status: string; time: string; active?: boolean }) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    const interval = setInterval(() => {
+      setProgress(p => (p + Math.random() * 5) % 100);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [active]);
+
   return (
-    <div className={`flex items-center justify-between border-l-2 p-2 ${active ? "border-amber-400 bg-amber-400/[0.05]" : "border-command-line/40 bg-black/20"}`}>
-      <span className={`text-xs font-semibold ${active ? "text-amber-300" : "text-slate-300"}`}>{title}</span>
-      <div className="flex items-center gap-3">
-        <span className={`text-[9px] font-bold ${status === "COMPLETED" ? "text-emerald-400" : status === "ACTIVE" ? "text-amber-400" : "text-command-steel"}`}>{status}</span>
-        <span className="w-12 text-right text-[10px] text-command-muted">{time}</span>
+    <div className={`flex flex-col border-l-2 p-2 ${active ? "border-amber-400 bg-amber-400/[0.05]" : "border-command-line/40 bg-black/20"}`}>
+      <div className="flex items-center justify-between">
+        <span className={`text-xs font-semibold ${active ? "text-amber-300" : "text-slate-300"}`}>{title}</span>
+        <div className="flex items-center gap-3">
+          <span className={`text-[9px] font-bold ${status === "COMPLETED" ? "text-emerald-400" : status === "ACTIVE" ? "text-amber-400" : "text-command-steel"}`}>{status}</span>
+          <span className="w-12 text-right text-[10px] text-command-muted">{time}</span>
+        </div>
       </div>
+      {active && (
+        <div className="mt-2 h-1 w-full bg-black border border-amber-400/20 overflow-hidden">
+          <motion.div className="h-full bg-amber-400" initial={{ width: "0%" }} animate={{ width: `${progress}%` }} transition={{ duration: 1, ease: "linear" }} />
+        </div>
+      )}
     </div>
   );
 }
 
-function ProductionTraceabilityPanel() {
+function ProductionTraceabilityPanel({ latestRun }: { latestRun: { state: string } | null }) {
   return (
     <div className="border border-command-line/70 bg-black/30 p-4">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Production Traceability</p>
-        <StatusChip status="simulated" compact />
+        <StatusChip status={latestRun?.state === "APPROVAL_REQUIRED" ? "approval" : "simulated"} compact />
       </div>
       <p className="mt-3 text-sm font-bold text-white">Lot NT-2025-0517-AX12</p>
       <div className="mt-3 space-y-3 border-l border-command-line/60 ml-2 pl-3 relative">
@@ -301,40 +391,65 @@ function TraceStep({ label, value, done, active }: { label: string; value: strin
   );
 }
 
-function EvidenceLedgerPanel() {
+function LiveEventLedgerPanel() {
+  const [logs, setLogs] = useState<{ id: number, label: string, hash: string, time: string }[]>([]);
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const labels = ["Telemetry Ingest", "Anomaly Scan", "State Replay", "Hash Verification", "Spindle Drift Comp", "Vibration FFT", "Twin Mesh Update", "Operator Gate Check"];
+    const interval = setInterval(() => {
+      setCounter(c => c + 1);
+      setLogs(prev => {
+        const newLog = {
+          id: Date.now(),
+          label: labels[Math.floor(Math.random() * labels.length)],
+          hash: Math.random().toString(16).slice(2, 10),
+          time: new Date().toISOString().split('T')[1].slice(0, 8)
+        };
+        return [newLog, ...prev].slice(0, 5);
+      });
+    }, 1200 + Math.random() * 800);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="border border-command-line/70 bg-black/30 p-4">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Evidence Ledger</p>
-        <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1"><Icon name="check" className="h-3 w-3" /> Verifiable</span>
+    <div className="border border-command-line/70 bg-black/30 p-4 overflow-hidden h-[240px] flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Live Event Ledger</p>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-cyan-400">{counter} events</span>
+          <span className="relative flex h-2 w-2 rounded-full bg-emerald-400 status-ping shrink-0" />
+        </div>
       </div>
-      <div className="mt-4 space-y-2">
-        <LedgerRow label="Process Data" records="12,450 records" hash="7f3a...9c2b" />
-        <LedgerRow label="Quality Measurements" records="812 records" hash="a91b...d4e1" />
-        <LedgerRow label="Machine Signals" records="4.2M samples" hash="c2d4...1f88" />
-        <LedgerRow label="Operator Actions" records="14 actions" hash="d9e1...7e5f" />
+      <div className="space-y-2 relative flex-1">
+        <AnimatePresence>
+          {logs.map((log) => (
+            <motion.div 
+              key={log.id} 
+              initial={{ opacity: 0, x: 20 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-[1fr_80px_30px] items-center gap-2 border-b border-command-line/40 py-1"
+            >
+              <div className="min-w-0">
+                <p className="text-xs text-white truncate">{log.label}</p>
+                <p className="text-[9px] text-command-muted">{log.time}</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-command-muted">HASH</p>
+                <p className="font-mono text-[10px] text-cyan-300">{log.hash}</p>
+              </div>
+              <Icon name="check" className="h-4 w-4 text-emerald-400 justify-self-end shrink-0" />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
-function LedgerRow({ label, records, hash }: { label: string; records: string; hash: string }) {
-  return (
-    <div className="grid grid-cols-[1fr_100px_30px] items-center gap-2 border-b border-command-line/40 py-2">
-      <div>
-        <p className="text-xs text-white">{label}</p>
-        <p className="text-[9px] text-command-muted">{records}</p>
-      </div>
-      <div>
-        <p className="text-[9px] text-command-muted">HASH</p>
-        <p className="font-mono text-[10px] text-cyan-300">{hash}</p>
-      </div>
-      <Icon name="check" className="h-4 w-4 text-emerald-400 justify-self-end" />
-    </div>
-  );
-}
-
-function OverviewRail({ latestRun }: { latestRun: RunSummary | null }) {
+function OverviewRail({ latestRun }: { latestRun: { id: string, state: string } | null }) {
   return (
     <div className="glass-panel relative flex h-full flex-col overflow-hidden bg-black/40">
       {/* Right accent bar */}
