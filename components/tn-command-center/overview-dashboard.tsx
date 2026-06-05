@@ -9,6 +9,7 @@ import { overviewEvents, overviewKpis } from "@/lib/tn-ai-data";
 import { useSimulatorStore } from "@/lib/simulator/store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { AICopilotTerminal } from "@/components/tn-command-center/ai-copilot-terminal";
 
 export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?: any, telemetryData?: any, scenarios?: any[] }) {
   const { runId: latestRunId, state: latestRunState } = useSimulatorStore();
@@ -68,6 +69,10 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
         <ProductionTraceabilityPanel latestRun={latestRun} />
         <LiveEventLedgerPanel />
       </motion.div>
+
+      <div className="mt-3">
+        <AICopilotTerminal telemetryData={telemetryData} />
+      </div>
     </CommandCenterShell>
   );
 }
