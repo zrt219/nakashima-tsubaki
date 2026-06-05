@@ -257,10 +257,15 @@ export function MagneticWrapper({ children, intensity = 20 }: { children: ReactN
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
 
-  const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
+  // High performance fluid spring physics
+  const springConfig = { damping: 10, stiffness: 400, mass: 0.1 };
   const springX = useSpring(x, springConfig);
   const springY = useSpring(y, springConfig);
+  const springRotateX = useSpring(rotateX, springConfig);
+  const springRotateY = useSpring(rotateY, springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!ref.current) return;
@@ -268,13 +273,23 @@ export function MagneticWrapper({ children, intensity = 20 }: { children: ReactN
     const { width, height, left, top } = ref.current.getBoundingClientRect();
     const centerX = left + width / 2;
     const centerY = top + height / 2;
-    x.set((clientX - centerX) / (width / 2) * intensity);
-    y.set((clientY - centerY) / (height / 2) * intensity);
+    
+    const distanceX = clientX - centerX;
+    const distanceY = clientY - centerY;
+
+    x.set((distanceX / (width / 2)) * intensity);
+    y.set((distanceY / (height / 2)) * intensity);
+    
+    // Physical 3D tilt towards mouse
+    rotateX.set((distanceY / (height / 2)) * -15);
+    rotateY.set((distanceX / (width / 2)) * 15);
   };
 
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
+    rotateX.set(0);
+    rotateY.set(0);
   };
 
   return (
@@ -282,7 +297,7 @@ export function MagneticWrapper({ children, intensity = 20 }: { children: ReactN
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ x: springX, y: springY }}
+      style={{ x: springX, y: springY, rotateX: springRotateX, rotateY: springRotateY, perspective: 1000, transformStyle: "preserve-3d" }}
       className="inline-block relative z-50 cursor-pointer"
     >
       {children}

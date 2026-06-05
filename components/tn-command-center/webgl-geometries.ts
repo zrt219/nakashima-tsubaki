@@ -182,3 +182,118 @@ export function generateTorus(count: number, R = 3, r = 1) {
   }
   return points;
 }
+
+export function generateHeatField(count: number, radius = 3) {
+  const points = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const x = (Math.random() - 0.5) * radius * 2;
+    const y = (Math.random() - 0.5) * radius * 2;
+    const z = (Math.random() - 0.5) * radius * 2;
+    // Concentrate in the center
+    const dist = Math.sqrt(x * x + y * y + z * z);
+    const factor = Math.random() * (dist / radius);
+    points[i * 3] = x * factor;
+    points[i * 3 + 1] = y * factor;
+    points[i * 3 + 2] = z * factor;
+  }
+  return points;
+}
+
+export function generateWaveTunnel(count: number, radius = 2, length = 8) {
+  const points = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const z = (Math.random() - 0.5) * length;
+    const theta = Math.random() * 2 * Math.PI;
+    // Radius modulates based on Z (sine wave tunnel)
+    const r = radius + Math.sin(z * 2) * 0.8 + (Math.random() - 0.5) * 0.2;
+    points[i * 3] = r * Math.cos(theta);
+    points[i * 3 + 1] = r * Math.sin(theta);
+    points[i * 3 + 2] = z;
+  }
+  return points;
+}
+
+export function generateErodingGeometry(count: number, size = 4) {
+  const points = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    let x = (Math.random() - 0.5) * size;
+    let y = (Math.random() - 0.5) * size;
+    let z = (Math.random() - 0.5) * size;
+    // Carve out a chunk (simulating wear/erosion)
+    if (x > 0 && y > 0 && z > 0) {
+      x -= size / 2;
+      y -= size / 2;
+    }
+    points[i * 3] = x;
+    points[i * 3 + 1] = y;
+    points[i * 3 + 2] = z;
+  }
+  return points;
+}
+
+export function generateFlowNetwork(count: number, size = 6) {
+  const points = new Float32Array(count * 3);
+  const nodes = Array.from({ length: 8 }).map(() => ({
+    x: (Math.random() - 0.5) * size,
+    y: (Math.random() - 0.5) * size,
+    z: (Math.random() - 0.5) * size,
+  }));
+  for (let i = 0; i < count; i++) {
+    const n1 = nodes[Math.floor(Math.random() * nodes.length)];
+    const n2 = nodes[Math.floor(Math.random() * nodes.length)];
+    const t = Math.random();
+    points[i * 3] = n1.x + (n2.x - n1.x) * t + (Math.random() - 0.5) * 0.2;
+    points[i * 3 + 1] = n1.y + (n2.y - n1.y) * t + (Math.random() - 0.5) * 0.2;
+    points[i * 3 + 2] = n1.z + (n2.z - n1.z) * t + (Math.random() - 0.5) * 0.2;
+  }
+  return points;
+}
+
+export function generateOrb(count: number, radius = 2.5) {
+  const points = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const u = Math.random();
+    const v = Math.random();
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+    // Smooth solid shell with minimal noise
+    const r = radius + (Math.random() - 0.5) * 0.05;
+    points[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    points[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    points[i * 3 + 2] = r * Math.cos(phi);
+  }
+  return points;
+}
+
+export function generateCentrifugeFEA(count: number, stressLevel = 0.5) {
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  
+  for (let i = 0; i < count; i++) {
+    const y = (Math.random() - 0.5) * 8;
+    const isRotor = Math.random() > 0.5;
+    const r = isRotor ? 1.5 : 2.5 + (Math.random() - 0.5) * 0.2; // Add some thickness
+    const theta = Math.random() * 2 * Math.PI;
+    
+    positions[i * 3] = r * Math.cos(theta);
+    positions[i * 3 + 1] = y;
+    positions[i * 3 + 2] = r * Math.sin(theta);
+
+    // Calculate von Mises stress heatmap color
+    const distFromCenter = Math.abs(y);
+    const stress = isRotor ? Math.max(0, (1 - distFromCenter / 4)) * stressLevel * 2 : 0.1;
+    const normalizedStress = Math.max(0, Math.min(1, stress));
+    
+    // Heatmap gradient: Blue(0) -> Green(0.5) -> Red(1.0)
+    if (normalizedStress < 0.5) {
+      colors[i * 3] = 0; // R
+      colors[i * 3 + 1] = normalizedStress * 2; // G
+      colors[i * 3 + 2] = 1 - (normalizedStress * 2); // B
+    } else {
+      colors[i * 3] = (normalizedStress - 0.5) * 2; // R
+      colors[i * 3 + 1] = 1 - ((normalizedStress - 0.5) * 2); // G
+      colors[i * 3 + 2] = 0; // B
+    }
+  }
+  return { positions, colors };
+}

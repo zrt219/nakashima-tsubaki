@@ -78,6 +78,31 @@ export function AdvisoryDashboard() {
               </div>
             </div>
           </div>
+
+          <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4 backdrop-blur-3xl mt-4 flex-1">
+            <span className="text-xs font-semibold text-command-muted uppercase">Decision Tree</span>
+            <div className="mt-4 space-y-4">
+              <div className="flex flex-col gap-2 relative">
+                <div className="absolute top-4 bottom-4 left-3 w-px bg-cyan-900" />
+                <div className="flex gap-3 items-center z-10">
+                  <div className="w-6 h-6 rounded-full bg-cyan-900 border border-cyan-500 text-[10px] flex items-center justify-center text-cyan-300">1</div>
+                  <div className="text-[10px] text-slate-300">Evaluate Spindle FFT</div>
+                </div>
+                <div className="flex gap-3 items-center z-10">
+                  <div className="w-6 h-6 rounded-full bg-cyan-900 border border-cyan-500 text-[10px] flex items-center justify-center text-cyan-300">2</div>
+                  <div className="text-[10px] text-slate-300">Cross-Ref bearing history</div>
+                </div>
+                <div className="flex gap-3 items-center z-10 pl-6">
+                  <div className="w-1 h-1 bg-cyan-500 rounded-full" />
+                  <div className="text-[10px] text-emerald-400 font-bold">Match Found (94%)</div>
+                </div>
+                <div className="flex gap-3 items-center z-10">
+                  <div className="w-6 h-6 rounded-full bg-amber-900 border border-amber-500 text-[10px] flex items-center justify-center text-amber-300 animate-pulse">3</div>
+                  <div className="text-[10px] text-slate-300">Propose Thermal Offset</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         {/* Center Canvas: OPEN FOR WEBGL */}
@@ -174,7 +199,28 @@ export function AdvisoryDashboard() {
             </div>
           </div>
           
-          <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4 backdrop-blur-3xl mt-2 flex-1">
+          <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4 backdrop-blur-3xl mt-4">
+            <span className="text-xs font-semibold text-command-muted uppercase flex items-center justify-between">
+              SOP Override Matrix
+              <span className="text-[8px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1 py-0.5">LEVEL 2</span>
+            </span>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-300">Force Execution w/o QA Hold</span>
+                <button className="border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 text-[9px] text-red-400 font-bold tracking-wider">OVERRIDE</button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-300">Bypass Maintenance Ticket</span>
+                <button className="border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 text-[9px] text-red-400 font-bold tracking-wider">OVERRIDE</button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-300">Manual Offset Injection</span>
+                <button className="border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 text-[9px] text-red-400 font-bold tracking-wider">OVERRIDE</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4 backdrop-blur-3xl mt-4 flex-1">
             <span className="text-xs font-semibold text-command-muted">RECENT ADVISORY ACTIVITY</span>
             <div className="mt-4 space-y-4">
               <div className="flex justify-between items-center border-b border-command-line/30 pb-2">

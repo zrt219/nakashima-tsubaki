@@ -1,208 +1,129 @@
 import type { StatusKind } from "@/lib/tn-ai-data";
 
-export type VibrationBand = "nominal" | "elevated" | "critical";
-export type TemperatureBand = "nominal" | "elevated" | "critical";
-export type SurfaceFinishStatus = "nominal" | "drift" | "breach";
-export type SampleExpansion = "not_required" | "recommended" | "required";
-export type RiskLevel = "stable" | "watch" | "critical";
-export type ScenarioTemplateId = "quality_hold" | "thermal_excursion" | "spindle_degradation";
-export type WorkflowStepId = "detect" | "retrieve" | "review" | "record" | "complete";
-export type ApprovalVerdict = "approve" | "reject" | "escalate";
-export type RunDisposition = "monitor" | "hold" | "controlled_release" | "engineering_board";
-export type TwinPhaseId =
-  | "baseline"
-  | "anomaly"
-  | "containment"
-  | "retrieval"
-  | "review_gate"
-  | "decision"
-  | "evidence";
+export type TwinModelId =
+  | "executive-globe"
+  | "roadmap-helix"
+  | "rag-knowledge-graph"
+  | "simulator-chaotic-spindle"
+  | "ledger-blockchain-grid"
+  | "advisory-decision-core"
+  | "governance-shield"
+  | "architecture-lattice"
+  | "kpi-telemetry-cylinder"
+  | "qa-inspection-torus"
+  | "thermal-heat-field"
+  | "vibration-wave-tunnel"
+  | "tool-wear-geometry"
+  | "supply-chain-flow"
+  | "operator-approval-orb"
+  | "stuxnet-centrifuge";
 
-export type ScenarioInput = {
-  scenarioTemplateId?: ScenarioTemplateId;
-  lotId: string;
-  facilityId?: string;
-  lineId: string;
-  machineId?: string;
-  vibrationBand: VibrationBand;
-  temperatureBand: TemperatureBand;
-  cpk: number;
-  surfaceFinishStatus: SurfaceFinishStatus;
-  sampleExpansion: SampleExpansion;
-  operatorShift: "day" | "swing" | "night";
-  qualityPriority: "throughput" | "balanced" | "containment";
+export type WorkflowStepId =
+  | "IDLE"
+  | "SCENARIO_SELECTED"
+  | "INCIDENT_SEEDED"
+  | "SIGNAL_DETECTED"
+  | "CONTEXT_RETRIEVED"
+  | "RECOMMENDATION_GENERATED"
+  | "OPERATOR_REVIEW"
+  | "APPROVAL_REQUIRED"
+  | "ACTION_APPROVED"
+  | "ACTION_REJECTED"
+  | "SHADOW_EXECUTION"
+  | "OUTCOME_MONITORED"
+  | "EVIDENCE_CAPTURED"
+  | "REPLAY_READY";
+
+export const WORKFLOW_STEPS: { id: WorkflowStepId; label: string }[] = [
+  { id: "IDLE", label: "Idle" },
+  { id: "SCENARIO_SELECTED", label: "Scenario Selected" },
+  { id: "INCIDENT_SEEDED", label: "Incident Seeded" },
+  { id: "SIGNAL_DETECTED", label: "Signal Detected" },
+  { id: "CONTEXT_RETRIEVED", label: "Context Retrieved" },
+  { id: "RECOMMENDATION_GENERATED", label: "Recommendation Generated" },
+  { id: "OPERATOR_REVIEW", label: "Operator Review" },
+  { id: "APPROVAL_REQUIRED", label: "Approval Required" },
+  { id: "ACTION_APPROVED", label: "Action Approved" },
+  { id: "ACTION_REJECTED", label: "Action Rejected" },
+  { id: "SHADOW_EXECUTION", label: "Shadow Execution" },
+  { id: "OUTCOME_MONITORED", label: "Outcome Monitored" },
+  { id: "EVIDENCE_CAPTURED", label: "Evidence Captured" },
+  { id: "REPLAY_READY", label: "Replay Ready" }
+];
+
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export type ApprovalGate = {
+  id: string;
+  label: string;
+  requiredRole: string;
+  reason: string;
+  status: ApprovalStatus;
 };
 
-export type KnowledgeDocument = {
+export type EvidenceSource = {
   id: string;
   title: string;
-  owner: string;
-  type: string;
-  snippet: string;
-  tags: string[];
-  control: string;
-  scenarioTemplates?: ScenarioTemplateId[];
-};
-
-export type RetrievedDocument = KnowledgeDocument & {
+  type: "sensor" | "procedure" | "maintenance-log" | "qa-record" | "operator-action" | "simulation";
   confidence: number;
-  relevance: number;
-  matchedTerms: string[];
+  hash?: string;
 };
 
-export type Recommendation = {
-  summary: string;
-  actions: string[];
-  lotDisposition: RunDisposition;
-  requiredApprovals: string[];
-  confidence: number;
-  missingContext: string[];
-};
-
-export type SimulationEvent = {
+export type TwinRecommendation = {
   id: string;
-  timestamp: string;
-  source: string;
-  event: string;
-  payload: string;
-  status: StatusKind;
-};
-
-export type TwinNode = {
-  id: string;
-  label: string;
-  state: string;
-  metric: string;
-  status: StatusKind;
-  x: number;
-  y: number;
-  detail?: string;
-};
-
-export type TwinTelemetry = {
-  label: string;
-  value: string;
-  trend: string;
-  detail: string;
-  status: StatusKind;
-};
-
-export type TwinSubsystemState = {
-  id: string;
-  label: string;
-  state: string;
-  detail: string;
-  status: StatusKind;
-};
-
-export type ShadowWriteback = {
-  system: string;
-  action: string;
-  mode: "blocked" | "staged" | "armed" | "recorded";
-  detail: string;
-  status: StatusKind;
-};
-
-export type TwinFrame = {
-  index: number;
-  id: TwinPhaseId;
-  label: string;
-  timestamp: string;
-  narrative: string;
-  gatingState: string;
-  mode: "observed" | "forecast";
-  status: StatusKind;
-  riskLevel: RiskLevel;
-  nodes: TwinNode[];
-  telemetry: TwinTelemetry[];
-  subsystems: TwinSubsystemState[];
-  writebacks: ShadowWriteback[];
-  alerts: string[];
-};
-
-export type TwinAssetNode = {
-  id: string;
-  label: string;
-  kind: "facility" | "line" | "cell" | "machine" | "lab" | "lot" | "system";
-  parentId: string | null;
-  state: string;
-  metric: string;
-  detail: string;
-  status: StatusKind;
-};
-
-export type ScenarioTemplate = {
-  id: ScenarioTemplateId;
   title: string;
-  subtitle: string;
-  detail: string;
-  focusArea: string;
-  controlBoundary: string;
-  operatorRole: string;
-  presetInput: ScenarioInput;
-};
-
-export type ApprovalDecision = {
-  verdict: ApprovalVerdict;
-  reviewer: string;
-  note: string;
-  decidedAt: string;
-};
-
-export type EvidencePacket = {
-  hash: string;
-  generatedAt: string;
-  packetId: string;
   summary: string;
-  categories: string[];
-  payload: {
-    runId: string;
-    disposition: RunDisposition;
-    recommendation: Recommendation;
-    approval: ApprovalDecision | null;
-    eventIds: string[];
-  };
-};
-
-export type RiskAssessment = {
-  score: number;
-  riskLevel: RiskLevel;
+  confidence: number;
+  expectedImpact: string;
+  safetyMode: "advisory" | "shadow" | "approval-required";
   rationale: string[];
-  kpiImpact: {
-    retrievalCoverage: number;
-    riskStates: number;
-    estimatedScrapDelta: number;
-    evidenceCount: number;
-  };
+};
+
+export type TwinSignal = {
+  id: string;
+  label: string;
+  unit: string;
+  baseline: number;
+  current: number;
+  threshold: number;
+  trend: number[];
+  status: "normal" | "watch" | "warning" | "critical";
+};
+
+export type TwinScenario = {
+  id: string;
+  name: string;
+  description: string;
+  modelId: TwinModelId;
+  incidentType: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+  riskLevel: "Low" | "Medium" | "High" | "Critical";
+  signals: TwinSignal[];
+  recommendations: TwinRecommendation[];
+  evidenceSources: EvidenceSource[];
+  requiredApprovals: ApprovalGate[];
+};
+
+export type SimulatorEvent = {
+  id: string;
+  timestamp: string;
+  scenarioId: string;
+  state: WorkflowStepId;
+  actor: "system" | "operator" | "simulator" | "advisor";
+  summary: string;
+  evidenceHash: string;
 };
 
 export type SimulationRun = {
   id: string;
-  scenarioName: string;
+  scenarioId: string;
   createdAt: string;
   updatedAt: string;
   currentStep: WorkflowStepId;
-  scenarioInput: ScenarioInput;
-  query: string;
-  risk: RiskAssessment;
-  recommendation: Recommendation;
-  decision: ApprovalDecision | null;
-  evidencePacket: EvidencePacket | null;
-  twinNodes: TwinNode[];
-  retrievedDocuments: RetrievedDocument[];
-  events: SimulationEvent[];
+  events: SimulatorEvent[];
+  // Snapshot of scenario data as it mutates
+  signals: TwinSignal[];
+  approvals: ApprovalGate[];
 };
 
-export type RunSummary = Pick<
-  SimulationRun,
-  "id" | "scenarioName" | "createdAt" | "updatedAt" | "currentStep" | "risk" | "decision"
-> & {
-  lotId: string;
-  lineId: string;
-};
-
-export type WorkflowAction =
-  | { type: "advance_detect" }
-  | { type: "advance_retrieve" }
-  | { type: "review"; verdict: ApprovalVerdict; reviewer: string; note: string }
-  | { type: "generate_evidence" };
+export type RunSummary = SimulationRun;

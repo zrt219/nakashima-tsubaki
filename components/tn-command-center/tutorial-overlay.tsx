@@ -117,7 +117,7 @@ export function TutorialOverlay() {
               Guided Tour • {currentStepIndex + 1}/{TUTORIAL_STEPS.length}
             </span>
             <button
-              onClick={() => tutorialStore.stop()}
+              onClick={() => tutorialStore.finish()}
               className="text-command-muted transition-colors hover:text-white"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

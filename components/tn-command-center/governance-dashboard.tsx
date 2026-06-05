@@ -33,33 +33,39 @@ export function GovernanceDashboard() {
       {/* Left Column: Risk Heatmap */}
       <motion.div variants={itemVariants} className="flex flex-col gap-4">
         <Panel 
-          title="Risk Heatmap" 
-          kicker="LIVE VECTORS" 
+          title="2D Risk Heatmap" 
+          kicker="PROBABILITY VS IMPACT" 
           icon="shield"
           accent="amber"
           action={<ButtonLinkLike tone="secondary"><Icon name="search" className="h-4 w-4" /> Scan</ButtonLinkLike>}
         >
           <div className="flex flex-col gap-3 mt-4">
-            <ComparisonBlock 
-              label="Cyber-Physical Access" 
-              text="Air-gapped simulator instance. No direct PLC connection." 
-              good={true} 
-            />
-            <ComparisonBlock 
-              label="Operator Override" 
-              text="Approval required for all automation actions. Advisory only." 
-              good={true} 
-            />
-            <ComparisonBlock 
-              label="Data Exfiltration" 
-              text="External egress blocked. Supabase VPC isolated." 
-              good={true} 
-            />
-            <ComparisonBlock 
-              label="Model Hallucination" 
-              text="Grounded strictly in approved engineering corpus." 
-              good={false} 
-            />
+            <div className="grid grid-cols-4 gap-1 h-32 text-[8px] uppercase tracking-wider text-center font-bold">
+              <div className="flex flex-col justify-end items-end pr-2 text-command-muted pb-1">Impact →<br/>Prob ↓</div>
+              <div className="bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">Low</div>
+              <div className="bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">Med</div>
+              <div className="bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">High</div>
+              
+              <div className="flex items-center justify-end pr-2 text-emerald-400">Low</div>
+              <div className="bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-200">2</div>
+              <div className="bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-200">1</div>
+              <div className="bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-200">0</div>
+              
+              <div className="flex items-center justify-end pr-2 text-amber-400">Med</div>
+              <div className="bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-200">1</div>
+              <div className="bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-200">3</div>
+              <div className="bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-200 shadow-[inset_0_0_10px_rgba(239,68,68,0.2)]">1</div>
+              
+              <div className="flex items-center justify-end pr-2 text-red-400">High</div>
+              <div className="bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-200">0</div>
+              <div className="bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-200">0</div>
+              <div className="bg-red-500/40 border border-red-500/60 flex items-center justify-center text-red-100 shadow-[inset_0_0_15px_rgba(239,68,68,0.5)]">0</div>
+            </div>
+            
+            <div className="mt-2 flex flex-col gap-2">
+              <ComparisonBlock label="Cyber-Physical Access" text="Air-gapped simulator instance." good={true} />
+              <ComparisonBlock label="Model Hallucination" text="Grounded strictly in approved engineering corpus." good={false} />
+            </div>
           </div>
         </Panel>
         
@@ -105,24 +111,71 @@ export function GovernanceDashboard() {
       {/* Right Column: Safety Constraints */}
       <motion.div variants={itemVariants} className="flex flex-col gap-4">
         <Panel 
-          title="Safety Constraints" 
-          kicker="ENFORCEMENT" 
+          title="ISO-27001 Live Compliance Matrix" 
+          kicker="CONTINUOUS AUDIT" 
           icon="lock"
           accent="cyan"
         >
-          <div className="mt-4 flex flex-col gap-4">
-            {governanceItems.map((item) => (
-              <div key={item.title} className="flex flex-col gap-2 rounded-lg border border-white/5 bg-white/[0.02] p-3 transition-colors hover:bg-white/[0.04]">
-                <div className="flex items-center justify-between gap-2">
-                  <h4 className="text-sm font-semibold text-white">{item.title}</h4>
-                  <StatusChip status={item.status} compact />
+          <div className="mt-4 flex flex-col gap-3">
+            {[
+              { id: "A.9.4.1", title: "Information Access Restriction", status: "advisory" },
+              { id: "A.12.4.1", title: "Event Logging", status: "testnet" },
+              { id: "A.12.6.1", title: "Vulnerability Management", status: "simulated" },
+              { id: "A.14.2.5", title: "Secure System Engineering", status: "advisory" },
+              { id: "A.17.1.2", title: "BCP & DR Readiness", status: "ready" }
+            ].map((iso) => (
+              <div key={iso.id} className="flex justify-between items-center border-b border-command-line/30 pb-2">
+                <div>
+                  <span className="text-[10px] text-cyan-400 font-mono">{iso.id}</span>
+                  <p className="text-xs text-white">{iso.title}</p>
                 </div>
-                <div className="space-y-1">
-                  <p className="font-mono text-xs text-command-muted">Control: <span className="text-cyan-200">{item.control}</span></p>
-                  <p className="text-xs text-slate-400">{item.evidence}</p>
-                </div>
+                <StatusChip status={iso.status as any} compact />
               </div>
             ))}
+          </div>
+          <div className="mt-4 w-full bg-cyan-900/30 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-cyan-400 h-full w-[94%]" />
+          </div>
+          <p className="text-[10px] text-right mt-1 text-cyan-400/60">Overall Compliance: 94%</p>
+        </Panel>
+
+        <Panel 
+          title="Trust Score Engine" 
+          kicker="LIVE AI RELIABILITY" 
+          icon="check"
+          accent="emerald"
+        >
+          <div className="flex flex-col items-center justify-center py-6 border-b border-command-line/40 mb-4">
+            <div className="relative flex items-center justify-center w-24 h-24 rounded-full border-4 border-emerald-500/20 bg-emerald-500/5 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+              <svg className="absolute inset-0 w-full h-full -rotate-90">
+                <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-emerald-500/10" />
+                <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray="276" strokeDashoffset="4" className="text-emerald-400" />
+              </svg>
+              <div className="text-center">
+                <span className="text-3xl font-mono font-bold text-white">98</span>
+                <span className="text-emerald-400 font-bold text-sm">.5</span>
+              </div>
+            </div>
+            <p className="text-[10px] uppercase tracking-widest text-emerald-400 mt-3 font-bold">System Trust Level: Optimal</p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-command-muted">Data Provenance</span>
+              <span className="text-white font-mono">100% (Blockchain Verified)</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-command-muted">Model Confidence (Avg)</span>
+              <span className="text-emerald-300 font-mono">99.2%</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-command-muted">Operator Override Rate</span>
+              <span className="text-cyan-300 font-mono">1.5% (Nominal)</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-command-muted">Hallucination Index</span>
+              <span className="text-emerald-400 font-mono">0.001 (Negligible)</span>
+            </div>
           </div>
         </Panel>
       </motion.div>

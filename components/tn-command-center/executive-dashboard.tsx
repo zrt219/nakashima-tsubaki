@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 import { overviewEvents } from "@/lib/tn-ai-data";
@@ -89,6 +90,27 @@ export function ExecutiveDashboard() {
                </div>
              </div>
           </div>
+
+          {/* MASSIVE START CTA */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 1.5, type: "spring", bounce: 0.6 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden md:block"
+          >
+            <Link href="/simulator">
+              <button className="group relative flex items-center gap-3 overflow-hidden border border-cyan-400/50 bg-cyan-400/[0.1] px-8 py-4 backdrop-blur-md transition-all hover:bg-cyan-400/[0.2] hover:shadow-[0_0_40px_rgba(0,212,255,0.4)] hover:scale-105 active:scale-95">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100 group-hover:animate-[scan_2s_ease-in-out_infinite]" />
+                <span className="relative flex h-3 w-3 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-cyan-400"></span>
+                </span>
+                <span className="relative font-mono text-sm font-bold uppercase tracking-[0.3em] text-cyan-100 drop-shadow-[0_0_8px_rgba(0,212,255,0.8)]">
+                  Start Simulator Now
+                </span>
+              </button>
+            </Link>
+          </motion.div>
         </div>
 
         {/* Right Rail: Intelligence & KPIs */}
@@ -169,6 +191,30 @@ export function ExecutiveDashboard() {
                </div>
              </div>
           </div>
+
+          {/* Global Fleet Command & E-Stop */}
+          <div className="relative overflow-hidden border border-red-500/50 bg-red-950/20 p-4 backdrop-blur-3xl">
+             <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-400 mb-3 flex items-center gap-2">
+               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+               Global Fleet Control
+             </h3>
+             <div className="space-y-3">
+               <div>
+                 <p className="text-[9px] uppercase text-red-400/60 mb-1">Fleet Broadcast (HMI Override)</p>
+                 <div className="flex gap-2">
+                   <input type="text" placeholder="Enter override command..." className="flex-1 bg-black/50 border border-red-500/30 text-xs text-white px-2 py-1 outline-none focus:border-red-500/80" />
+                   <button className="bg-red-500/20 text-red-400 text-[10px] font-bold px-3 uppercase border border-red-500/50 hover:bg-red-500/40 transition-colors">TX</button>
+                 </div>
+               </div>
+               <button className="w-full relative group overflow-hidden border border-red-500 bg-red-500/20 py-2 transition-all hover:bg-red-600/40">
+                 <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(239,68,68,0.2)_10px,rgba(239,68,68,0.2)_20px)] opacity-50" />
+                 <span className="relative text-xs font-black uppercase tracking-[0.2em] text-white drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+                   Total Plant E-Stop
+                 </span>
+                 <p className="relative text-[8px] uppercase text-red-200 mt-0.5 tracking-widest">Requires MFA Auth</p>
+               </button>
+             </div>
+           </div>
         </motion.div>
       </motion.div>
 

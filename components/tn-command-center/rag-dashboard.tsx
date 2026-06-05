@@ -78,27 +78,50 @@ export default function RagDashboard() {
         animate={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
       >
-        <div className="flex items-center space-x-3 mb-8 border-b border-white/10 pb-4">
+        <div className="flex items-center space-x-3 mb-6 border-b border-white/10 pb-4">
           <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse" />
           <h2 className="text-lg font-bold text-white tracking-[0.2em]">
-            INGESTION
+            INGESTION & VECTORS
           </h2>
         </div>
         
         <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-          {[1, 2, 3, 4, 5, 6].map((item) => (
+          {/* Vector Space Embeddings Map */}
+          <div className="p-4 rounded-sm bg-black/40 border border-white/10">
+            <h3 className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest mb-3">Vector Space Map (2D Projection)</h3>
+            <div className="relative h-32 w-full bg-cyan-950/20 border border-cyan-500/20 overflow-hidden">
+              {/* Scatter plot grid lines */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] bg-[size:10px_10px]" />
+              {/* Scatter dots */}
+              {Array.from({ length: 40 }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`absolute rounded-full ${i % 3 === 0 ? 'bg-emerald-400 h-1.5 w-1.5' : i % 5 === 0 ? 'bg-purple-400 h-2 w-2' : 'bg-cyan-400 h-1 w-1'}`}
+                  style={{
+                    left: `${Math.random() * 90 + 5}%`,
+                    top: `${Math.random() * 90 + 5}%`,
+                    opacity: Math.random() * 0.5 + 0.3
+                  }}
+                />
+              ))}
+              {/* Active search radius */}
+              <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-400/50 bg-emerald-400/10" />
+            </div>
+          </div>
+
+          <h3 className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">Active Streams</h3>
+          {[1, 2, 3].map((item) => (
             <motion.div 
               key={item}
-              className="p-4 rounded-sm bg-white/5 border border-white/5 hover:border-cyan-500/50 hover:bg-cyan-900/10 transition-all cursor-crosshair group"
+              className="p-3 rounded-sm bg-white/5 border border-white/5 hover:border-cyan-500/50 hover:bg-cyan-900/10 transition-all cursor-crosshair group"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex justify-between items-center mb-2">
-                <div className="text-xs text-cyan-500 font-semibold tracking-wider group-hover:text-cyan-400">STREAM 0{item}</div>
-                <div className="text-[10px] text-gray-500">{(Math.random() * 10).toFixed(1)} MB/s</div>
+              <div className="flex justify-between items-center mb-1">
+                <div className="text-[10px] text-cyan-500 font-semibold tracking-wider group-hover:text-cyan-400">STREAM 0{item}</div>
+                <div className="text-[9px] text-gray-500">{(Math.random() * 10).toFixed(1)} MB/s</div>
               </div>
-              <div className="text-xs text-gray-400 group-hover:text-gray-300">Vectorizing corpus...</div>
-              <div className="mt-3 h-[2px] w-full bg-gray-800 rounded overflow-hidden">
+              <div className="mt-2 h-[2px] w-full bg-gray-800 rounded overflow-hidden">
                 <motion.div 
                   className="h-full bg-cyan-500/80" 
                   initial={{ width: 0 }}
@@ -125,13 +148,29 @@ export default function RagDashboard() {
           <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
         </div>
         
-        <div className="flex flex-col space-y-8">
-          <div className="space-y-3">
-            <div className="text-xs text-gray-400 flex justify-between tracking-wider">
-              <span>SEARCH</span>
+        <div className="flex flex-col space-y-6">
+          <div className="space-y-2">
+            <div className="text-[10px] text-cyan-400 flex justify-between tracking-wider font-bold">
+              <span>SEMANTIC SEARCH PLAYGROUND</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <textarea 
+                className="w-full h-16 bg-black/40 border border-cyan-500/30 rounded p-2 text-xs text-white outline-none focus:border-cyan-400 resize-none"
+                placeholder="Query the engineering corpus..."
+                defaultValue="What is the acceptable vibration tolerance for spindle SP-44 at 1200 RPM?"
+              />
+              <button className="bg-cyan-500/20 hover:bg-cyan-500/40 border border-cyan-500/50 text-cyan-300 text-[10px] uppercase font-bold py-1.5 transition-colors">
+                Execute Query
+              </button>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="text-[10px] text-gray-400 flex justify-between tracking-wider">
+              <span>ACTIVE RETRIEVAL</span>
               <span className="text-cyan-400 font-semibold">ONLINE</span>
             </div>
-            <div className="p-3 bg-white/5 border border-white/10 rounded-sm text-[11px] text-gray-300 break-words leading-relaxed">
+            <div className="p-3 bg-white/5 border border-white/10 rounded-sm text-[10px] text-gray-300 break-words leading-relaxed">
               <span className="text-pink-500">SELECT</span> relevant_nodes <br/>
               <span className="text-pink-500">FROM</span> knowledge_graph <br/>
               <span className="text-pink-500">WHERE</span> similarity &gt; 0.92 <br/>
@@ -139,29 +178,14 @@ export default function RagDashboard() {
             </div>
           </div>
           
-          <div className="space-y-3">
-            <div className="text-xs text-gray-400 flex justify-between tracking-wider">
-              <span>CONTEXT WINDOW</span>
-              <span className="text-cyan-400 font-semibold">128k</span>
+          <div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/5">
+            <div className="p-3 bg-white/5 border border-white/10 rounded-sm flex flex-col items-center justify-center text-center group hover:bg-white/10 transition-colors">
+              <span className="text-2xl font-light text-white group-hover:text-cyan-300 transition-colors">42</span>
+              <span className="text-[9px] text-gray-500 uppercase mt-1 tracking-widest">QPS</span>
             </div>
-            <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-gradient-to-r from-cyan-500 to-purple-500" 
-                initial={{ width: "0%" }}
-                animate={{ width: "75%" }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-            <div className="p-4 bg-white/5 border border-white/10 rounded-sm flex flex-col items-center justify-center text-center group hover:bg-white/10 transition-colors">
-              <span className="text-3xl font-light text-white group-hover:text-cyan-300 transition-colors">42</span>
-              <span className="text-[9px] text-gray-500 uppercase mt-2 tracking-widest">QPS</span>
-            </div>
-            <div className="p-4 bg-white/5 border border-white/10 rounded-sm flex flex-col items-center justify-center text-center group hover:bg-white/10 transition-colors">
-              <span className="text-3xl font-light text-white group-hover:text-purple-300 transition-colors">0.99</span>
-              <span className="text-[9px] text-gray-500 uppercase mt-2 tracking-widest">Relevance</span>
+            <div className="p-3 bg-white/5 border border-white/10 rounded-sm flex flex-col items-center justify-center text-center group hover:bg-white/10 transition-colors">
+              <span className="text-2xl font-light text-white group-hover:text-purple-300 transition-colors">0.99</span>
+              <span className="text-[9px] text-gray-500 uppercase mt-1 tracking-widest">Relevance</span>
             </div>
           </div>
         </div>

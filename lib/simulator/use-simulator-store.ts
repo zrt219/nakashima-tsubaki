@@ -1,250 +1,171 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createLocalRun, persistLocalRun } from "@/lib/simulator/local-store";
-import { getSimulatorPersistenceMode } from "@/lib/simulator/persistence";
-import { useLatestLocalRun, useLocalRun, useLocalRunSummaries } from "@/lib/simulator/use-local-simulator";
-import type { RunSummary, ScenarioInput, SimulationRun } from "@/lib/simulator/types";
+import { useState, useEffect, useCallback } from "react";
+import type { SimulationRun, TwinScenario, WorkflowStepId, SimulatorEvent } from "./types";
+import { SCENARIOS } from "./simulator-scenarios";
 
-const REMOTE_EVENT = "tn-simulator-remote-store:change";
+const STORAGE_KEY = "tn-simulator-runs:v2";
+const EVENT_STREAM = "tn-simulator-event-stream";
 
-type RemoteIndexState = {
-  loaded: boolean;
-  latestRun: RunSummary | null;
-  recentRuns: RunSummary[];
+type SimulatorState = {
+  activeRun: SimulationRun | null;
+  runs: SimulationRun[];
+  timeScrubIndex: number | null;
 };
 
-type RemoteRunState = {
-  loaded: boolean;
-  run: SimulationRun | null;
+let memoryStore: SimulatorState = {
+  activeRun: null,
+  runs: [],
+  timeScrubIndex: null,
 };
 
-function isBrowserMode() {
-  return getSimulatorPersistenceMode() === "browser";
-}
-
-function notifyRemoteStoreChange() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.dispatchEvent(new CustomEvent(REMOTE_EVENT));
-}
-
-function subscribeRemoteStore(callback: () => void) {
-  if (typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  window.addEventListener(REMOTE_EVENT, callback);
-
-  return () => {
-    window.removeEventListener(REMOTE_EVENT, callback);
-  };
-}
-
-async function readJson<T>(input: RequestInfo | URL, init?: RequestInit) {
-  const response = await fetch(input, {
-    cache: "no-store",
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {})
+// Load from local storage
+if (typeof window !== "undefined") {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      memoryStore = JSON.parse(raw);
     }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Simulator request failed: ${response.status}`);
+  } catch (e) {
+    console.warn("Failed to load simulator storage", e);
   }
-
-  return (await response.json()) as T;
 }
 
-function useRemoteStoreSignal() {
-  const [revision, setRevision] = useState(0);
+function persistStore() {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(memoryStore));
+    window.dispatchEvent(new CustomEvent(EVENT_STREAM));
+  }
+}
+
+function generateId() {
+  return Math.random().toString(36).substring(2, 9);
+}
+
+export function useSimulatorStore() {
+  const [state, setState] = useState<SimulatorState>(memoryStore);
 
   useEffect(() => {
-    if (isBrowserMode()) {
-      return;
-    }
-
-    return subscribeRemoteStore(() => {
-      setRevision((currentRevision) => currentRevision + 1);
-    });
+    const handleUpdate = () => setState({ ...memoryStore });
+    window.addEventListener(EVENT_STREAM, handleUpdate);
+    return () => window.removeEventListener(EVENT_STREAM, handleUpdate);
   }, []);
 
-  return revision;
-}
+  const startScenario = useCallback((scenarioId: string) => {
+    const scenario = SCENARIOS.find((s) => s.id === scenarioId);
+    if (!scenario) return;
 
-function useRemoteIndexState(): RemoteIndexState {
-  const revision = useRemoteStoreSignal();
-  const [state, setState] = useState<RemoteIndexState>({
-    loaded: false,
-    latestRun: null,
-    recentRuns: []
-  });
-
-  useEffect(() => {
-    if (isBrowserMode()) {
-      return;
-    }
-
-    let active = true;
-
-    async function load() {
-      try {
-        const payload = await readJson<{
-          latestRun: RunSummary | null;
-          summaries: RunSummary[];
-        }>("/api/simulator/runs");
-
-        if (!active) {
-          return;
+    const newRun: SimulationRun = {
+      id: generateId(),
+      scenarioId: scenario.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      currentStep: "SCENARIO_SELECTED",
+      events: [
+        {
+          id: generateId(),
+          timestamp: new Date().toISOString(),
+          scenarioId: scenario.id,
+          state: "SCENARIO_SELECTED",
+          actor: "operator",
+          summary: `Selected scenario: ${scenario.name}`,
+          evidenceHash: "0x" + generateId()
         }
-
-        setState({
-          loaded: true,
-          latestRun: payload.latestRun ?? null,
-          recentRuns: payload.summaries ?? []
-        });
-      } catch {
-        if (!active) {
-          return;
-        }
-
-        setState({
-          loaded: true,
-          latestRun: null,
-          recentRuns: []
-        });
-      }
-    }
-
-    void load();
-
-    return () => {
-      active = false;
+      ],
+      signals: JSON.parse(JSON.stringify(scenario.signals)), // Deep copy
+      approvals: JSON.parse(JSON.stringify(scenario.requiredApprovals))
     };
-  }, [revision]);
 
-  return state;
-}
+    memoryStore.activeRun = newRun;
+    memoryStore.runs.push(newRun);
+    persistStore();
+    
+    return newRun.id;
+  }, []);
 
-function useRemoteRunState(runId: string): RemoteRunState {
-  const revision = useRemoteStoreSignal();
-  const [state, setState] = useState<RemoteRunState>({
-    loaded: false,
-    run: null
-  });
+  const advanceStep = useCallback((step: WorkflowStepId, actor: SimulatorEvent["actor"], summary: string) => {
+    const run = memoryStore.activeRun;
+    if (!run) return;
 
-  useEffect(() => {
-    if (isBrowserMode()) {
-      return;
+    run.currentStep = step;
+    run.updatedAt = new Date().toISOString();
+    run.events.push({
+      id: generateId(),
+      timestamp: new Date().toISOString(),
+      scenarioId: run.scenarioId,
+      state: step,
+      actor,
+      summary,
+      evidenceHash: "0x" + generateId()
+    });
+
+    memoryStore.timeScrubIndex = null; // Snap back to realtime on new events
+    persistStore();
+  }, []);
+
+  const setApproval = useCallback((gateId: string, status: "approved" | "rejected") => {
+    const run = memoryStore.activeRun;
+    if (!run) return;
+
+    const gate = run.approvals.find((g) => g.id === gateId);
+    if (gate) {
+      gate.status = status;
+      run.updatedAt = new Date().toISOString();
+      persistStore();
     }
+  }, []);
 
-    let active = true;
+  const clearHistory = useCallback(() => {
+    memoryStore.runs = [];
+    memoryStore.activeRun = null;
+    memoryStore.timeScrubIndex = null;
+    persistStore();
+  }, []);
 
-    async function load() {
-      try {
-        const response = await fetch(`/api/simulator/runs/${runId}`, { cache: "no-store" });
+  const setTimeScrubIndex = useCallback((index: number | null) => {
+    memoryStore.timeScrubIndex = index;
+    persistStore();
+  }, []);
 
-        if (!active) {
-          return;
-        }
-
-        if (response.status === 404) {
-          setState({
-            loaded: true,
-            run: null
-          });
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`Simulator run request failed: ${response.status}`);
-        }
-
-        const payload = (await response.json()) as { run: SimulationRun | null };
-        setState({
-          loaded: true,
-          run: payload.run ?? null
-        });
-      } catch {
-        if (!active) {
-          return;
-        }
-
-        setState({
-          loaded: true,
-          run: null
-        });
-      }
-    }
-
-    void load();
-
-    return () => {
-      active = false;
+  // Compute derived run if scrubbing
+  let derivedRun = state.activeRun;
+  if (derivedRun && state.timeScrubIndex !== null && state.timeScrubIndex < derivedRun.events.length) {
+    const scrubbedEvents = derivedRun.events.slice(0, state.timeScrubIndex + 1);
+    const currentState = scrubbedEvents[scrubbedEvents.length - 1].state;
+    derivedRun = {
+      ...derivedRun,
+      events: scrubbedEvents,
+      currentStep: currentState
     };
-  }, [revision, runId]);
-
-  return state;
-}
-
-export async function createSimulatorRun(input: ScenarioInput) {
-  if (isBrowserMode()) {
-    return createLocalRun(input);
   }
 
-  const payload = await readJson<{ run: SimulationRun }>("/api/simulator/runs", {
-    method: "POST",
-    body: JSON.stringify({ input })
-  });
-
-  notifyRemoteStoreChange();
-  return payload.run;
-}
-
-export async function persistSimulatorRun(run: SimulationRun) {
-  if (isBrowserMode()) {
-    return persistLocalRun(run);
-  }
-
-  const payload = await readJson<{ run: SimulationRun }>(`/api/simulator/runs/${run.id}`, {
-    method: "PUT",
-    body: JSON.stringify({ run })
-  });
-
-  notifyRemoteStoreChange();
-  return payload.run;
+  return {
+    activeRun: derivedRun,
+    activeScenario: derivedRun ? SCENARIOS.find((s) => s.id === derivedRun!.scenarioId) : null,
+    runs: state.runs,
+    timeScrubIndex: state.timeScrubIndex,
+    actualActiveRunLength: state.activeRun?.events.length || 0,
+    startScenario,
+    advanceStep,
+    setApproval,
+    clearHistory,
+    setTimeScrubIndex
+  };
 }
 
 export function useSimulatorLatestRun() {
-  const latestLocalRun = useLatestLocalRun();
-  const remoteState = useRemoteIndexState();
-
-  return {
-    isLoading: isBrowserMode() ? false : !remoteState.loaded,
-    latestRun: isBrowserMode() ? latestLocalRun : remoteState.latestRun
-  };
+  const { runs } = useSimulatorStore();
+  const latestRun = runs.length > 0 ? runs[runs.length - 1] : null;
+  return { latestRun };
 }
 
 export function useSimulatorRunSummaries() {
-  const localRuns = useLocalRunSummaries();
-  const remoteState = useRemoteIndexState();
-
-  return {
-    isLoading: isBrowserMode() ? false : !remoteState.loaded,
-    recentRuns: isBrowserMode() ? localRuns : remoteState.recentRuns
-  };
+  const { runs } = useSimulatorStore();
+  return { recentRuns: runs.slice().reverse() };
 }
 
 export function useSimulatorRun(runId: string) {
-  const localRun = useLocalRun(runId);
-  const remoteState = useRemoteRunState(runId);
-
-  return {
-    isLoading: isBrowserMode() ? false : !remoteState.loaded,
-    run: isBrowserMode() ? localRun : remoteState.run
-  };
+  const { runs } = useSimulatorStore();
+  const run = runs.find(r => r.id === runId) || null;
+  return { run, isLoading: false };
 }

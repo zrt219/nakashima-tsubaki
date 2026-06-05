@@ -1,11 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 import { overviewEvents } from "@/lib/tn-ai-data";
 
 export function QaDashboard() {
+  const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
+
   return (
     <CommandCenterShell
       activeAreaId="qa"
@@ -37,6 +40,26 @@ export function QaDashboard() {
         <FloatingCallout x="65%" y="65%" label="Concentricity 0.005" value="0.003" status="PASS" delay={0.6} />
         <FloatingCallout x="28%" y="70%" label="Length 150.0 ±0.1" value="150.04" status="PASS" delay={0.7} />
 
+        {/* AI Vision Overlay Tag */}
+        <motion.div 
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 pointer-events-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 100, damping: 20, delay: 1 }}
+        >
+          <div className="border border-emerald-400/50 bg-black/60 backdrop-blur-md p-3 flex items-center gap-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+            <div className="relative flex h-8 w-8 items-center justify-center border border-emerald-400/30 bg-emerald-400/10">
+              <Icon name="search" className="h-4 w-4 text-emerald-400" />
+              <div className="absolute inset-0 border border-emerald-400/50 animate-ping opacity-20" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Mock Defect Classifier AI</p>
+              <p className="text-xs text-white">No Surface Defects Detected</p>
+              <p className="text-[9px] text-command-muted mt-0.5">Vision Confidence: 99.8%</p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Left Border Panels */}
         <div className="absolute left-4 top-4 bottom-4 flex w-[320px] flex-col gap-4 pointer-events-auto z-10">
           <motion.div 
@@ -48,14 +71,24 @@ export function QaDashboard() {
             <InspectionSummaryPanel />
           </motion.div>
           
-          <motion.div 
-            className="flex-1 corner-accent glass-panel border border-command-line/70 bg-black/60 backdrop-blur-md p-4 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col min-h-0"
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.1 }}
-          >
-            <CriticalCharacteristicsPanel />
-          </motion.div>
+          <AnimatePresence>
+            {expandedPanel !== "critical" && (
+              <motion.div 
+                layoutId="critical-panel"
+                className="flex-1 corner-accent glass-panel border border-command-line/70 bg-black/60 backdrop-blur-md p-4 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col min-h-0 cursor-pointer group hover:border-cyan-400/50 transition-colors"
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.1 }}
+                onClick={() => setExpandedPanel("critical")}
+              >
+                <div className="absolute inset-0 bg-cyan-400/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                <CriticalCharacteristicsPanel />
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-cyan-400/50">
+                  <Icon name="search" className="w-4 h-4" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Right Border Panel */}
@@ -69,6 +102,30 @@ export function QaDashboard() {
             <AttachmentsPanel />
           </motion.div>
         </div>
+
+        {/* Center Breakout Overlay */}
+        <AnimatePresence>
+          {expandedPanel === "critical" && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center pointer-events-auto bg-black/60 backdrop-blur-sm" 
+              onClick={() => setExpandedPanel(null)}
+            >
+              <motion.div
+                layoutId="critical-panel"
+                className="w-[800px] h-[600px] corner-accent glass-panel border border-cyan-400/80 bg-black/90 backdrop-blur-2xl p-8 shadow-[0_0_50px_rgba(0,212,255,0.15)] flex flex-col cursor-pointer"
+                onClick={(e) => { e.stopPropagation(); setExpandedPanel(null); }}
+              >
+                <div className="absolute top-4 right-4 text-cyan-400/50 hover:text-cyan-400">
+                  <Icon name="search" className="w-6 h-6 rotate-90" />
+                </div>
+                <CriticalCharacteristicsPanel isExpanded />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </CommandCenterShell>
@@ -141,7 +198,7 @@ function InspectionSummaryPanel() {
   );
 }
 
-function CriticalCharacteristicsPanel() {
+function CriticalCharacteristicsPanel({ isExpanded = false }: { isExpanded?: boolean }) {
   const chars = [
     { name: "Main Journal Dia", spec: "24.50 ±0.01", actual: "24.498", dev: "-0.002", status: "PASS" },
     { name: "Surface Roughness", spec: "Ra 0.8 max", actual: "0.65", dev: "-", status: "PASS" },
@@ -153,30 +210,32 @@ function CriticalCharacteristicsPanel() {
   return (
     <>
       <div className="flex items-center justify-between mb-4 flex-none">
-        <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-400/80">Characteristics</h3>
-        <span className="text-[10px] font-bold text-emerald-400">5 / 5 Passed</span>
+        <h3 className={`font-semibold uppercase tracking-[0.2em] text-cyan-400/80 ${isExpanded ? 'text-lg' : 'text-[10px]'}`}>Characteristics {isExpanded && "Deep Dive Hologram"}</h3>
+        <span className={`${isExpanded ? 'text-lg' : 'text-[10px]'} font-bold text-emerald-400`}>5 / 5 Passed</span>
       </div>
       
-      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2.5">
+      <div className={`flex-1 overflow-y-auto pr-2 custom-scrollbar ${isExpanded ? 'space-y-4' : 'space-y-2.5'}`}>
         {chars.map((c, i) => (
-          <div key={i} className="border border-command-line/50 bg-black/30 p-2.5 hover:bg-black/50 transition-colors">
+          <div key={i} className={`border border-command-line/50 bg-black/30 hover:bg-black/50 transition-colors ${isExpanded ? 'p-4' : 'p-2.5'}`}>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-semibold text-white">{c.name}</span>
-              <span className="text-[9px] font-bold text-emerald-400">{c.status}</span>
+              <span className={`font-semibold text-white ${isExpanded ? 'text-base' : 'text-xs'}`}>{c.name}</span>
+              <span className={`${isExpanded ? 'text-sm' : 'text-[9px]'} font-bold text-emerald-400`}>{c.status}</span>
             </div>
-            <div className="grid grid-cols-3 gap-2 text-[10px]">
+            <div className={`grid grid-cols-2 gap-2 ${isExpanded ? 'text-sm' : 'text-[10px]'}`}>
               <div>
                 <span className="text-command-muted block mb-0.5">SPEC</span>
                 <span className="text-slate-300 font-mono">{c.spec}</span>
               </div>
-              <div>
+              <div className="text-right">
                 <span className="text-command-muted block mb-0.5">ACTUAL</span>
                 <span className="text-cyan-300 font-mono">{c.actual}</span>
               </div>
-              <div>
-                <span className="text-command-muted block mb-0.5">DEV</span>
-                <span className="text-slate-300 font-mono">{c.dev}</span>
-              </div>
+            </div>
+            {/* Tolerance Band Visualizer */}
+            <div className="mt-2 h-1.5 w-full bg-white/10 relative">
+               <div className="absolute top-0 bottom-0 left-[20%] right-[20%] bg-emerald-500/20 border-x border-emerald-500/50" />
+               <div className="absolute top-0 bottom-0 w-[2px] bg-cyan-400 shadow-[0_0_5px_rgba(0,212,255,0.8)]" style={{ left: `${40 + ((i * 7) % 20)}%` }} />
+               <div className="absolute top-1/2 left-1/2 w-[1px] h-3 bg-white/30 -translate-x-1/2 -translate-y-1/2" />
             </div>
           </div>
         ))}

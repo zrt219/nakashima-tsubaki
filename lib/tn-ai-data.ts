@@ -146,6 +146,15 @@ export const missionAreas: MissionArea[] = [
     icon: "evidence",
     href: "/qa",
     status: "ready"
+  },
+  {
+    id: "cognitive",
+    index: "11",
+    title: "Cognitive Swarm Brain",
+    descriptor: "Live neural decision graph",
+    icon: "twin",
+    href: "/cognitive",
+    status: "simulated"
   }
 ];
 

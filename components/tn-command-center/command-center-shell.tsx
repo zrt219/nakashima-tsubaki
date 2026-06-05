@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { type ReactNode, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { missionAreas, type EvidenceItem } from "@/lib/tn-ai-data";
 import { ButtonLinkLike, Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 import { TutorialOverlay } from "@/components/tn-command-center/tutorial-overlay";
+import { AgentTerminal } from "@/components/tn-command-center/agent-terminal";
+import { AgentSwarmCanvas } from "@/components/tn-command-center/agent-swarm-canvas";
+
+import { useSimulatorStore } from "@/lib/simulator/use-simulator-store";
+import { audioEngine } from "@/lib/simulator/ui-audio-engine";
+import { WORKFLOW_STEPS } from "@/lib/simulator/types";
 
 const DataCoreWebGL = dynamic(() => import("@/components/tn-command-center/data-core-webgl"), { ssr: false });
 
@@ -15,19 +21,69 @@ export function CommandCenterShell({
   rightRail,
   eventStream,
   children,
-  utilityActions
+  utilityActions,
+  modelOverride,
+  signalState
 }: {
   activeAreaId: string;
-  rightRail: ReactNode;
+  rightRail?: ReactNode;
   eventStream: EvidenceItem[];
   children: ReactNode;
   utilityActions?: ReactNode;
+  modelOverride?: any;
+  signalState?: any;
 }) {
+  const { activeRun } = useSimulatorStore();
+
+  const currentStepIndex = activeRun ? WORKFLOW_STEPS.findIndex(s => s.id === activeRun.currentStep) : -1;
+
+  let computedSignalState = signalState || "normal";
+  if (!signalState && activeRun && currentStepIndex > 0) {
+    const stepId = WORKFLOW_STEPS[currentStepIndex]?.id;
+    if (stepId === "INCIDENT_SEEDED") {
+      computedSignalState = "watch";
+    } else if (stepId === "SIGNAL_DETECTED" || stepId === "CONTEXT_RETRIEVED" || stepId === "RECOMMENDATION_GENERATED") {
+      computedSignalState = "warning";
+    } else if (stepId === "APPROVAL_REQUIRED" || stepId === "OPERATOR_REVIEW") {
+      computedSignalState = "critical";
+    } else if (stepId === "SHADOW_EXECUTION" || stepId === "OUTCOME_MONITORED") {
+      computedSignalState = "watch";
+    }
+  }
+
+  const computedModelOverride = modelOverride || (activeRun && currentStepIndex > 0 ? (activeRun.scenarioId as any) : undefined);
+
+  // Global Flashlight Mouse Tracking
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  useEffect(() => {
+    const updateMouse = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", updateMouse);
+    return () => window.removeEventListener("mousemove", updateMouse);
+  }, [mouseX, mouseY]);
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-command-black text-command-text">
       
+      {/* Global Agent Swarm Canvas & Terminal */}
+      <AgentSwarmCanvas />
+      <AgentTerminal />
+
+      {/* Global Interactive Flashlight Overlay */}
+      <motion.div
+        className="pointer-events-none fixed inset-0 z-20"
+        style={{
+          background: useMotionTemplate`radial-gradient(1200px circle at ${mouseX}px ${mouseY}px, rgba(0, 212, 255, 0.06), transparent 80%)`
+        }}
+        aria-hidden="true"
+      />
+      
       {/* Global 3D WebGL Background */}
-      <DataCoreWebGL />
+      <DataCoreWebGL modelOverride={computedModelOverride} signalState={computedSignalState} />
 
       {/* Global Interactive Tutorial Overlay */}
       <TutorialOverlay />
@@ -73,6 +129,10 @@ export function CommandCenterShell({
             {children}
           </section>
           <aside className="lg:sticky lg:top-[82px] lg:h-[calc(100vh-128px)]">{rightRail}</aside>
+        </div>
+        <div className="flex px-3 lg:px-4 gap-4 mb-2">
+           <OperatorComms />
+           <TimeScrubber />
         </div>
         <EventStream items={eventStream} />
       </div>
@@ -314,6 +374,68 @@ function EventStream({ items }: { items: EvidenceItem[] }) {
         </div>
       </div>
     </footer>
+  );
+}
+
+function TimeScrubber() {
+  const { activeRun, actualActiveRunLength, timeScrubIndex, setTimeScrubIndex } = useSimulatorStore();
+  
+  if (!activeRun || actualActiveRunLength === 0) return null;
+
+  const maxIndex = actualActiveRunLength - 1;
+  const currentIndex = timeScrubIndex !== null ? timeScrubIndex : maxIndex;
+
+  return (
+    <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(0,212,255,0.03)_10px,rgba(0,212,255,0.03)_20px)] pointer-events-none" />
+      <Icon name="history" className="h-4 w-4 text-cyan-400" />
+      <div className="flex-1 flex flex-col">
+        <div className="flex justify-between text-[9px] font-mono text-cyan-400/80 uppercase tracking-widest mb-1">
+          <span>T-MINUS (Rewind)</span>
+          <span>{currentIndex === maxIndex ? "LIVE" : "ARCHIVE PLAYBACK"}</span>
+        </div>
+        <input 
+          type="range" 
+          min={0} 
+          max={maxIndex} 
+          value={currentIndex}
+          onChange={(e) => setTimeScrubIndex(Number(e.target.value) === maxIndex ? null : Number(e.target.value))}
+          className="w-full h-1 bg-cyan-900/50 appearance-none rounded-full outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
+        />
+      </div>
+    </div>
+  );
+}
+
+function OperatorComms() {
+  const [levels, setLevels] = useState<number[]>(Array(10).fill(10));
+  const { activeRun } = useSimulatorStore();
+
+  useEffect(() => {
+    // Simulate radio chatter intensity based on simulator state
+    const isCritical = activeRun?.currentStep === "APPROVAL_REQUIRED" || activeRun?.currentStep === "SIGNAL_DETECTED";
+    
+    const interval = setInterval(() => {
+      setLevels(prev => prev.map(() => {
+        const base = isCritical ? 40 : 10;
+        const variance = isCritical ? 60 : 30;
+        return base + Math.random() * variance;
+      }));
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [activeRun?.currentStep]);
+
+  return (
+    <div className="w-48 border border-amber-500/30 bg-amber-900/10 p-2 backdrop-blur-md flex items-center gap-2">
+      <Icon name="zap" className="h-4 w-4 text-amber-500 animate-pulse" />
+      <div className="flex-1 flex items-end justify-between h-6 gap-0.5">
+        {levels.map((lvl, i) => (
+          <div key={i} className="w-full bg-amber-500/80 transition-all duration-75" style={{ height: `${lvl}%` }} />
+        ))}
+      </div>
+      <span className="text-[8px] font-mono text-amber-500 uppercase tracking-widest rotate-[-90deg] translate-x-2">COMMS</span>
+    </div>
   );
 }
 

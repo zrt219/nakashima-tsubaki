@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, Transition } from "framer-motion";
 import { overviewEvents } from "@/lib/tn-ai-data";
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
@@ -207,12 +208,119 @@ function LeftRailTrendMatrices() {
       </div>
 
       <div className="border border-command-line/50 bg-black/50 backdrop-blur-md p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400 mb-2">Telemetry Streams</p>
-        <Sparkline label="Power Draw (kW)" data={[20,25,22,30,28,35,40,38,42,39,45]} color="cyan" />
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400 mb-2">Telemetry & ML Confidence Bands</p>
+        <Sparkline label="Power Draw (kW)" data={[20,25,22,30,28,35,40,38,42,39,45]} color="cyan" showBands />
         <div className="h-4" />
-        <Sparkline label="Coolant Temp (°C)" data={[20,21,21,22,23,24,25,26,26,27,27]} color="amber" />
+        <Sparkline label="Coolant Temp (°C)" data={[20,21,21,22,23,24,25,26,26,27,27]} color="amber" showBands />
       </div>
+
+      <SpindleFftAnalyzer />
+
+      <PidTuningInterface />
     </>
+  );
+}
+
+// ----------------------------------------------------------------------
+// Spindle FFT Spectrum Analyzer
+// ----------------------------------------------------------------------
+function SpindleFftAnalyzer() {
+  const bars = Array.from({ length: 32 }, () => Math.random() * 100);
+  
+  return (
+    <div className="border border-command-line/50 bg-black/50 backdrop-blur-md p-3 mt-4">
+      <div className="flex justify-between items-center mb-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400">Spindle FFT Spectrum</p>
+        <span className="text-[8px] bg-cyan-900/40 text-cyan-200 px-1 py-0.5 border border-cyan-500/30">10 kHz</span>
+      </div>
+      <div className="flex items-end gap-[1px] h-16 w-full opacity-80 mt-2">
+        {bars.map((val, i) => {
+          const isHarmonic = i === 8 || i === 16 || i === 24;
+          const height = isHarmonic ? val * 0.8 + 20 : val * 0.3 + 10;
+          return (
+            <motion.div
+              key={i}
+              className={`flex-1 ${isHarmonic ? "bg-amber-400" : "bg-cyan-500/50"}`}
+              initial={{ height: 0 }}
+              animate={{ height: `${height}%` }}
+              transition={{
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+                repeat: Infinity,
+                repeatType: "mirror",
+                duration: 1 + Math.random(),
+              }}
+            />
+          );
+        })}
+      </div>
+      <div className="flex justify-between text-[8px] text-command-muted mt-1 uppercase">
+        <span>0 Hz</span>
+        <span className="text-amber-400">Harmonic Spike</span>
+        <span>10 kHz</span>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------
+// PID Tuning Interface (Level 1 PLC Override)
+// ----------------------------------------------------------------------
+function PidTuningInterface() {
+  const [p, setP] = useState(1.2);
+  const [i, setI] = useState(0.05);
+  const [d, setD] = useState(0.3);
+
+  return (
+    <div className="border border-command-line/50 bg-black/50 backdrop-blur-md p-3 mt-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-cyan-400 mb-2 flex items-center justify-between">
+        <span>PID Loop Tuning</span>
+        <span className="text-[8px] bg-red-500/20 text-red-400 px-1 py-0.5 border border-red-500/30">LEVEL 1 PLC OVERRIDE</span>
+      </p>
+      
+      <div className="space-y-3 mt-3">
+        <PidSlider label="Proportional (Kp)" value={p} max={5} setValue={setP} color="cyan" />
+        <PidSlider label="Integral (Ki)" value={i} max={1} setValue={setI} color="amber" />
+        <PidSlider label="Derivative (Kd)" value={d} max={2} setValue={setD} color="emerald" />
+      </div>
+
+      <button className="w-full mt-4 border border-cyan-500/50 bg-cyan-500/10 hover:bg-cyan-500/20 py-2 text-[10px] uppercase text-cyan-300 font-bold tracking-widest transition-all hover:shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+        Write to Flash (Air-Gapped)
+      </button>
+    </div>
+  );
+}
+
+function PidSlider({ label, value, max, setValue, color }: { label: string, value: number, max: number, setValue: (val: number) => void, color: "cyan" | "amber" | "emerald" }) {
+  const percent = (value / max) * 100;
+  const bgMap = {
+    cyan: "bg-cyan-400 shadow-[0_0_8px_rgba(0,212,255,0.6)]",
+    amber: "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]",
+    emerald: "bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+  };
+  
+  return (
+    <div>
+      <div className="flex justify-between text-[9px] text-slate-300 mb-1">
+        <span>{label}</span>
+        <span className="font-mono text-white">{value.toFixed(2)}</span>
+      </div>
+      <div className="relative h-1.5 w-full bg-white/10 group cursor-pointer" onClick={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const newPct = Math.max(0, Math.min(100, (x / rect.width) * 100));
+        setValue(Number(((newPct / 100) * max).toFixed(2)));
+      }}>
+         <motion.div 
+           className={`h-full ${bgMap[color]}`}
+           initial={false}
+           animate={{ width: `${percent}%` }}
+           transition={{ type: "spring", stiffness: 300, damping: 30 }}
+         />
+         <div className="absolute top-1/2 -mt-1.5 w-3 h-3 bg-white border border-black rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none drop-shadow-md" style={{ left: `calc(${percent}% - 6px)` }} />
+      </div>
+    </div>
   );
 }
 
@@ -277,7 +385,7 @@ function Gauge({ title, value, color }: { title: string, value: number, color: "
   );
 }
 
-function Sparkline({ label, data, color }: { label: string, data: number[], color: "cyan" | "amber" }) {
+function Sparkline({ label, data, color, showBands }: { label: string, data: number[], color: "cyan" | "amber", showBands?: boolean }) {
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
@@ -297,6 +405,9 @@ function Sparkline({ label, data, color }: { label: string, data: number[], colo
         <span className="text-[10px] font-mono text-white">{data[data.length-1]}</span>
       </div>
       <div className="h-8 w-full bg-black/30 border border-white/5 relative">
+        {showBands && (
+          <div className="absolute inset-0 bg-[rgba(255,255,255,0.03)] border-y border-[rgba(255,255,255,0.1)] h-1/2 top-1/4 pointer-events-none" />
+        )}
         <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
            <motion.polyline 
              points={points} 

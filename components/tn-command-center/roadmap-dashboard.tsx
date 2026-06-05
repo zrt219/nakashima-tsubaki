@@ -275,9 +275,84 @@ export function RoadmapDashboard() {
         </motion.div>
       </div>
 
+      {/* Phase Dependency Graph Minimap */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.8, type: "spring" }}
+        className="absolute top-8 right-8 z-20 w-64 p-4 rounded-xl bg-black/40 backdrop-blur-3xl border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[10px] font-bold text-white tracking-[0.2em] uppercase">Dependency Graph</span>
+          <LinkIcon className="w-3 h-3 text-cyan-400" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <div className="flex-1 h-[1px] bg-emerald-400/50" />
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <div className="flex-1 h-[1px] bg-emerald-400/50" />
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,214,0.8)]" />
+          </div>
+          <div className="flex justify-between text-[8px] text-white/40 uppercase font-mono px-1">
+            <span>Ph 0</span>
+            <span>Ph 1</span>
+            <span className="text-cyan-400">Ph 2</span>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-transparent" />
+            <div className="flex-1 h-[1px] bg-transparent" />
+            <div className="w-1px h-4 border-l border-dashed border-cyan-400/30 ml-[25%]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+            <div className="flex-1 h-[1px] bg-white/10" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+          </div>
+          <div className="flex justify-end text-[8px] text-white/40 uppercase font-mono px-1 gap-12">
+            <span>Ph 3</span>
+            <span>Ph 4</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Resource Allocation Budget Sliders */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, type: "spring" }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-[600px] p-5 rounded-xl bg-black/60 backdrop-blur-3xl border border-cyan-900/50 shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-xs font-bold text-cyan-400 tracking-[0.2em] uppercase">Resource Allocation (Compute & R&D)</span>
+          <span className="text-[10px] text-cyan-400/60 font-mono">Current Run Rate: $4.2M/yr</span>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] text-white w-24 uppercase font-bold tracking-wider">H100 Cluster</span>
+            <div className="flex-1 h-2 bg-black/50 border border-cyan-900/50 rounded-full overflow-hidden relative">
+              <div className="absolute left-0 top-0 bottom-0 bg-cyan-500 w-[70%]" />
+            </div>
+            <span className="text-[10px] text-cyan-300 font-mono w-12 text-right">70%</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] text-white w-24 uppercase font-bold tracking-wider">DevOps R&D</span>
+            <div className="flex-1 h-2 bg-black/50 border border-purple-900/50 rounded-full overflow-hidden relative">
+              <div className="absolute left-0 top-0 bottom-0 bg-purple-500 w-[45%]" />
+            </div>
+            <span className="text-[10px] text-purple-300 font-mono w-12 text-right">45%</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] text-white w-24 uppercase font-bold tracking-wider">Edge Inference</span>
+            <div className="flex-1 h-2 bg-black/50 border border-emerald-900/50 rounded-full overflow-hidden relative">
+              <div className="absolute left-0 top-0 bottom-0 bg-emerald-500 w-[20%]" />
+            </div>
+            <span className="text-[10px] text-emerald-300 font-mono w-12 text-right">20%</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Edge decoration */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 via-black/20 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
     </div>
   );
 }

@@ -57,22 +57,23 @@ export function ArchitectureDashboard() {
           </div>
           
           <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4 backdrop-blur-3xl flex-1">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-command-muted mb-3 block">Integration Pipelines (Live)</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-command-muted mb-3 block">Purdue Model Topology</span>
             <div className="space-y-4">
               {[
-                { name: "OPC UA Telemetry", to: "Stream Ingest", rate: "12,450 msg/s", color: "cyan" },
-                { name: "RAG Context Sync", to: "LLM Gateway", rate: "2,154 req/min", color: "emerald" },
-                { name: "Evidence Events", to: "Registry", rate: "1,387 ev/min", color: "amber" },
-                { name: "Twin State Sync", to: "Supabase", rate: "845 tx/min", color: "cyan" }
+                { name: "Level 4/5 - Enterprise", items: "ERP, Cloud, Dashboards", color: "cyan" },
+                { name: "Level 3 - Operations", items: "MES, Historian", color: "violet" },
+                { name: "Level 2 - Control", items: "SCADA, HMI", color: "amber" },
+                { name: "Level 1 - Basic", items: "PLC, RTU, IED", color: "emerald" },
+                { name: "Level 0 - Process", items: "Sensors, Actuators", color: "slate" }
               ].map((pipe, i) => (
-                <div key={i} className="flex justify-between items-center border-b border-command-line/30 pb-2">
-                  <div>
-                    <p className="text-[10px] text-command-muted uppercase">{pipe.name} <span className="text-white">→</span> {pipe.to}</p>
+                <div key={i} className="flex flex-col justify-center border-b border-command-line/30 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full bg-${pipe.color}-400`} />
+                    <p className="text-[10px] text-white uppercase">{pipe.name}</p>
                   </div>
-                  <span className={`text-[10px] text-${pipe.color}-400`}>{pipe.rate}</span>
+                  <span className="text-[9px] text-command-muted ml-4 mt-1">{pipe.items}</span>
                 </div>
               ))}
-              <span className="text-[10px] text-cyan-400 cursor-pointer">View all pipelines &gt;</span>
             </div>
           </div>
         </motion.div>
@@ -155,19 +156,34 @@ export function ArchitectureDashboard() {
           </div>
 
           <div className="relative overflow-hidden border border-command-line/70 bg-black/20 p-4 backdrop-blur-3xl flex-1">
-             <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-400/80 mb-3">Architecture Metrics</h3>
-             <div className="space-y-2">
-               <div className="flex justify-between border-b border-command-line/30 pb-1">
-                 <span className="text-[10px] text-command-muted">Total Components</span>
-                 <span className="text-[10px] text-white">128</span>
+             <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-400 mb-3">Subnet Isolator Switches</h3>
+             <div className="space-y-3">
+               <div className="flex justify-between items-center border-b border-red-500/20 pb-2">
+                 <div>
+                   <p className="text-[10px] text-white uppercase">Level 1/2 Bridge</p>
+                   <p className="text-[8px] text-red-400/80">Airgap PLC network</p>
+                 </div>
+                 <button className="border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 text-[9px] text-red-400 font-bold tracking-wider transition-colors">
+                   ISOLATE
+                 </button>
                </div>
-               <div className="flex justify-between border-b border-command-line/30 pb-1">
-                 <span className="text-[10px] text-command-muted">Active Integrations</span>
-                 <span className="text-[10px] text-white">24</span>
+               <div className="flex justify-between items-center border-b border-red-500/20 pb-2">
+                 <div>
+                   <p className="text-[10px] text-white uppercase">DMZ Interconnect</p>
+                   <p className="text-[8px] text-red-400/80">Block external IT traffic</p>
+                 </div>
+                 <button className="border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 text-[9px] text-red-400 font-bold tracking-wider transition-colors">
+                   ISOLATE
+                 </button>
                </div>
-               <div className="flex justify-between border-b border-command-line/30 pb-1">
-                 <span className="text-[10px] text-command-muted">Data Flows (Live)</span>
-                 <span className="text-[10px] text-white">128</span>
+               <div className="flex justify-between items-center pb-2">
+                 <div>
+                   <p className="text-[10px] text-white uppercase">Cloud Gateway</p>
+                   <p className="text-[8px] text-red-400/80">Sever telemetry uplink</p>
+                 </div>
+                 <button className="border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 text-[9px] text-red-400 font-bold tracking-wider transition-colors">
+                   ISOLATE
+                 </button>
                </div>
              </div>
           </div>
