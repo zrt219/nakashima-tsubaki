@@ -42,6 +42,70 @@ function generateId() {
   return Math.random().toString(36).substring(2, 9);
 }
 
+export function startScenario(scenarioId: string) {
+  const scenario = SCENARIOS.find((s) => s.id === scenarioId);
+  if (!scenario) return;
+
+  const newRun: SimulationRun = {
+    id: generateId(),
+    scenarioId: scenario.id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    currentStep: "SCENARIO_SELECTED",
+    events: [
+      {
+        id: generateId(),
+        timestamp: new Date().toISOString(),
+        scenarioId: scenario.id,
+        state: "SCENARIO_SELECTED",
+        actor: "operator",
+        summary: `Selected scenario: ${scenario.name}`,
+        evidenceHash: "0x" + generateId()
+      }
+    ],
+    signals: JSON.parse(JSON.stringify(scenario.signals)), // Deep copy
+    approvals: JSON.parse(JSON.stringify(scenario.requiredApprovals))
+  };
+
+  memoryStore.activeRun = newRun;
+  memoryStore.runs.push(newRun);
+  persistStore();
+  
+  return newRun.id;
+}
+
+export function advanceStep(step: WorkflowStepId, actor: SimulatorEvent["actor"], summary: string) {
+  const run = memoryStore.activeRun;
+  if (!run) return;
+
+  run.currentStep = step;
+  run.updatedAt = new Date().toISOString();
+  run.events.push({
+    id: generateId(),
+    timestamp: new Date().toISOString(),
+    scenarioId: run.scenarioId,
+    state: step,
+    actor,
+    summary,
+    evidenceHash: "0x" + generateId()
+  });
+
+  memoryStore.timeScrubIndex = null; // Snap back to realtime on new events
+  persistStore();
+}
+
+export function setApproval(gateId: string, status: "approved" | "rejected") {
+  const run = memoryStore.activeRun;
+  if (!run) return;
+
+  const gate = run.approvals.find((g) => g.id === gateId);
+  if (gate) {
+    gate.status = status;
+    run.updatedAt = new Date().toISOString();
+    persistStore();
+  }
+}
+
 export function useSimulatorStore() {
   const [state, setState] = useState<SimulatorState>(memoryStore);
 
@@ -49,70 +113,6 @@ export function useSimulatorStore() {
     const handleUpdate = () => setState({ ...memoryStore });
     window.addEventListener(EVENT_STREAM, handleUpdate);
     return () => window.removeEventListener(EVENT_STREAM, handleUpdate);
-  }, []);
-
-  const startScenario = useCallback((scenarioId: string) => {
-    const scenario = SCENARIOS.find((s) => s.id === scenarioId);
-    if (!scenario) return;
-
-    const newRun: SimulationRun = {
-      id: generateId(),
-      scenarioId: scenario.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      currentStep: "SCENARIO_SELECTED",
-      events: [
-        {
-          id: generateId(),
-          timestamp: new Date().toISOString(),
-          scenarioId: scenario.id,
-          state: "SCENARIO_SELECTED",
-          actor: "operator",
-          summary: `Selected scenario: ${scenario.name}`,
-          evidenceHash: "0x" + generateId()
-        }
-      ],
-      signals: JSON.parse(JSON.stringify(scenario.signals)), // Deep copy
-      approvals: JSON.parse(JSON.stringify(scenario.requiredApprovals))
-    };
-
-    memoryStore.activeRun = newRun;
-    memoryStore.runs.push(newRun);
-    persistStore();
-    
-    return newRun.id;
-  }, []);
-
-  const advanceStep = useCallback((step: WorkflowStepId, actor: SimulatorEvent["actor"], summary: string) => {
-    const run = memoryStore.activeRun;
-    if (!run) return;
-
-    run.currentStep = step;
-    run.updatedAt = new Date().toISOString();
-    run.events.push({
-      id: generateId(),
-      timestamp: new Date().toISOString(),
-      scenarioId: run.scenarioId,
-      state: step,
-      actor,
-      summary,
-      evidenceHash: "0x" + generateId()
-    });
-
-    memoryStore.timeScrubIndex = null; // Snap back to realtime on new events
-    persistStore();
-  }, []);
-
-  const setApproval = useCallback((gateId: string, status: "approved" | "rejected") => {
-    const run = memoryStore.activeRun;
-    if (!run) return;
-
-    const gate = run.approvals.find((g) => g.id === gateId);
-    if (gate) {
-      gate.status = status;
-      run.updatedAt = new Date().toISOString();
-      persistStore();
-    }
   }, []);
 
   const clearHistory = useCallback(() => {

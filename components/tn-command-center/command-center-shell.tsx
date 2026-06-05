@@ -379,8 +379,15 @@ function EventStream({ items }: { items: EvidenceItem[] }) {
 
 function TimeScrubber() {
   const { activeRun, actualActiveRunLength, timeScrubIndex, setTimeScrubIndex } = useSimulatorStore();
-  
-  if (!activeRun || actualActiveRunLength === 0) return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
+
+  if (!activeRun || actualActiveRunLength === 0) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
 
   const maxIndex = actualActiveRunLength - 1;
   const currentIndex = timeScrubIndex !== null ? timeScrubIndex : maxIndex;

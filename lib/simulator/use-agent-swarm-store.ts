@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { useSimulatorStore } from "./use-simulator-store";
+import { startScenario, advanceStep } from "./use-simulator-store";
 
 export type AgentType = "inspector" | "fixer" | "guardian" | "analyst";
 
@@ -134,13 +134,12 @@ export const useAgentSwarmStore = create<AgentSwarmState>((set, get) => ({
       case "sim":
         const simAction = args[1];
         const simTarget = args[2];
-        const simStore = useSimulatorStore.getState();
 
         if (simAction === "trigger" && simTarget) {
-          simStore.startScenario(simTarget);
+          startScenario(simTarget);
           output = `[SIM_KERNEL] Triggered scenario: ${simTarget}\n` + generateHexDump(2);
         } else if (simAction === "advance" && simTarget) {
-          simStore.advanceStep(simTarget as any, "simulator", "Forced advance via Swarm Terminal");
+          advanceStep(simTarget as any, "simulator", "Forced advance via Swarm Terminal");
           output = `[SIM_KERNEL] Advanced simulator step to: ${simTarget}\n` + generateHexDump(2);
         } else {
           output = `[SIM_KERNEL] Invalid sim command. Usage:\n  sim trigger [scenario_id]\n  sim advance [step_id]\n` + generateHexDump(1);
