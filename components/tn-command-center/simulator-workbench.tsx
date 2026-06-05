@@ -274,6 +274,7 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
             </div>
             {primaryAction ? (
               <button
+                id="tutorial-step-advance"
                 type="button"
                 onClick={primaryAction.action}
                 disabled={isPending}

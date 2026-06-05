@@ -14,6 +14,7 @@ import { getSimulatorPersistenceLabel } from "@/lib/simulator/persistence";
 import { buildScenarioInputPreset, defaultScenarioInput, scenarioTemplates } from "@/lib/simulator/seed-data";
 import { motion } from "framer-motion";
 import { createSimulatorRun, useSimulatorRunSummaries } from "@/lib/simulator/use-simulator-store";
+import { tutorialStore } from "@/lib/simulator/tutorial-store";
 import type { RunSummary, ScenarioInput } from "@/lib/simulator/types";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, Panel, StatusChip } from "@/components/tn-command-center/command-center-primitives";
@@ -102,11 +103,20 @@ export function SimulatorLaunchpad() {
           visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
         }}
       >
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }}>
-          <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">Mission Launchpad</h2>
-          <p className="mt-1 text-sm text-slate-300">
-            Configure and instantiate a new digital twin scenario in isolated testnet bounds.
-          </p>
+        <motion.div id="tutorial-welcome" variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }} className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">Mission Launchpad</h2>
+            <p className="mt-1 text-sm text-slate-300">
+              Configure and instantiate a new digital twin scenario in isolated testnet bounds.
+            </p>
+          </div>
+          <button
+            onClick={() => tutorialStore.start()}
+            className="btn-glow flex items-center gap-2 border border-violet-400/40 bg-violet-400/[0.1] px-4 py-2 text-sm font-semibold text-violet-100 transition-all hover:border-violet-400/80 hover:bg-violet-400/[0.2] hover:shadow-[0_0_20px_rgba(155,109,255,0.3)]"
+          >
+            <Icon name="play" className="h-4 w-4" />
+            Start Guided Tutorial
+          </button>
         </motion.div>
 
         <motion.div 
@@ -244,7 +254,7 @@ export function SimulatorLaunchpad() {
                     })}
                   </div>
 
-                  <div className="grid gap-3.5 md:grid-cols-2">
+                  <div id="tutorial-step-seed" className="grid gap-3.5 md:grid-cols-2">
                     <FormField
                       label="Facility ID"
                       value={form.facilityId ?? ""}

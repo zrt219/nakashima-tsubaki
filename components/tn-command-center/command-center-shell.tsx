@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { missionAreas, type EvidenceItem } from "@/lib/tn-ai-data";
 import { ButtonLinkLike, Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { TutorialOverlay } from "@/components/tn-command-center/tutorial-overlay";
 
 const DataCoreWebGL = dynamic(() => import("@/components/tn-command-center/data-core-webgl"), { ssr: false });
 
@@ -27,6 +28,9 @@ export function CommandCenterShell({
       
       {/* Global 3D WebGL Background */}
       <DataCoreWebGL />
+
+      {/* Global Interactive Tutorial Overlay */}
+      <TutorialOverlay />
 
       {/* Animated background grid */}
       <div className="fixed inset-0 command-grid opacity-100" aria-hidden="true" />
