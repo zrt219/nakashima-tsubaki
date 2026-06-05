@@ -1,7 +1,7 @@
 import { KpiDashboard } from "@/components/tn-command-center/kpi-dashboard";
 import { createClient } from "@/lib/supabase/server";
 
-export const revalidate = 0; // Disable static rendering for this dashboard
+export const revalidate = 60; // Enable 1-minute ISR caching for supreme efficiency
 
 export default async function KpiPage() {
   const supabase = await createClient();

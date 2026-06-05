@@ -3,7 +3,7 @@ import { overviewEvents } from "@/lib/tn-ai-data";
 import { OverviewDashboard } from "@/components/tn-command-center/overview-dashboard";
 import { createClient } from "@/lib/supabase/server";
 
-export const revalidate = 0; // Disable static rendering
+export const revalidate = 60; // Enable 1-minute ISR caching for supreme efficiency
 
 export default async function Home() {
   const supabase = await createClient();
