@@ -94,11 +94,16 @@ Recursive Self-Improvement (RSI) is incredibly powerful, but requires rigid boun
 
 ---
 
-## Author's Final Note
+## 7. Final Thesis: The Autonomic Edge 
 
-Building cyber-physical digital twins combined with bounded recursive self-improvement demands an architecture that fundamentally respects the unpredictability of physical industrial systems. The concepts materialized in this repository are deeply informed by over 100 academic papers and industry specifications spanning deterministic control theory, multi-agent reinforcement learning, blockchain consensus provenance, and edge-native WebGL processing. 
+Building cyber-physical digital twins combined with bounded recursive self-improvement demands an architecture that fundamentally respects the unpredictability of physical industrial systems. The concepts materialized in this repository are deeply informed by over 100 academic papers and industry specifications spanning deterministic control theory, multi-agent reinforcement learning (MARL), blockchain consensus provenance, and edge-native WebGL processing.
 
-By modeling systems after biomimetic patterns—dolphin pods for high-context cognitive tasks, and beehives for low-latency parallel orchestration—we establish a scalable, fault-tolerant intelligence grid. When paired with the uncompromising data integrity of on-chain ledgers and the continuous verification loop of Retrieval-Augmented Generation (RAG), the result is an Autonomic Edge OS capable of safely upgrading its own capabilities without breaking the physical safety envelope. 
+### Theoretical Foundations
+1. **Cyber-Physical Digital Twins (CPDT):** Grounded in IEEE frameworks for Hardware-in-the-Loop (HIL) environments, ZRT utilizes CPDT to synchronize virtual models with physical factory assets. As noted in critical infrastructure research, this enables multi-stage simulation, operational optimization, and resiliency testing against disturbances before executing on physical systems.
+2. **Bounded Recursive Self-Improvement (RSI):** Rather than unconstrained scaling, ZRT restricts RSI loops to a formalized cycle: *planning, execution, evaluation, and reflection*. Guided by rigorous boundary mechanics—such as QA simulations, human-in-the-loop authorization gates, and deterministic auditability—the system upgrades its own capabilities without violating the physical safety envelope.
+3. **Swarm Intelligence & MARL:** Traditional centralized AI control fails at scale in stochastic industrial environments. ZRT applies Multi-Agent Reinforcement Learning to coordinate decentralized networks of agents. By modeling systems after biomimetic patterns—Dolphin Pods for high-context cognitive tasks and Beehives for low-latency parallel orchestration—we achieve emergent collective intelligence and fault-tolerant grid operations.
+
+When paired with the uncompromising data integrity of on-chain ledgers and the continuous verification loop of Retrieval-Augmented Generation (RAG), the result is an Autonomic Edge OS capable of unparalleled industrial intelligence.
 
 This repository serves as both a proof-of-concept and a structural blueprint for the next decade of industrial AI.
 
