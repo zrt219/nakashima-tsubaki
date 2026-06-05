@@ -31,49 +31,49 @@ To transition from a "Simulation" to "Live Cognition", this blueprint outlines h
 A showcase of the cyber-physical routes built within this application.
 
 ### 1. Digital Twin Simulator
-![Digital Twin Simulator](./public/docs/dashboard_simulator_1780642787849.png)
+![Digital Twin Simulator](public/docs/dashboard_simulator_1780642787849.png)
 
 ### 2. QA Evidence Report & 3D Holograms
-![QA Evidence Report](./public/docs/dashboard_qa_1780642776610.png)
+![QA Evidence Report](public/docs/dashboard_qa_1780642776610.png)
 
 ### 3. Cognitive Agent Swarm Brain
-![Cognitive Brain Graph](./public/docs/dashboard_cognitive_1780642764109.png)
+![Cognitive Brain Graph](public/docs/dashboard_cognitive_1780642764109.png)
 
 ### 4. Risk & Governance Compliance
-![Risk and Governance](./public/docs/dashboard_governance_1780642798485.png)
+![Risk and Governance](public/docs/dashboard_governance_1780642798485.png)
 
 ### 5. Concept Model 1
-![Model 1](./public/docs/cnc_twin_model_1780571500913.png)
+![Model 1](public/docs/cnc_twin_model_1780571500913.png)
 
 ### 6. Media Render A
-![Media A](./public/docs/media__1780571451298.jpg)
+![Media A](public/docs/media__1780571451298.jpg)
 
 ### 7. Media Render B
-![Media B](./public/docs/media__1780572747550.jpg)
+![Media B](public/docs/media__1780572747550.jpg)
 
 ### 8. Media Render C
-![Media C](./public/docs/media__1780572747563.jpg)
+![Media C](public/docs/media__1780572747563.jpg)
 
 ### 9. Media Render D
-![Media D](./public/docs/media__1780572747569.jpg)
+![Media D](public/docs/media__1780572747569.jpg)
 
 ### 10. Media Render E
-![Media E](./public/docs/media__1780572747585.jpg)
+![Media E](public/docs/media__1780572747585.jpg)
 
 ### 11. Media Render F
-![Media F](./public/docs/media__1780572747596.jpg)
+![Media F](public/docs/media__1780572747596.jpg)
 
 ### 12. Media Render G
-![Media G](./public/docs/media__1780572780480.jpg)
+![Media G](public/docs/media__1780572780480.jpg)
 
 ### 13. Media Render H
-![Media H](./public/docs/media__1780572780489.jpg)
+![Media H](public/docs/media__1780572780489.jpg)
 
 ### 14. Media Render I
-![Media I](./public/docs/media__1780572780501.jpg)
+![Media I](public/docs/media__1780572780501.jpg)
 
 ### 15. Concept Model Interface
-![Concept Interface](./public/docs/media__1780572871057.png)
+![Concept Interface](public/docs/media__1780572871057.png)
 
 ---
 *Built as a next-generation industrial AI interface.*
