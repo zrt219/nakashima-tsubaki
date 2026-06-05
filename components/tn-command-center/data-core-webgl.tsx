@@ -5,30 +5,34 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stars, Float, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { usePathname } from "next/navigation";
+import {
+  generateGlobe,
+  generateHelix,
+  generateNeural,
+  generateSpindle,
+  generateGrid,
+  generateOctahedron,
+  generateShield,
+  generateLattice,
+  generateCylinder,
+  generateTorus
+} from "./webgl-geometries";
 
-function generateSpindlePoints(count: number, area: string) {
-  const points = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    // If we are in the workbench (simulate), make it chaotic
-    const ySpread = area === "/simulator" ? 6 : 4;
-    const y = (Math.random() - 0.5) * ySpread; 
-    
-    let r = 1;
-    if (area === "/simulator") {
-      r = Math.random() * 2 + 0.5; // Wider, chaotic sphere
-    } else {
-      if (Math.abs(y) > 1.5) r = 0.5;
-      else if (Math.abs(y) < 0.5) r = 1.2;
-    }
-
-    const theta = Math.random() * 2 * Math.PI;
-    const radius = Math.random() * r; 
-
-    points[i * 3] = radius * Math.cos(theta);
-    points[i * 3 + 1] = y;
-    points[i * 3 + 2] = radius * Math.sin(theta);
+function getTwinConfig(area: string, isCritical: boolean) {
+  if (isCritical) return { generate: generateSpindle, color: "#ef4444", rotSpeed: 0.8, pulse: 0.2, cameraZ: 8, args: [true], size: 0.04 };
+  switch(area) {
+    case "/": return { generate: generateGlobe, color: "#00d4ff", rotSpeed: 0.05, pulse: 0.02, cameraZ: 6, args: [], size: 0.02 };
+    case "/roadmap": return { generate: generateHelix, color: "#ffb84d", rotSpeed: 0.1, pulse: 0.05, cameraZ: 12, args: [], size: 0.03 };
+    case "/rag": return { generate: generateNeural, color: "#9b6dff", rotSpeed: 0.02, pulse: 0.1, cameraZ: 7, args: [], size: 0.03 };
+    case "/simulator": return { generate: generateSpindle, color: "#f59e0b", rotSpeed: 0.4, pulse: 0.15, cameraZ: 8, args: [true], size: 0.04 };
+    case "/ledger": return { generate: generateGrid, color: "#00e5a0", rotSpeed: 0.05, pulse: 0.02, cameraZ: 9, args: [], size: 0.03 };
+    case "/advisory": return { generate: generateOctahedron, color: "#e8f4ff", rotSpeed: 0.1, pulse: 0.08, cameraZ: 7, args: [], size: 0.03 };
+    case "/governance": return { generate: generateShield, color: "#00e5a0", rotSpeed: 0.08, pulse: 0.04, cameraZ: 7, args: [], size: 0.02 };
+    case "/architecture": return { generate: generateLattice, color: "#0099bb", rotSpeed: 0.05, pulse: 0.03, cameraZ: 8, args: [], size: 0.03 };
+    case "/kpi": return { generate: generateCylinder, color: "#ff4d7a", rotSpeed: 0.2, pulse: 0.1, cameraZ: 10, args: [], size: 0.03 };
+    case "/qa": return { generate: generateTorus, color: "#ffb84d", rotSpeed: 0.15, pulse: 0.05, cameraZ: 8, args: [], size: 0.03 };
+    default: return { generate: generateGlobe, color: "#00d4ff", rotSpeed: 0.05, pulse: 0.02, cameraZ: 6, args: [], size: 0.02 };
   }
-  return points;
 }
 
 function ParticleCore({ isCritical, area }: { isCritical?: boolean, area: string }) {
@@ -36,22 +40,22 @@ function ParticleCore({ isCritical, area }: { isCritical?: boolean, area: string
   
   // 15000 particles for a GIGANTIC digital twin feel
   const particleCount = 15000;
-  const positions = useMemo(() => generateSpindlePoints(particleCount, area), [particleCount, area]);
+  
+  const config = useMemo(() => getTwinConfig(area, !!isCritical), [area, isCritical]);
 
-  // Color dynamic based on area and critical state
-  const color = isCritical ? "#ef4444" : area === "/simulator" ? "#f59e0b" : "#00d4ff"; // Amber in simulator, cyan in overview
+  const positions = useMemo(() => {
+    // @ts-ignore
+    return config.generate(particleCount, ...config.args);
+  }, [config, particleCount]);
 
   useFrame((state) => {
     if (!pointsRef.current) return;
     const time = state.clock.getElapsedTime();
     
-    // Rotation speed based on area
-    const rotSpeed = area === "/simulator" ? 0.4 : 0.05;
-    pointsRef.current.rotation.y = time * rotSpeed;
+    pointsRef.current.rotation.y = time * config.rotSpeed;
     
     // Pulse effect
-    const pulseFactor = area === "/simulator" ? 0.15 : 0.05;
-    const scale = 1 + Math.sin(time * (area === "/simulator" ? 5 : 2)) * pulseFactor;
+    const scale = 1 + Math.sin(time * (area === "/simulator" ? 5 : 2)) * config.pulse;
     pointsRef.current.scale.set(scale, scale, scale);
   });
 
@@ -59,8 +63,8 @@ function ParticleCore({ isCritical, area }: { isCritical?: boolean, area: string
     <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false}>
       <PointMaterial
         transparent
-        color={color}
-        size={area === "/simulator" ? 0.04 : 0.02}
+        color={config.color}
+        size={config.size}
         sizeAttenuation={true}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
@@ -99,11 +103,12 @@ function MouseParallax({ children }: { children: React.ReactNode }) {
 export default function DataCoreWebGL({ isCritical = false }: { isCritical?: boolean }) {
   const pathname = usePathname();
   const area = pathname || "/";
+  const config = getTwinConfig(area, !!isCritical);
 
   // Massive scaling for global background
   return (
     <div className="fixed inset-0 z-0 pointer-events-none mix-blend-screen transition-opacity duration-1000">
-      <Canvas camera={{ position: [0, 0, area === "/simulator" ? 8 : 6], fov: 60 }}>
+      <Canvas camera={{ position: [0, 0, config.cameraZ], fov: 60 }}>
         <ambientLight intensity={0.5} />
         <MouseParallax>
           <Float speed={area === "/simulator" ? 3 : 1} rotationIntensity={area === "/simulator" ? 1.5 : 0.5} floatIntensity={area === "/simulator" ? 2 : 1}>
