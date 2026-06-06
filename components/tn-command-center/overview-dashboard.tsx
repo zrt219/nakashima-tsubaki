@@ -153,7 +153,7 @@ function NetworkPing() {
   }, []);
 
   return (
-    <div className="absolute top-6 left-6 z-20 flex gap-4 font-mono text-[10px]">
+    <div className="relative mt-2 z-20 flex items-center gap-4 text-[10px] font-mono">
       <div className="flex items-center gap-1">
         <Icon name="arrow" className="h-3 w-3 text-cyan-400" />
         <span className="text-command-steel">LATENCY:</span>
