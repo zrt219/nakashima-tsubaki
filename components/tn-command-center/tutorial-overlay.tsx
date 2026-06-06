@@ -22,7 +22,7 @@ export function TutorialOverlay() {
     let retries = 0;
 
     const measure = () => {
-      const el = document.getElementById(step.id);
+      const el = document.getElementById(step.targetElementId);
       if (el) {
         setRect(el.getBoundingClientRect());
         
