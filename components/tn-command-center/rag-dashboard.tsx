@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function RagDashboard() {
@@ -78,6 +79,16 @@ export default function RagDashboard() {
         animate={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
       >
+        {/* Back Button inside Panel */}
+        <div className="mb-4">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 px-3 py-1.5 border border-cyan-500/30 bg-cyan-500/5 text-[10px] font-bold uppercase tracking-wider text-cyan-300 hover:text-white hover:border-cyan-400 hover:bg-cyan-500/15 transition-all shadow-[0_0_10px_rgba(6,182,212,0.1)]"
+          >
+            ← Back to Dashboard
+          </Link>
+        </div>
+
         <div className="flex items-center space-x-3 mb-6 border-b border-white/10 pb-4">
           <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse" />
           <h2 className="text-lg font-bold text-white tracking-[0.2em]">

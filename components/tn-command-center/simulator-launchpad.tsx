@@ -11,7 +11,7 @@ import { Icon, Panel, StatusChip } from "@/components/tn-command-center/command-
 
 export function SimulatorLaunchpad() {
   const router = useRouter();
-  const { loadScenario } = useSimulatorStore();
+  const { setScenario } = useSimulatorStore();
   const [selectedId, setSelectedId] = useState<string | null>(SCENARIOS[0].id);
   const [isStarting, setIsStarting] = useState(false);
 
@@ -23,8 +23,9 @@ export function SimulatorLaunchpad() {
     
     // Slight delay for effect
     setTimeout(() => {
-      const runId = loadScenario(selectedId);
-      router.push(`/simulator?runId=${runId}`);
+      setScenario(selectedId);
+      const currentRunId = useSimulatorStore.getState().runId;
+      router.push(`/simulator/${currentRunId}`);
     }, 600);
   };
 
