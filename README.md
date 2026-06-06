@@ -1,21 +1,37 @@
-# Tsubaki-Nakashima AI Digital Twin 🚀
+# Tsubaki-Nakashima AI Digital Twin Command Center
 
 ![Executive Overview](https://raw.githubusercontent.com/zrt219/tsubaki-nakashima-ai/main/docs/overview.png)
 
-Welcome to the **Tsubaki-Nakashima AI Command Center**. This is an enterprise-grade, closed-loop Cyber-Physical System (CPS) built to ingest live CNC machine telemetry, visualize it in real-time, and utilize Agentic AI (Google Gemini) to autonomously analyze and physically adjust the machine state.
+An enterprise-grade cyber-physical digital twin prototype for live CNC telemetry, edge-to-cloud event streaming, AI-assisted machine-state analysis, and operator-approved command dispatch.
+
+The system connects a simulated CNC edge environment, AWS IoT Core MQTT messaging, Supabase real-time persistence, a Next.js command dashboard, and a Gemini-powered AI copilot. The AI can analyze the latest machine state and propose structured actions, but all commands are intercepted by a human-in-the-loop approval gate before any edge command is dispatched.
 
 **Live Production URL:** [https://tsubaki-nakashima-ai-67fz54661-zrt219s-projects.vercel.app/](https://tsubaki-nakashima-ai-67fz54661-zrt219s-projects.vercel.app/)
+
+## 🔄 Core Loop
+
+`Simulator → AWS IoT MQTT → Supabase → Next.js → Gemini → Approval Modal → Command Topic → Event Ledger`
+
+## 🛡️ Safety Position
+
+This project is designed as an advisory-first cyber-physical control prototype.
+* AI can analyze telemetry.
+* AI can propose structured machine actions.
+* Operators must approve actions.
+* Commands are logged before dispatch.
+* The system is suitable for simulation, shadow-mode testing, and future controlled edge-device demos.
+* No unsafe direct machine autonomy is claimed.
 
 ## 🏗️ Architecture
 
 This project spans from the Edge to the Cloud:
 
 1. **The Edge Simulator (`/scripts/aws-iot-bridge.js`)**: Streams live IoT telemetry (Spindle Speed, Thermal Drift, Vibration) and bridges communication directly via AWS IoT Core using MQTT.
-2. **The AWS Nervous System**: AWS IoT Core acts as the central message broker, enabling bi-directional communication between the cloud interface and the physical edge devices.
+2. **The AWS Nervous System**: AWS IoT Core acts as the central message broker, enabling bi-directional communication between the cloud interface and simulated or authorized edge devices.
 3. **The Supabase Memory**: Data is piped into a Supabase PostgreSQL database, establishing an immutable historical state and providing a real-time data layer for the frontend.
 4. **The Vercel Application**: A Next.js dashboard visualizes the live Supabase streams in an immersive, highly active dark-mode UI with moving sparklines and scrolling event ledgers.
-5. **The Gemini Brain**: Gemini (using `gemini-2.5-flash` for high-frequency, cost-optimized logic) connects via a serverless `/api/chat` route. It reads the telemetry and has **Function Calling** capabilities to issue physical commands back to the CNC machine.
-6. **The Safety Gate**: A strict Human-in-the-Loop mechanism. When the AI attempts to fire an action, the UI throws an "Operator Approval Required" modal. No physical adjustments happen without explicit human consent.
+5. **The Gemini Brain**: Gemini (using `gemini-2.5-flash` for high-frequency, cost-optimized logic) connects via a serverless `/api/chat` route. It reads the telemetry and has **Function Calling** capabilities to issue edge commands back to the CNC machine.
+6. **The Safety Gate**: A strict Human-in-the-Loop mechanism. When the AI attempts to fire an action, the UI throws an "Operator Approval Required" modal. No edge command is dispatched without explicit human consent.
 
 ## 🚀 Getting Started
 
@@ -47,6 +63,17 @@ node scripts/aws-iot-bridge.js
 npm run dev
 ```
 
+### 🎮 Demo Script
+
+To see the closed-loop system in action:
+1. Open the AI Copilot Terminal.
+2. Ask Gemini: *"Thermal drift is rising. What should we do?"*
+3. Gemini proposes a structured action (e.g., reduce spindle speed or inspect coolant loop).
+4. The UI blocks the action and requests approval.
+5. Operator clicks **AUTHORIZE**.
+6. An AWS IoT command is dispatched via the bridge script.
+7. The Event Ledger records the approval and hash.
+
 ## 🛠️ Built With
 
 *   **Next.js (App Router)** - Framework
@@ -61,7 +88,7 @@ npm run dev
 
 ## 📜 The Epic Journey
 
-Building this closed-loop system was a masterclass in evolving a static user interface into a living, breathing cyber-physical system. Here is the chronological journey of how we built it:
+Building this closed-loop prototype with a human approval gate was a masterclass in evolving a static user interface into a living, breathing cyber-physical system. Here is the chronological journey of how we built it:
 
 ### Phase 1: From Mock to Reality
 We started with a beautiful but entirely static Next.js dashboard. It looked the part but lacked a true backend. The first major milestone was tearing out the hardcoded `lib/tn-ai-data.ts` mock data and wiring the components directly to a real **Supabase PostgreSQL database**. 
@@ -80,13 +107,13 @@ Even with 100k records, the UI needed to *feel* alive. We completely overhauled 
 * **Auto-Polling:** Configured the Next.js router to refresh the Server Components every 5 seconds so new Supabase data appears instantly without manual browser refreshes.
 
 ### Phase 4: The Master Architecture (Gemini + AWS IoT)
-With the dashboard pulsating with data, we implemented the final "Master Plan" to achieve a bi-directional (both ways) digital twin using Gemini AI and AWS Free Tier.
+With the dashboard pulsating with data, we implemented the final "Master Plan" to achieve a bi-directional digital twin using Gemini AI and AWS Free Tier.
 1. **The Brain (Gemini 2.5 Flash):** To protect our API credits, we optimized the payload to send only the latest telemetry state. We built an `AICopilotTerminal` directly into the UI where the operator can converse with the AI about the machine's live state.
 2. **Agentic Function Calling:** We empowered Gemini with "Tools". If instructed to "reduce spindle speed," Gemini generates a structured JSON function call (`set_spindle_speed`).
-3. **The Human Gate:** Safety first. We built an interceptor in the UI that catches Gemini's commands and flashes `⚠️ OPERATOR APPROVAL REQUIRED`. The AI cannot modify the physical machine without the operator clicking `AUTHORIZE`.
-4. **The Nervous System (AWS IoT):** We wrote bash scripts to automatically provision AWS IoT Certificates and created a Node.js bridge (`aws-iot-bridge.js`). When an operator authorizes an AI command, the bridge catches it from Supabase and fires an MQTT message over AWS IoT directly back to the physical edge device, completing the closed loop.
+3. **The Human Gate:** Safety first. We built an interceptor in the UI that catches Gemini's commands and flashes `⚠️ OPERATOR APPROVAL REQUIRED`. The AI cannot modify the machine without the operator clicking `AUTHORIZE`.
+4. **The Nervous System (AWS IoT):** We wrote bash scripts to automatically provision AWS IoT Certificates and created a Node.js bridge (`aws-iot-bridge.js`). When an operator authorizes an AI command, the bridge catches it from Supabase and fires an MQTT message over AWS IoT directly back to the simulated edge device, completing the loop.
 
-We successfully transformed a static React dashboard into a fully autonomous, highly active, agentic AI industrial command center!
+We successfully transformed a static React dashboard into an agentic, operator-gated industrial command center!
 
 ---
 *Built with 💙 by [@zrt219](https://github.com/zrt219) & Antigravity*
