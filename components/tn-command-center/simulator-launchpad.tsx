@@ -127,12 +127,12 @@ export function SimulatorLaunchpad() {
                             <div>
                               <p className="text-sm font-semibold text-white">{template.name}</p>
                               <p className="mt-0.5 text-[10px] uppercase tracking-[0.16em] text-command-muted">
-                                {template.incidentType}
+                                {template.category}
                               </p>
                             </div>
                             <StatusChip status={active ? "ready" : "simulated"} compact />
                           </div>
-                          <p className="mt-3 text-xs leading-5 text-slate-400">{template.description}</p>
+                          <p className="mt-3 text-xs leading-5 text-slate-400">{template.beginnerSummary}</p>
                           <div className="mt-3 flex gap-2">
                              <span className="border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-white/70">{template.difficulty}</span>
                              <span className="border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-white/70">{template.riskLevel} Risk</span>
