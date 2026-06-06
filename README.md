@@ -33,6 +33,40 @@ This project spans from the Edge to the Cloud:
 5. **The Gemini Brain**: Gemini (using `gemini-2.5-flash` for high-frequency, cost-optimized logic) connects via a serverless `/api/chat` route. It reads the telemetry and has **Function Calling** capabilities to issue edge commands back to the CNC machine.
 6. **The Safety Gate**: A strict Human-in-the-Loop mechanism. When the AI attempts to fire an action, the UI throws an "Operator Approval Required" modal. No edge command is dispatched without explicit human consent.
 
+## 📸 Visual Tour
+
+*Note: Please record and place these GIFs in the `docs/gifs/` folder to activate this gallery.*
+
+### The UI Overdrive
+1. **Live Spindle Sparklines:** <br/> ![Spindle Sparkline](docs/gifs/01-spindle-sparkline.gif)
+2. **Thermal Drift Analytics:** <br/> ![Thermal Drift](docs/gifs/02-thermal-drift.gif)
+3. **Vibration FFT Metrics:** <br/> ![Vibration FFT](docs/gifs/03-vibration-fft.gif)
+4. **Scrolling Event Ledger:** <br/> ![Event Ledger](docs/gifs/04-event-ledger.gif)
+5. **Network Latency Pings:** <br/> ![Network Pings](docs/gifs/05-network-pings.gif)
+
+### The Gemini AI Copilot
+6. **Initializing Terminal:** <br/> ![Terminal Init](docs/gifs/06-terminal-init.gif)
+7. **Querying Telemetry Context:** <br/> ![Telemetry Query](docs/gifs/07-telemetry-query.gif)
+8. **AI Diagnostics (The Dolphins):** <br/> ![AI Diagnostics](docs/gifs/08-ai-diagnostics.gif)
+9. **Function Calling (Proposing Action):** <br/> ![Function Calling](docs/gifs/09-function-calling.gif)
+
+### The Human Approval Gate
+10. **Action Intercepted (Warning State):** <br/> ![Intercept Warning](docs/gifs/10-intercept-warning.gif)
+11. **Reviewing Command Arguments:** <br/> ![Command Review](docs/gifs/11-command-review.gif)
+12. **Authorizing Command:** <br/> ![Authorize Click](docs/gifs/12-authorize-click.gif)
+
+### AWS IoT & The Edge
+13. **MQTT Payload Dispatch:** <br/> ![MQTT Dispatch](docs/gifs/13-mqtt-dispatch.gif)
+14. **Bridge Script Inbound:** <br/> ![Bridge Inbound](docs/gifs/14-bridge-inbound.gif)
+15. **Supabase Real-time Sync:** <br/> ![Supabase Sync](docs/gifs/15-supabase-sync.gif)
+16. **Edge Device Response:** <br/> ![Edge Response](docs/gifs/16-edge-response.gif)
+
+### The Digital Twin Canvas
+17. **3D Mesh Rendering:** <br/> ![3D Mesh](docs/gifs/17-3d-mesh.gif)
+18. **Scenario Progress Bars:** <br/> ![Scenario Bars](docs/gifs/18-scenario-bars.gif)
+19. **Dark Mode UI Aesthetics:** <br/> ![Dark Mode UI](docs/gifs/19-dark-mode-ui.gif)
+20. **Full Dashboard Overview:** <br/> ![Dashboard Overview](docs/gifs/20-dashboard-overview.gif)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
