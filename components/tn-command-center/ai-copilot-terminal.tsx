@@ -2,18 +2,39 @@
 
 import { useState } from "react";
 import { Panel } from "./command-center-primitives";
-import { createClient } from "@supabase/supabase-js";
+
+type CopilotMessage = {
+  role: "user" | "ai" | "system";
+  content: string;
+  action?: {
+    name: string;
+    args: Record<string, unknown>;
+    mode?: string;
+    model?: string;
+  };
+};
+
+type ActionExecutionState = "pending" | "sent";
 
 export function AICopilotTerminal({ telemetryData }: { telemetryData?: any }) {
-  const [messages, setMessages] = useState<{ role: "user" | "ai" | "system", content: string, action?: any }[]>([
-    { role: "system", content: "Gemini AI Copilot initialized. Ready for diagnostics and control." }
+  const [messages, setMessages] = useState<CopilotMessage[]>([
+    {
+      role: "system",
+      content:
+        "Advisory copilot initialized. Remote Gemini will be used when available; otherwise the terminal stays in deterministic local demo mode."
+    }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [executedActions, setExecutedActions] = useState<Record<string, ActionExecutionState>>({});
+
+  const getActionKey = (action: CopilotMessage["action"]) =>
+    `${action?.name}:${JSON.stringify(action?.args ?? {})}`;
 
   const handleSend = async () => {
-    if (!input.trim()) return;
-    const userMessage = input;
+    if (!input.trim() || loading) return;
+
+    const userMessage = input.trim();
     setInput("");
     setMessages(prev => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
@@ -24,84 +45,129 @@ export function AICopilotTerminal({ telemetryData }: { telemetryData?: any }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: userMessage, telemetryContext: telemetryData })
       });
+
       const data = await res.json();
-      
+
       if (data.type === "tool_call") {
-        setMessages(prev => [...prev, { 
-          role: "ai", 
-          content: data.text, 
-          action: { name: data.functionName, args: data.args } 
-        }]);
+        setMessages(prev => [
+          ...prev,
+          {
+            role: "ai",
+            content: data.text,
+            action: {
+              name: data.functionName,
+              args: data.args,
+              mode: data.source,
+              model: data.model
+            }
+          }
+        ]);
       } else {
         setMessages(prev => [...prev, { role: "ai", content: data.text || data.error }]);
       }
-    } catch (err) {
-      setMessages(prev => [...prev, { role: "system", content: "ERROR: Connection to Gemini failed. Check API Key." }]);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "system",
+          content: "ERROR: Advisory route is unavailable. No remote or local automation action was executed."
+        }
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
-  const executeAction = async (action: any) => {
-    setMessages(prev => [...prev, { role: "system", content: `EXECUTING: ${action.name} over AWS IoT...` }]);
-    
-    try {
-      // In a real app we'd trigger an insert into operator_actions to be picked up by the bridge
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "", 
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-      );
-      
-      await supabase.from('operator_actions').insert([{
-        action_type: action.name,
-        payload: action.args,
-        status: 'PENDING_AWS_IOT'
-      }]);
-      
-      setTimeout(() => {
-        setMessages(prev => [...prev, { role: "system", content: `SUCCESS: Command delivered to edge via AWS IoT.` }]);
-      }, 1500);
-    } catch (err) {
-      console.error(err);
-    }
+  const executeAction = async (action: NonNullable<CopilotMessage["action"]>) => {
+    const actionKey = getActionKey(action);
+    if (executedActions[actionKey]) return;
+
+    setExecutedActions(prev => ({ ...prev, [actionKey]: "pending" }));
+    setMessages(prev => [
+      ...prev,
+      {
+        role: "system",
+        content: `SIMULATED TRANSMISSION: ${action.name} staged locally for operator review. No AWS IoT or machine write was performed.`
+      }
+    ]);
+
+    setTimeout(() => {
+      setExecutedActions(prev => ({ ...prev, [actionKey]: "sent" }));
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "system",
+          content: `LOCAL DEMO ONLY: ${action.name} was recorded as an advisory action. Human approval is still required before any real plant-side command.`
+        }
+      ]);
+    }, 900);
   };
 
   return (
-    <Panel title="AI Copilot Terminal" kicker="Gemini 1.5 Pro Agent" icon="zap" accent="emerald">
-      <div className="flex flex-col h-[350px] border border-emerald-400/20 bg-black/60 p-3 overflow-hidden">
-        <div className="flex-1 overflow-y-auto space-y-3 pb-2 font-mono text-xs scrollbar-hide">
+    <Panel title="AI Copilot Terminal" kicker="Gemini / Local Advisory Agent" icon="zap" accent="emerald">
+      <div className="flex h-[350px] flex-col overflow-hidden border border-emerald-400/20 bg-black/60 p-3">
+        <div className="flex-1 space-y-3 overflow-y-auto pb-2 font-mono text-xs scrollbar-hide">
           {messages.map((msg, i) => (
-            <div key={i} className={`flex gap-2 ${msg.role === "user" ? "text-cyan-300" : msg.role === "system" ? "text-amber-400 font-bold" : "text-emerald-100"}`}>
+            <div
+              key={i}
+              className={`flex gap-2 ${
+                msg.role === "user"
+                  ? "text-cyan-300"
+                  : msg.role === "system"
+                    ? "font-bold text-amber-400"
+                    : "text-emerald-100"
+              }`}
+            >
               <span className="shrink-0">{msg.role === "user" ? ">" : msg.role === "system" ? "[SYS]" : "AI:"}</span>
-              <div className="whitespace-pre-wrap flex-1">
+              <div className="flex-1 whitespace-pre-wrap">
                 {msg.content}
                 {msg.action && (
-                  <div className="mt-3 border border-emerald-400/40 bg-emerald-400/10 p-3 rounded shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-                    <p className="text-emerald-300 font-bold mb-2 tracking-widest text-[10px]">⚠️ OPERATOR APPROVAL REQUIRED</p>
-                    <p className="text-slate-300">Function: <span className="text-white font-bold">{msg.action.name}</span></p>
-                    <p className="text-slate-300 mt-1">Args: <span className="text-cyan-200">{JSON.stringify(msg.action.args)}</span></p>
-                    <button 
-                      onClick={() => executeAction(msg.action)}
-                      className="mt-3 w-full bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-100 px-3 py-2 border border-emerald-400/50 transition-colors uppercase tracking-widest text-[10px] font-bold"
+                  <div className="mt-3 rounded border border-emerald-400/40 bg-emerald-400/10 p-3 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                    <p className="mb-2 text-[10px] font-bold tracking-widest text-emerald-300">OPERATOR APPROVAL REQUIRED</p>
+                    {msg.action.mode === "local_demo" && (
+                      <p className="mb-2 text-[10px] uppercase tracking-widest text-amber-300">Local demo fallback active</p>
+                    )}
+                    <p className="text-slate-300">
+                      Function: <span className="font-bold text-white">{msg.action.name}</span>
+                    </p>
+                    <p className="mt-1 text-slate-300">
+                      Args: <span className="text-cyan-200">{JSON.stringify(msg.action.args)}</span>
+                    </p>
+                    <button
+                      onClick={() => executeAction(msg.action!)}
+                      disabled={!!executedActions[getActionKey(msg.action)]}
+                      className="mt-3 w-full border border-emerald-400/50 bg-emerald-500/20 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-emerald-100 transition-colors hover:bg-emerald-500/40 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      AUTHORIZE & TRANSMIT VIA AWS IOT
+                      {executedActions[getActionKey(msg.action)] === "pending"
+                        ? "Staging advisory action..."
+                        : executedActions[getActionKey(msg.action)] === "sent"
+                          ? "Recorded in local demo queue"
+                          : "Authorize local demo action"}
                     </button>
                   </div>
                 )}
               </div>
             </div>
           ))}
-          {loading && <div className="text-emerald-400 animate-pulse font-mono text-xs">Gemini is reasoning...</div>}
+          {loading && <div className="animate-pulse font-mono text-xs text-emerald-400">Gemini is reasoning...</div>}
         </div>
         <div className="mt-3 flex gap-2 border-t border-emerald-400/20 pt-3">
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleSend()}
             placeholder="Command the Digital Twin (e.g., 'Lower the spindle RPM to 10k')..."
-            className="flex-1 bg-transparent border-none outline-none text-emerald-300 font-mono text-xs placeholder:text-emerald-400/40 focus:ring-0"
+            className="flex-1 bg-transparent text-xs text-emerald-300 outline-none placeholder:text-emerald-400/40 focus:ring-0"
           />
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={loading || !input.trim()}
+            className="border border-emerald-400/40 bg-emerald-400/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-emerald-100 transition-colors hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Send
+          </button>
         </div>
       </div>
     </Panel>

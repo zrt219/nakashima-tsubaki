@@ -103,6 +103,7 @@ export function TwinModelRegistry({ modelId, particleCount = 4000 }: TwinModelRe
     <points ref={pointsRef}>
       <bufferGeometry>
         <bufferAttribute
+          args={[positions, 3]}
           attach="attributes-position"
           count={positions.length / 3}
           array={positions}

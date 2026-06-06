@@ -74,9 +74,9 @@ export type SimulatorEvent = {
   scenarioId: string;
   runId: string;
   state: SimulatorState;
-  type: SimulatorEventType;
+  type?: SimulatorEventType;
   actor: "system" | "operator" | "simulator" | "advisor" | "governance" | "rag" | "qa";
-  severity: "info" | "success" | "warning" | "critical";
+  severity?: "info" | "success" | "warning" | "critical";
   summary: string;
   details?: string;
   evidenceHash: string;
@@ -89,15 +89,20 @@ export type SignalState = "normal" | "watch" | "warning" | "critical";
 
 export type TwinSignalDefinition = {
   id: string;
-  name: string;
+  label?: string;
+  name?: string;
   unit: string;
-  baseline: number;
-  watchThreshold: number;
-  warningThreshold: number;
-  criticalThreshold: number;
-  noiseAmplitude: number;
-  rampRate: number;
-  incidentMagnitude: number;
+  baseline?: number;
+  watchThreshold?: number;
+  warningThreshold?: number;
+  criticalThreshold?: number;
+  noiseAmplitude?: number;
+  rampRate?: number;
+  incidentMagnitude?: number;
+  current?: number;
+  threshold?: number;
+  trend?: number[];
+  status?: SignalState;
 };
 
 export type KpiSnapshot = {
@@ -131,22 +136,27 @@ export type ReplayPacket = {
 export type EvidenceSource = {
   id: string;
   title: string;
-  type: "document" | "procedure" | "policy" | "log";
-  summary: string;
-  appliesToScenarios: string[];
+  type: string;
+  summary?: string;
+  appliesToScenarios?: string[];
   confidence: number;
-  approved: boolean;
-  lastUpdated: string;
-  simulatedHash: string;
+  approved?: boolean;
+  lastUpdated?: string;
+  simulatedHash?: string;
+  hash?: string;
 };
 
 export type RecommendationDefinition = {
   id: string;
-  text: string;
-  rationale: string;
+  text?: string;
+  title?: string;
+  summary?: string;
+  rationale: string | string[];
   confidence: number;
-  requiresApproval: boolean;
-  shadowActionAvailable: boolean;
+  requiresApproval?: boolean;
+  shadowActionAvailable?: boolean;
+  expectedImpact?: string;
+  safetyMode?: string;
 };
 
 export type TwinScenarioDefinition = {
@@ -174,6 +184,34 @@ export type TwinScenarioDefinition = {
   signals: TwinSignalDefinition[];
   evidencePlan: EvidenceSource[];
   recommendations: RecommendationDefinition[];
-  // Tutorial highlights optional per scenario
   tutorialHints?: { target: string; message: string }[];
+};
+
+export type WorkflowStepId = SimulatorState;
+
+export type TwinScenario = {
+  id: string;
+  name: string;
+  description?: string;
+  modelId: string;
+  incidentType: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+  riskLevel: "Low" | "Medium" | "High" | "Critical";
+  signals: TwinSignalDefinition[];
+  recommendations: RecommendationDefinition[];
+  evidenceSources?: EvidenceSource[];
+  requiredApprovals?: Array<{ id: string; status?: string; label?: string; requiredRole?: string; reason?: string }>;
+  [key: string]: unknown;
+};
+
+export type SimulationRun = {
+  id: string;
+  scenarioId: string;
+  createdAt: string;
+  updatedAt: string;
+  currentStep: WorkflowStepId;
+  events: SimulatorEvent[];
+  signals: TwinSignalDefinition[];
+  approvals: Array<{ id: string; status: string }>;
+  [key: string]: unknown;
 };

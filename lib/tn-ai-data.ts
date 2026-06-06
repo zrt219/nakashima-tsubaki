@@ -155,6 +155,15 @@ export const missionAreas: MissionArea[] = [
     icon: "twin",
     href: "/cognitive",
     status: "simulated"
+  },
+  {
+    id: "iot_maker",
+    index: "12",
+    title: "IoT Maker",
+    descriptor: "Commissioning studio for connected and proof layers",
+    icon: "hash",
+    href: "/iot-maker",
+    status: "approval"
   }
 ];
 

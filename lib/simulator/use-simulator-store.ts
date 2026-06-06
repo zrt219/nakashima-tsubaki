@@ -24,7 +24,7 @@ if (typeof window !== "undefined") {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      memoryStore = JSON.parse(raw);
+      memoryStore = JSON.parse(raw) as SimulatorState;
     }
   } catch (e) {
     console.warn("Failed to load simulator storage", e);
@@ -57,14 +57,17 @@ export function startScenario(scenarioId: string) {
         id: generateId(),
         timestamp: new Date().toISOString(),
         scenarioId: scenario.id,
+        runId: "run-" + scenario.id,
         state: "SCENARIO_SELECTED",
+        type: "scenario_selected",
+        severity: "info",
         actor: "operator",
         summary: `Selected scenario: ${scenario.name}`,
         evidenceHash: "0x" + generateId()
       }
     ],
     signals: JSON.parse(JSON.stringify(scenario.signals)), // Deep copy
-    approvals: JSON.parse(JSON.stringify(scenario.requiredApprovals))
+    approvals: JSON.parse(JSON.stringify((scenario as TwinScenario).requiredApprovals ?? [])),
   };
 
   memoryStore.activeRun = newRun;
@@ -84,7 +87,10 @@ export function advanceStep(step: WorkflowStepId, actor: SimulatorEvent["actor"]
     id: generateId(),
     timestamp: new Date().toISOString(),
     scenarioId: run.scenarioId,
+    runId: (run as unknown as { runId?: string }).runId ?? run.id,
     state: step,
+    type: step === "RUN_COMPLETE" ? "tutorial_completed" : "operator_approved",
+    severity: "info",
     actor,
     summary,
     evidenceHash: "0x" + generateId()
@@ -98,7 +104,7 @@ export function setApproval(gateId: string, status: "approved" | "rejected") {
   const run = memoryStore.activeRun;
   if (!run) return;
 
-  const gate = run.approvals.find((g) => g.id === gateId);
+  const gate = run.approvals.find((g: { id: string; status: string }) => g.id === gateId);
   if (gate) {
     gate.status = status;
     run.updatedAt = new Date().toISOString();
