@@ -1,0 +1,12 @@
+{
+  "sql": "SELECT * FROM 'dt/spindle/telemetry'",
+  "description": "Routes telemetry to Supabase Lambda",
+  "actions": [
+    {
+      "lambda": {
+        "functionArn": "arn:aws:lambda:us-east-2:816940506805:function:IotToSupabaseTelemetry"
+      }
+    }
+  ],
+  "ruleDisabled": false
+}

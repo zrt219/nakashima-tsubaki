@@ -280,9 +280,12 @@ function TelemetryBar({ telemetryData }: { telemetryData?: any }) {
 }
 
 function LiveSparkline({ color }: { color: string }) {
-  const [points, setPoints] = useState(() => Array.from({ length: 20 }, () => Math.random() * 15));
+  const [points, setPoints] = useState<number[]>(() => Array.from({ length: 20 }, () => 7.5));
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setPoints(Array.from({ length: 20 }, () => Math.random() * 15));
+    setMounted(true);
     const interval = setInterval(() => {
       setPoints(prev => {
         const next = [...prev.slice(1), Math.random() * 15];

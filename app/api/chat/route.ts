@@ -88,7 +88,7 @@ Analyze the situation. If the user asks to change a parameter or if you detect a
         type: "tool_call",
         functionName: call.name,
         args: call.args,
-        text: `I have analyzed the data and need to execute a physical command: **${call.name}**\n\nReasoning: ${call.args.reason || "Optimizing parameters."}`
+        text: `I have analyzed the data and need to execute a physical command: **${call.name}**\n\nReasoning: ${(call.args as any).reason || "Optimizing parameters."}`
       });
     }
 
