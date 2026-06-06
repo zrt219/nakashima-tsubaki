@@ -136,12 +136,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Pump Intake Blockage", description: "Simulates sudden drop in coolant pressure and flow.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-0", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-flow",
+            "name": "Coolant Flow Rate",
+            "unit": "L/min",
+            "baseline": 45,
+            "watchThreshold": 35,
+            "warningThreshold": 20,
+            "criticalThreshold": 10,
+            "noiseAmplitude": 2.5,
+            "rampRate": 5,
+            "incidentMagnitude": -38
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-04-coolant", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-coolant",
+            "text": "Emergency M05 Spindle Stop",
+            "rationale": "Flow < 10L/min detected. Immediate stop required to prevent catastrophic tool thermal shock.",
+            "confidence": 0.99,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -159,12 +175,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Inclusion Strike", description: "Simulates striking a hard material inclusion.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-1", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-ae",
+            "name": "Acoustic Emission",
+            "unit": "kHz",
+            "baseline": 120,
+            "watchThreshold": 180,
+            "warningThreshold": 250,
+            "criticalThreshold": 350,
+            "noiseAmplitude": 15,
+            "rampRate": 2,
+            "incidentMagnitude": 240
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-05-toolwear", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-tool",
+            "text": "Trigger Auto Tool Change (M06)",
+            "rationale": "High-frequency acoustic spike matches signature of insert micro-fracture. Tool life expired.",
+            "confidence": 0.94,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -182,12 +214,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Axis Bind", description: "Injects simulated friction into ball screw model.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-2", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-servo",
+            "name": "Y-Axis Following Error",
+            "unit": "mm",
+            "baseline": 0.005,
+            "watchThreshold": 0.02,
+            "warningThreshold": 0.05,
+            "criticalThreshold": 0.1,
+            "noiseAmplitude": 0.002,
+            "rampRate": 10,
+            "incidentMagnitude": 0.06
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-06-servo", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-servo",
+            "text": "Apply Dynamic Gain Tuning",
+            "rationale": "Friction variance detected in Y-axis ball screw. Dynamic feed-forward gain adjustment required.",
+            "confidence": 0.88,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -205,12 +253,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Grid Fluctuation", description: "Simulates 150ms 20% voltage sag.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-3", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-volt",
+            "name": "Mains L1-L2 Voltage",
+            "unit": "V",
+            "baseline": 480,
+            "watchThreshold": 450,
+            "warningThreshold": 420,
+            "criticalThreshold": 380,
+            "noiseAmplitude": 5,
+            "rampRate": 1,
+            "incidentMagnitude": -110
       }
     ],
     evidencePlan: [mockEvidenceCorpus[3]],
     recommendations: [
-      { id: "rec-scenario-07-power", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-power",
+            "text": "Engage Soft-Recovery Routine",
+            "rationale": "Under-voltage event recorded. Drives must execute controlled deceleration to preserve part.",
+            "confidence": 0.97,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -228,12 +292,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Thermal Expansion", description: "Injects gradual diameter increase.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-4", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-dim",
+            "name": "Bore Diameter",
+            "unit": "mm",
+            "baseline": 25,
+            "watchThreshold": 25.015,
+            "warningThreshold": 25.02,
+            "criticalThreshold": 25.025,
+            "noiseAmplitude": 0.002,
+            "rampRate": 600,
+            "incidentMagnitude": 0.022
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-08-quality", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-cpk",
+            "text": "Inject Wear Offset (-0.02mm)",
+            "rationale": "Linear growth in bore dimension correlates with insert flank wear. Apply macro wear offset.",
+            "confidence": 0.91,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -251,12 +331,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Empty Tank", description: "Simulates tank level falling below threshold.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-5", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-lube",
+            "name": "Lube Tank Level",
+            "unit": "%",
+            "baseline": 45,
+            "watchThreshold": 15,
+            "warningThreshold": 5,
+            "criticalThreshold": 1,
+            "noiseAmplitude": 0.5,
+            "rampRate": 50,
+            "incidentMagnitude": -44
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-09-lubrication", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-lube",
+            "text": "Block M30 Cycle Restart",
+            "rationale": "Way lube depleted. Cycle start must be inhibited to prevent severe guideway scoring.",
+            "confidence": 1,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -274,12 +370,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Offset Error", description: "Simulates tool length offset discrepancy.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-6", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-load",
+            "name": "Z-Axis Motor Load",
+            "unit": "%",
+            "baseline": 15,
+            "watchThreshold": 50,
+            "warningThreshold": 100,
+            "criticalThreshold": 140,
+            "noiseAmplitude": 2,
+            "rampRate": 1,
+            "incidentMagnitude": 135
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-10-collision", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-collision",
+            "text": "Emergency E-Stop & Quarantine",
+            "rationale": "Catastrophic load spike detected in Z-axis. Immediate halt and metrology recalibration required.",
+            "confidence": 0.99,
+            "requiresApproval": true,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -297,12 +409,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Switch Congestion", description: "Injects artificial network jitter and latency.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-7", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-ping",
+            "name": "MQTT Broker Latency",
+            "unit": "ms",
+            "baseline": 12,
+            "watchThreshold": 100,
+            "warningThreshold": 300,
+            "criticalThreshold": 500,
+            "noiseAmplitude": 8,
+            "rampRate": 15,
+            "incidentMagnitude": 520
       }
     ],
     evidencePlan: [mockEvidenceCorpus[3]],
     recommendations: [
-      { id: "rec-scenario-11-network", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-network",
+            "text": "Transition to Edge-Local Governance",
+            "rationale": "Cloud uplink unstable. Failsafe routing requires falling back to local isolated AI processing.",
+            "confidence": 0.85,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -320,12 +448,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Compressor Trip", description: "Simulates slow loss of shop air.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-8", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-air",
+            "name": "Main Air Pressure",
+            "unit": "PSI",
+            "baseline": 90,
+            "watchThreshold": 75,
+            "warningThreshold": 65,
+            "criticalThreshold": 55,
+            "noiseAmplitude": 1,
+            "rampRate": 40,
+            "incidentMagnitude": -38
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-12-air", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-air",
+            "text": "Controlled Feed Hold",
+            "rationale": "Pneumatic pressure falling. Machine must hold feed before ATC or chuck actuation fails.",
+            "confidence": 0.96,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -343,12 +487,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Stringy Chips", description: "Simulates mechanical bind in conveyor chain.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-9", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-conveyor",
+            "name": "Conveyor Motor Current",
+            "unit": "A",
+            "baseline": 1.5,
+            "watchThreshold": 3,
+            "warningThreshold": 4.5,
+            "criticalThreshold": 6,
+            "noiseAmplitude": 0.2,
+            "rampRate": 10,
+            "incidentMagnitude": 5.5
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-13-chip", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-chip",
+            "text": "Execute Auto-Reverse Unjam",
+            "rationale": "Overcurrent on chip auger. A 3-second reverse cycle will clear the stringy chip bundle.",
+            "confidence": 0.93,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -366,12 +526,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Freon Leak", description: "Simulates loss of cooling capacity.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-10", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-chiller",
+            "name": "Chiller Error Code",
+            "unit": "code",
+            "baseline": 0,
+            "watchThreshold": 0.5,
+            "warningThreshold": 0.5,
+            "criticalThreshold": 40,
+            "noiseAmplitude": 0,
+            "rampRate": 1,
+            "incidentMagnitude": 44
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-14-chiller", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-chiller",
+            "text": "Clamp Max RPM to 20%",
+            "rationale": "Chiller failure requires severe spindle speed derating to prevent bearing seizure.",
+            "confidence": 0.98,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -389,12 +565,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Obscure Alarm", description: "Injects undocumented OEM alarm code.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-11", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-rag",
+            "name": "Knowledge Retrieval Score",
+            "unit": "index",
+            "baseline": 0.95,
+            "watchThreshold": 0.6,
+            "warningThreshold": 0.4,
+            "criticalThreshold": 0.25,
+            "noiseAmplitude": 0.02,
+            "rampRate": 5,
+            "incidentMagnitude": -0.75
       }
     ],
     evidencePlan: [mockEvidenceCorpus[3]],
     recommendations: [
-      { id: "rec-scenario-15-rag", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-rag",
+            "text": "Escalate to Tier 3 Engineering",
+            "rationale": "No safe advisory can be generated. Vector search returned zero matching SOPs for this fault.",
+            "confidence": 1,
+            "requiresApproval": true,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -412,12 +604,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Battery Drain", description: "Simulates voltage drop on Renishaw probe.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-12", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-batt",
+            "name": "OMP60 Battery Voltage",
+            "unit": "V",
+            "baseline": 3.6,
+            "watchThreshold": 2.8,
+            "warningThreshold": 2.5,
+            "criticalThreshold": 2.2,
+            "noiseAmplitude": 0.05,
+            "rampRate": 200,
+            "incidentMagnitude": -1.5
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-16-probe", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-probe",
+            "text": "Bypass In-Machine Probing",
+            "rationale": "Probe battery critical. Bypass macro G65 P9810 to prevent false-trigger measurement crashes.",
+            "confidence": 0.91,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -435,12 +643,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "EMI Interference", description: "Injects bit-flips into simulated encoder stream.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-13", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-enc",
+            "name": "Quadrature Loss Events",
+            "unit": "count",
+            "baseline": 0,
+            "watchThreshold": 5,
+            "warningThreshold": 15,
+            "criticalThreshold": 50,
+            "noiseAmplitude": 1,
+            "rampRate": 5,
+            "incidentMagnitude": 60
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-17-encoder", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-enc",
+            "text": "Halt Motion & Inspect Grounding",
+            "rationale": "Severe EMI causing encoder packet loss. Continued motion risks hard positional runaway.",
+            "confidence": 0.99,
+            "requiresApproval": true,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -458,12 +682,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Operator Override", description: "Simulates physical door open during cycle.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-14", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-door",
+            "name": "Interlock Integrity",
+            "unit": "status",
+            "baseline": 1,
+            "watchThreshold": 0.8,
+            "warningThreshold": 0.5,
+            "criticalThreshold": 0.1,
+            "noiseAmplitude": 0,
+            "rampRate": 1,
+            "incidentMagnitude": -1
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-18-door", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-door",
+            "text": "Log OSHA Incident Hash",
+            "rationale": "Door interlock overridden during active M03 cycle. Hard kill triggered. Logging to blockchain ledger.",
+            "confidence": 1,
+            "requiresApproval": false,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -481,12 +721,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Wrong Material", description: "Simulates scanning wrong routing sheet.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-15", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-erp",
+            "name": "ERP Routing Match",
+            "unit": "match",
+            "baseline": 1,
+            "watchThreshold": 0.5,
+            "warningThreshold": 0.5,
+            "criticalThreshold": 0.1,
+            "noiseAmplitude": 0,
+            "rampRate": 1,
+            "incidentMagnitude": -1
       }
     ],
     evidencePlan: [mockEvidenceCorpus[3]],
     recommendations: [
-      { id: "rec-scenario-19-barcode", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-erp",
+            "text": "Reject Pallet Load",
+            "rationale": "Material lot hash does not match current ERP work order. Pallet rejected from load station.",
+            "confidence": 1,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -504,12 +760,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Sludge Buildup", description: "Simulates slow rise in DP sensor.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-16", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-dp",
+            "name": "Filter Pressure Drop",
+            "unit": "PSI",
+            "baseline": 2,
+            "watchThreshold": 8,
+            "warningThreshold": 12,
+            "criticalThreshold": 18,
+            "noiseAmplitude": 0.5,
+            "rampRate": 120,
+            "incidentMagnitude": 17
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-20-filter", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-filter",
+            "text": "Schedule CMMS Work Order",
+            "rationale": "Filter DP high. Parts washing efficiency reduced. Generate automated maintenance ticket.",
+            "confidence": 0.85,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -527,12 +799,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Bad Generation", description: "Forces LLM to emit invalid G-code param.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-17", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-hall",
+            "name": "Physics Violation Score",
+            "unit": "index",
+            "baseline": 0,
+            "watchThreshold": 0.2,
+            "warningThreshold": 0.5,
+            "criticalThreshold": 0.9,
+            "noiseAmplitude": 0.01,
+            "rampRate": 2,
+            "incidentMagnitude": 0.95
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-21-ai", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-hall",
+            "text": "Veto Generated G-Code",
+            "rationale": "Advisory generated Spindle Speed (90,000 RPM) exceeds machine physical limit (12,000 RPM). Vetoed by governance layer.",
+            "confidence": 1,
+            "requiresApproval": false,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -550,12 +838,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Thin Wall Resonance", description: "Simulates unstable cutting dynamics.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-18", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-fft",
+            "name": "400Hz FFT Amplitude",
+            "unit": "dB",
+            "baseline": -60,
+            "watchThreshold": -30,
+            "warningThreshold": -15,
+            "criticalThreshold": -5,
+            "noiseAmplitude": 5,
+            "rampRate": 10,
+            "incidentMagnitude": 58
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-22-harmonic", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-harm",
+            "text": "Activate Spindle Speed Variation",
+            "rationale": "Regenerative chatter detected. Modulating spindle speed ±10% will break the resonant frequency.",
+            "confidence": 0.92,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -573,12 +877,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Monday Morning", description: "Simulates system startup from ambient 15C.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-19", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-cast",
+            "name": "Base Casting Temp",
+            "unit": "°C",
+            "baseline": 25,
+            "watchThreshold": 20,
+            "warningThreshold": 18,
+            "criticalThreshold": 15,
+            "noiseAmplitude": 0.1,
+            "rampRate": 1,
+            "incidentMagnitude": -10
       }
     ],
     evidencePlan: [mockEvidenceCorpus[3]],
     recommendations: [
-      { id: "rec-scenario-23-warmup", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-warm",
+            "text": "Run O9000 Spindle Warm-up",
+            "rationale": "Casting is cold. Executing a 15-minute kinematic warm-up prevents first-part dimensional scrap.",
+            "confidence": 0.95,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -596,12 +916,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Hard Spot", description: "Simulates sudden torque loss.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-20", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-torque",
+            "name": "Spindle Torque",
+            "unit": "%",
+            "baseline": 65,
+            "watchThreshold": 85,
+            "warningThreshold": 10,
+            "criticalThreshold": 5,
+            "noiseAmplitude": 3,
+            "rampRate": 1,
+            "incidentMagnitude": -65
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-24-toolbreak", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-break",
+            "text": "Retract Z and Flag Part",
+            "rationale": "Sudden loss of torque indicates catastrophic tool fracture. Retract to avoid spindle crash.",
+            "confidence": 0.99,
+            "requiresApproval": true,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -619,12 +955,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Supply Chain Attack", description: "Simulates malicious payload drop.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-21", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-fw",
+            "name": "Firmware Hash Verification",
+            "unit": "status",
+            "baseline": 1,
+            "watchThreshold": 0.5,
+            "warningThreshold": 0.1,
+            "criticalThreshold": 0,
+            "noiseAmplitude": 0,
+            "rampRate": 1,
+            "incidentMagnitude": -1
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-25-firmware", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-fw",
+            "text": "Quarantine Firmware Payload",
+            "rationale": "OTA signature does not match OEM public key. Update quarantined. Zero-trust policy enforced.",
+            "confidence": 1,
+            "requiresApproval": false,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -642,12 +994,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Oil Mist Ignition", description: "Simulates UV/IR flame detector trip.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-22", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-fire",
+            "name": "Enclosure Flame Sensor",
+            "unit": "IR",
+            "baseline": 0,
+            "watchThreshold": 10,
+            "warningThreshold": 50,
+            "criticalThreshold": 100,
+            "noiseAmplitude": 1,
+            "rampRate": 2,
+            "incidentMagnitude": 150
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-26-fire", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-fire",
+            "text": "Discharge CO2 & Power Kill",
+            "rationale": "Flame detected inside enclosure. Hard electrical isolation and fire suppression required.",
+            "confidence": 1,
+            "requiresApproval": false,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -665,12 +1033,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Split Brain", description: "Simulates concurrent offline writes.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-23", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-sync",
+            "name": "Ledger Divergence",
+            "unit": "blocks",
+            "baseline": 0,
+            "watchThreshold": 5,
+            "warningThreshold": 20,
+            "criticalThreshold": 50,
+            "noiseAmplitude": 0,
+            "rampRate": 5,
+            "incidentMagnitude": 65
       }
     ],
     evidencePlan: [mockEvidenceCorpus[3]],
     recommendations: [
-      { id: "rec-scenario-27-data", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-sync",
+            "text": "Trigger Merkle Tree Rebuild",
+            "rationale": "Local cache is out of sync with cloud ledger. Initiating deterministic state reconciliation.",
+            "confidence": 0.9,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -688,12 +1072,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Leaking Seal", description: "Simulates pressure bleed-off.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-24", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-hyd",
+            "name": "Chuck Hydraulic Pressure",
+            "unit": "Bar",
+            "baseline": 40,
+            "watchThreshold": 30,
+            "warningThreshold": 25,
+            "criticalThreshold": 15,
+            "noiseAmplitude": 0.5,
+            "rampRate": 15,
+            "incidentMagnitude": -28
       }
     ],
     evidencePlan: [mockEvidenceCorpus[0]],
     recommendations: [
-      { id: "rec-scenario-28-hydraulic", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-hyd",
+            "text": "Inhibit Spindle Rotation",
+            "rationale": "Hydraulic pressure below safe grip threshold. Spinning up will throw the workpiece.",
+            "confidence": 0.98,
+            "requiresApproval": true,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   },
@@ -711,12 +1111,28 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "Auditor Request", description: "Simulates an external verification query.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-25", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-audit",
+            "name": "Audit Query Load",
+            "unit": "req/s",
+            "baseline": 0.1,
+            "watchThreshold": 5,
+            "warningThreshold": 15,
+            "criticalThreshold": 50,
+            "noiseAmplitude": 0,
+            "rampRate": 5,
+            "incidentMagnitude": 60
       }
     ],
     evidencePlan: [mockEvidenceCorpus[1]],
     recommendations: [
-      { id: "rec-scenario-29-audit", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-audit",
+            "text": "Generate Hashed Evidence Packet",
+            "rationale": "External audit requested. Compiling fully immutable operator decision ledger for ISO compliance.",
+            "confidence": 0.99,
+            "requiresApproval": true,
+            "shadowActionAvailable": true
+      }
     ],
     tutorialHints: []
   },
@@ -734,12 +1150,40 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     incidentSeed: { name: "The Perfect Storm", description: "Injects multiple interacting degradation vectors.", delaySeconds: 3 },
     signals: [
       {
-        id: "sig-metric-26", name: "Anomaly Indicator", unit: "unit", baseline: 1.0, watchThreshold: 2.0, warningThreshold: 3.0, criticalThreshold: 4.0, noiseAmplitude: 0.1, rampRate: 20, incidentMagnitude: 5.0
+            "id": "sig-comp1",
+            "name": "Vibration RMS",
+            "unit": "mm/s",
+            "baseline": 1.2,
+            "watchThreshold": 2.5,
+            "warningThreshold": 4,
+            "criticalThreshold": 6,
+            "noiseAmplitude": 0.5,
+            "rampRate": 20,
+            "incidentMagnitude": 5.8
+      },
+      {
+            "id": "sig-comp2",
+            "name": "Spindle Temp",
+            "unit": "°C",
+            "baseline": 35,
+            "watchThreshold": 50,
+            "warningThreshold": 65,
+            "criticalThreshold": 85,
+            "noiseAmplitude": 1,
+            "rampRate": 30,
+            "incidentMagnitude": 55
       }
     ],
     evidencePlan: [mockEvidenceCorpus[2]],
     recommendations: [
-      { id: "rec-scenario-30-compound", text: "Acknowledge and Apply Corrective Protocol", rationale: "Based on SOP guidelines, resolving this simulated failure requires manual intervention and shadow verification.", confidence: 0.90, requiresApproval: true, shadowActionAvailable: true }
+      {
+            "id": "rec-comp",
+            "text": "Execute Multi-System Safestate",
+            "rationale": "Compound degradation detected across 3 distinct vectors. Immediate unified safestate required.",
+            "confidence": 0.89,
+            "requiresApproval": true,
+            "shadowActionAvailable": false
+      }
     ],
     tutorialHints: []
   }
