@@ -38,7 +38,7 @@ This project spans from the Edge to the Cloud:
 *Note: Please record and place these GIFs in the `docs/gifs/` folder to activate this gallery.*
 
 ### The UI Overdrive
-1. **Live Spindle Sparklines:** <br/> ![Spindle Sparkline](docs/gifs/01-spindle-sparkline.gif)
+1. **Live Spindle Sparklines:** <br/> ![Spindle Sparkline](docs/images/01-spindle-sparkline.png)
 2. **Thermal Drift Analytics:** <br/> ![Thermal Drift](docs/gifs/02-thermal-drift.gif)
 3. **Vibration FFT Metrics:** <br/> ![Vibration FFT](docs/gifs/03-vibration-fft.gif)
 4. **Scrolling Event Ledger:** <br/> ![Event Ledger](docs/gifs/04-event-ledger.gif)
