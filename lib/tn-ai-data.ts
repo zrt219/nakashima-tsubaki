@@ -58,80 +58,125 @@ export type EvidenceItem = {
 
 export const missionAreas: MissionArea[] = [
   {
-    id: "overview",
+    id: "atlas-overview",
     index: "01",
-    title: "Executive Overview",
-    descriptor: "Early adoption operating layer",
+    title: "Atlas Overview",
+    descriptor: "Global operating shell",
     icon: "mission",
     href: "/",
     status: "ready"
   },
   {
-    id: "roadmap",
+    id: "ralphplan-ai",
     index: "02",
-    title: "AI Adoption Roadmap",
-    descriptor: "Standards-first rollout",
+    title: "Ralphplan AI",
+    descriptor: "Local cognitive retrieval lab",
     icon: "roadmap",
-    href: "/roadmap",
+    href: "/rag",
     status: "review"
   },
   {
-    id: "rag",
+    id: "umattr",
     index: "03",
-    title: "RAG Knowledge Console",
-    descriptor: "Approved corpus retrieval",
-    icon: "rag",
-    href: "/rag",
+    title: "UMATTR",
+    descriptor: "Commissioning intelligence studio",
+    icon: "chart",
+    href: "/iot-maker",
     status: "simulated"
   },
   {
-    id: "twins",
+    id: "chain-state-lab",
     index: "04",
-    title: "Digital Twin Command",
-    descriptor: "Cyber-physical replay",
-    icon: "twin",
-    href: "/simulator",
-    status: "simulated"
-  },
-  {
-    id: "ledger",
-    index: "05",
-    title: "Provenance Ledger",
-    descriptor: "Evidence hash registry",
+    title: "Chain State Lab",
+    descriptor: "Testnet proof anchors",
     icon: "hash",
     href: "/ledger",
     status: "testnet"
   },
   {
-    id: "automation",
-    index: "06",
-    title: "Advisory Automation",
-    descriptor: "Operator-approved workflow",
-    icon: "flow",
-    href: "/advisory",
-    status: "approval"
-  },
-  {
-    id: "governance",
-    index: "07",
-    title: "Risk and Governance",
-    descriptor: "Safety, compliance, audit",
-    icon: "shield",
+    id: "uranium-systems",
+    index: "05",
+    title: "Uranium Systems",
+    descriptor: "Safety-first plant topology",
+    icon: "power",
     href: "/governance",
     status: "locked"
   },
   {
-    id: "architecture",
+    id: "uo2x",
+    index: "06",
+    title: "UO2X",
+    descriptor: "Connected logistics intelligence",
+    icon: "flow",
+    href: "/simulator",
+    status: "simulated"
+  },
+  {
+    id: "digital-twin-architecture",
+    index: "07",
+    title: "Digital Twin Architecture",
+    descriptor: "Cyber-physical map and replay",
+    icon: "twin",
+    href: "/simulator",
+    status: "ready"
+  },
+  {
+    id: "event-horizon-lab",
     index: "08",
-    title: "Vendor Architecture",
-    descriptor: "Open stack comparison",
-    icon: "stack",
-    href: "/architecture",
+    title: "Event Horizon Lab",
+    descriptor: "Anomaly stream and memory",
+    icon: "history",
+    href: "/logs",
     status: "review"
   },
   {
-    id: "kpis",
+    id: "app-systems",
     index: "09",
+    title: "App Systems",
+    descriptor: "Agent rail and workflow tools",
+    icon: "stack",
+    href: "/agents",
+    status: "approval"
+  },
+  {
+    id: "credentials",
+    index: "10",
+    title: "Credentials",
+    descriptor: "Proof corpus and traceability",
+    icon: "evidence",
+    href: "/source",
+    status: "ready"
+  },
+  {
+    id: "source",
+    index: "11",
+    title: "Source / References",
+    descriptor: "Architectural and protocol references",
+    icon: "search",
+    href: "/source",
+    status: "review"
+  },
+  {
+    id: "roadmap",
+    index: "12",
+    title: "AI Adoption Roadmap",
+    descriptor: "Standards-first rollout",
+    icon: "chart",
+    href: "/roadmap",
+    status: "review"
+  },
+  {
+    id: "cognitive",
+    index: "13",
+    title: "Cognitive Swarm Brain",
+    descriptor: "Live neural decision graph",
+    icon: "twin",
+    href: "/cognitive",
+    status: "simulated"
+  },
+  {
+    id: "kpis",
+    index: "14",
     title: "KPI Dashboard",
     descriptor: "Executive signal board",
     icon: "chart",
@@ -140,30 +185,12 @@ export const missionAreas: MissionArea[] = [
   },
   {
     id: "qa",
-    index: "10",
+    index: "15",
     title: "QA Evidence Report",
     descriptor: "Verification packet",
     icon: "evidence",
     href: "/qa",
     status: "ready"
-  },
-  {
-    id: "cognitive",
-    index: "11",
-    title: "Cognitive Swarm Brain",
-    descriptor: "Live neural decision graph",
-    icon: "twin",
-    href: "/cognitive",
-    status: "simulated"
-  },
-  {
-    id: "iot_maker",
-    index: "12",
-    title: "IoT Maker",
-    descriptor: "Commissioning studio for connected and proof layers",
-    icon: "hash",
-    href: "/iot-maker",
-    status: "approval"
   }
 ];
 

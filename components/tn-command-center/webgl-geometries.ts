@@ -218,7 +218,7 @@ export function generateErodingGeometry(count: number, size = 4) {
   for (let i = 0; i < count; i++) {
     let x = (Math.random() - 0.5) * size;
     let y = (Math.random() - 0.5) * size;
-    let z = (Math.random() - 0.5) * size;
+    const z = (Math.random() - 0.5) * size;
     // Carve out a chunk (simulating wear/erosion)
     if (x > 0 && y > 0 && z > 0) {
       x -= size / 2;

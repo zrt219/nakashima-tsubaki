@@ -6,6 +6,12 @@ import { overviewEvents } from "@/lib/tn-ai-data";
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
 import { Icon } from "@/components/tn-command-center/command-center-primitives";
 
+type TelemetryPoint = {
+  metric_key: string;
+  value_numeric: number;
+  timestamp: string;
+};
+
 const springTransition: Transition = {
   type: "spring",
   stiffness: 100,
@@ -13,7 +19,7 @@ const springTransition: Transition = {
   mass: 1,
 };
 
-export function KpiDashboard({ telemetryData = [] }: { telemetryData?: any[] }) {
+export function KpiDashboard({ telemetryData = [] }: { telemetryData?: TelemetryPoint[] }) {
   return (
     <CommandCenterShell
       activeAreaId="kpis"
@@ -184,7 +190,7 @@ function TopMetricBox({ label, value, trend, status }: { label: string, value: s
 // ----------------------------------------------------------------------
 // Left Rail Trend Matrices
 // ----------------------------------------------------------------------
-function LeftRailTrendMatrices({ telemetryData }: { telemetryData: any[] }) {
+function LeftRailTrendMatrices({ telemetryData }: { telemetryData: TelemetryPoint[] }) {
   // Extract and sort real telemetry data
   const powerData = telemetryData.filter((d) => d.metric_key === "spindle_speed_rpm").map((d) => d.value_numeric).reverse();
   const tempData = telemetryData.filter((d) => d.metric_key === "coolant_temp_c").map((d) => d.value_numeric).reverse();
@@ -239,7 +245,10 @@ function LeftRailTrendMatrices({ telemetryData }: { telemetryData: any[] }) {
 // Spindle FFT Spectrum Analyzer
 // ----------------------------------------------------------------------
 function SpindleFftAnalyzer() {
-  const bars = Array.from({ length: 32 }, () => Math.random() * 100);
+  const bars = Array.from({ length: 32 }, (_, i) => {
+    const x = Math.sin(i * 1.71 + 0.3) * 10000;
+    return (x - Math.floor(x)) * 100;
+  });
   
   return (
     <div className="border border-command-line/50 bg-black/50 backdrop-blur-md p-3 mt-4">
@@ -263,7 +272,7 @@ function SpindleFftAnalyzer() {
                 damping: 20,
                 repeat: Infinity,
                 repeatType: "mirror",
-                duration: 1 + Math.random(),
+                duration: 1 + (i % 4) * 0.2,
               }}
             />
           );

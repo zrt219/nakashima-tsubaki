@@ -116,7 +116,7 @@ export const hederaTestnetProofAdapter: ProofAdapter = {
     if (!rpcUrl || !contractAddress) {
       return {
         verified: false,
-        detail: "Hedera config missing — cannot verify on-chain.",
+        detail: "Hedera config missing - cannot verify on-chain.",
       };
     }
 

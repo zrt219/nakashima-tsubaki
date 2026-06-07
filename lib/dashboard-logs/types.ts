@@ -19,7 +19,7 @@ export type DashboardLogEvent = {
   type: string;
   severity: DashboardLogSeverity;
   summary: string;
-  details?: string;
+  details?: Record<string, unknown>;
   durationMs?: number;
   mode?: DashboardLogMode;
   metadata?: Record<string, unknown>;

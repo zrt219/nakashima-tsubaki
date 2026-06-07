@@ -1,5 +1,3 @@
-import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
-import { overviewEvents } from "@/lib/tn-ai-data";
 import { OverviewDashboard } from "@/components/tn-command-center/overview-dashboard";
 import { createClient } from "@/lib/supabase/server";
 

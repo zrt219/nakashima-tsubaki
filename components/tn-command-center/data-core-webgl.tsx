@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useRef, useMemo, useEffect, useState, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stars, Float, PointMaterial } from "@react-three/drei";
 import { EffectComposer, Bloom, Glitch, ChromaticAberration } from "@react-three/postprocessing";
@@ -18,7 +18,6 @@ import {
   generateLattice,
   generateCylinder,
   generateTorus,
-  generateHeatField,
   generateWaveTunnel,
   generateErodingGeometry,
   generateFlowNetwork,
@@ -45,6 +44,17 @@ export type TwinModelId =
   | "stuxnet-centrifuge";
 
 export type WebGLSignalState = "normal" | "watch" | "warning" | "critical";
+
+type AdvancedGeometry = {
+  positions: Float32Array;
+  colors?: Float32Array | null;
+};
+
+type GeometryData = Float32Array | AdvancedGeometry;
+
+const isAdvancedGeometry = (value: GeometryData): value is AdvancedGeometry => {
+  return typeof value === "object" && value !== null && "positions" in value;
+};
 
 function getTwinConfig(areaOrModel: string, state: WebGLSignalState) {
   // Determine base color and animation intensity based on state
@@ -110,14 +120,13 @@ function ParticleCore({ state, areaOrModel }: { state: WebGLSignalState, areaOrM
   
   const config = useMemo(() => getTwinConfig(areaOrModel, state), [areaOrModel, state]);
 
-  const geoData = useMemo(() => {
-    // @ts-ignore
-    return config.generate(particleCount, ...config.args);
+  const geoData = useMemo<GeometryData>(() => {
+    const generate = config.generate as (...args: unknown[]) => GeometryData;
+    return generate(particleCount, ...(config.args as unknown[]));
   }, [config, particleCount]);
 
-  const isAdvancedGeo = (geoData as any).positions !== undefined;
-  const positions = isAdvancedGeo ? (geoData as any).positions : geoData;
-  const colors = isAdvancedGeo ? (geoData as any).colors : null;
+  const positions = isAdvancedGeometry(geoData) ? geoData.positions : geoData;
+  const colors = isAdvancedGeometry(geoData) ? geoData.colors ?? null : null;
 
   // Color transition target
   const targetColor = useMemo(() => new THREE.Color(config.color), [config.color]);
@@ -155,7 +164,16 @@ function ParticleCore({ state, areaOrModel }: { state: WebGLSignalState, areaOrM
   );
 }
 
-function Points({ positions, colors, children, ...props }: any) {
+function Points({
+  positions,
+  colors,
+  children,
+  ...props
+}: {
+  positions: Float32Array;
+  colors?: Float32Array | null;
+  children?: ReactNode;
+} & Record<string, unknown>) {
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));

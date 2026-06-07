@@ -3,6 +3,11 @@
 import { motion } from "framer-motion";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 
+const seededValue = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
 export function AdvisoryDashboard() {
   return (
     <div className="flex h-full flex-col gap-4">
@@ -31,7 +36,7 @@ export function AdvisoryDashboard() {
             </div>
             <div className="mt-2 h-8 w-full">
               <svg viewBox="0 0 100 30" className="h-full w-full opacity-60" preserveAspectRatio="none">
-                <path d={`M0 25 Q20 ${10 + Math.random()*20} 40 15 T80 20 T100 5`} fill="none" stroke="currentColor" strokeWidth="1.5" className={metric.color} />
+                <path d={`M0 25 Q20 ${10 + seededValue(i * 1.7 + metric.label.length) * 20} 40 15 T80 20 T100 5`} fill="none" stroke="currentColor" strokeWidth="1.5" className={metric.color} />
               </svg>
             </div>
           </motion.div>

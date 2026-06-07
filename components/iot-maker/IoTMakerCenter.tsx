@@ -12,6 +12,8 @@ import { CommandFlowTestRunner } from "@/components/iot-maker/CommandFlowTestRun
 import { SafetyBoundaryMatrix } from "@/components/iot-maker/SafetyBoundaryMatrix";
 import { SetupExportPanel } from "@/components/iot-maker/SetupExportPanel";
 import { ProofLedgerPanel } from "@/components/iot-maker/proof-ledger/ProofLedgerPanel";
+import { GeminiQueryLab } from "@/components/iot-maker/gemini-lab/GeminiQueryLab";
+import { SupabaseQueryLab } from "@/components/iot-maker/supabase-lab/SupabaseQueryLab";
 import type {
   LastEvidencePacket,
   ProofStatusResponse,
@@ -19,8 +21,10 @@ import type {
 import { EnvChecklist } from "@/components/iot-maker/EnvChecklist";
 import { IoTMakerEventLedger } from "@/components/iot-maker/IoTMakerEventLedger";
 import type { ReadinessCheck } from "@/lib/iot-maker/types";
+import { ExplainThis } from "@/components/education/ExplainThis";
 
 type TabId =
+  | "queryLabs"
   | "topology"
   | "demo"
   | "connected"
@@ -116,6 +120,7 @@ const TABS = [
   { id: "connected", label: "Connected Mode" },
   { id: "readiness", label: "Readiness Checks" },
   { id: "commandFlow", label: "Command Flow Test" },
+  { id: "queryLabs", label: "Query Labs" },
   { id: "safety", label: "Safety Boundary" },
   { id: "proofLedger", label: "Proof Ledger" },
   { id: "setup", label: "Setup Export" },
@@ -158,21 +163,6 @@ export function IoTMakerCenter() {
         xrplConfig: { ws: false, seed: false, destination: false, jsonRpc: false },
         hederaConfig: { rpcUrl: false, privateKey: false, contractAddress: false, chainId: null },
       };
-
-  const latestProof: CommandFlowReport["proofAnchor"] | null = useMemo(() => {
-    if (!proofStatus?.latestProof?.length) return null;
-    const latest = proofStatus.latestProof[0];
-    return {
-      network: latest.network,
-      status: latest.status,
-      evidenceHash: latest.evidenceHash,
-      evidenceBytes32: latest.evidenceBytes32 ?? undefined,
-      transactionHash: latest.transactionHash ?? undefined,
-      blockNumber: latest.blockNumber ?? undefined,
-      ledgerIndex: latest.ledgerIndex ?? undefined,
-      explorerUrl: latest.explorerUrl ?? undefined,
-    };
-  }, [proofStatus]);
 
   const latestEvidencePacket = useMemo<LastEvidencePacket | null>(() => {
     if (!lastFlow?.evidence?.packet) return null;
@@ -241,13 +231,18 @@ export function IoTMakerCenter() {
   };
 
   useEffect(() => {
-    void loadHealth();
-    void loadProofStatus();
+    const bootTimer = window.setTimeout(() => {
+      void loadHealth();
+      void loadProofStatus();
+    }, 0);
     const interval = setInterval(() => {
       void loadHealth();
       void loadProofStatus();
     }, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      window.clearTimeout(bootTimer);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -264,7 +259,7 @@ export function IoTMakerCenter() {
       <div className="grid gap-4 xl:grid-cols-[1fr_auto]">
         <div className="rounded border border-command-line/60 bg-black/20 p-2">
           <div className="mb-3 flex flex-wrap gap-2">
-            {TABS.map((tab) => (
+          {TABS.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
@@ -280,31 +275,87 @@ export function IoTMakerCenter() {
             ))}
           </div>
 
-          {activeTab === "topology" && <IoTMakerTopology />}
-          {activeTab === "demo" && <DemoModePanel />}
+          {activeTab === "topology" && (
+            <ExplainThis
+              label="Topology"
+              explanation="This diagram shows how the browser, Vercel runtime, Supabase, AWS IoT, AI provider, operator gate, edge bridge, and proof ledger connect in advisory-first commissioning."
+            >
+              <IoTMakerTopology />
+            </ExplainThis>
+          )}
+          {activeTab === "demo" && (
+            <ExplainThis
+              label="Demo Mode"
+              explanation="Demo Mode generates synthetic telemetry, runs deterministic advisory logic, and never sends real machine control. No cloud or field-bus commands are dispatched."
+            >
+              <DemoModePanel />
+            </ExplainThis>
+          )}
           {activeTab === "connected" && (
-            <ConnectedModePanel checks={activeChecks} envChecks={activeEnvChecks} warnings={health?.warnings ?? []} />
+            <ExplainThis
+              label="Connected Mode"
+              explanation="Connected Mode shows what is available when cloud keys are present. It is a readiness and safety view, not an automatic live control path."
+            >
+              <ConnectedModePanel checks={activeChecks} envChecks={activeEnvChecks} warnings={health?.warnings ?? []} />
+            </ExplainThis>
           )}
           {activeTab === "readiness" && (
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-              <ReadinessCheckGrid checks={activeChecks} />
-              <div className="rounded border border-cyan-900/60 bg-black/30 p-3">
-                <p className="text-xs uppercase tracking-[0.16em] text-cyan-300">Ready-state summary</p>
-                <ul className="mt-2 space-y-1 text-[11px] text-slate-300">
-                  <li>Mode: {runtimeMode}</li>
-                  <li>Proof mode: {proofMode}</li>
-                  <li>Operator approval gate active: {String(health?.safetyStatus.approvalGateActive ?? false)}</li>
-                  <li>Direct machine control disabled: {String(health?.safetyStatus.directMachineControlDisabled ?? false)}</li>
-                  <li>Connected prerequisites satisfied: {String(activeChecks.every((item) => item.status === "ready" || !item.requiredForConnected ? item.status !== "blocked" : true))}</li>
-                </ul>
+            <ExplainThis
+              label="Readiness Checks"
+              explanation="These readiness checks show the explicit prerequisites for advisory execution and connected integration. A failed check blocks dispatch and keeps the flow safe."
+            >
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+                <ReadinessCheckGrid checks={activeChecks} />
+                <div className="rounded border border-cyan-900/60 bg-black/30 p-3">
+                  <p className="text-xs uppercase tracking-[0.16em] text-cyan-300">Ready-state summary</p>
+                  <ul className="mt-2 space-y-1 text-[11px] text-slate-300">
+                    <li>Mode: {runtimeMode}</li>
+                    <li>Proof mode: {proofMode}</li>
+                    <li>Operator approval gate active: {String(health?.safetyStatus.approvalGateActive ?? false)}</li>
+                    <li>Direct machine control disabled: {String(health?.safetyStatus.directMachineControlDisabled ?? false)}</li>
+                    <li>Connected prerequisites satisfied: {String(activeChecks.every((item) => item.status === "ready" || !item.requiredForConnected ? item.status !== "blocked" : true))}</li>
+                  </ul>
+                </div>
               </div>
-            </div>
+            </ExplainThis>
           )}
           {activeTab === "commandFlow" && (
-            <CommandFlowTestRunner onComplete={handleFlowComplete} />
+            <ExplainThis
+              label="Command Flow Test"
+              explanation="Run a full commissioning cycle: telemetry packet, recommendation, operator approval check, dispatch simulation, evidence hashing, and proof anchor."
+            >
+              <CommandFlowTestRunner onComplete={handleFlowComplete} />
+            </ExplainThis>
           )}
-          {activeTab === "safety" && <SafetyBoundaryMatrix />}
+          {activeTab === "queryLabs" && (
+            <div className="grid gap-4 xl:grid-cols-2">
+              <ExplainThis
+                label="Supabase Query Lab"
+                explanation="Read-only query presets are safe by default. In Demo Mode results are simulated so you can validate schema intent without live database risk."
+              >
+                <SupabaseQueryLab />
+              </ExplainThis>
+              <ExplainThis
+                label="Gemini Query Lab"
+                explanation="Test advisory prompts and structured action proposals. Tool proposals are visible but require operator policy for execution."
+              >
+                <GeminiQueryLab />
+              </ExplainThis>
+            </div>
+          )}
+          {activeTab === "safety" && (
+            <ExplainThis
+              label="Safety Boundary"
+              explanation="The matrix is the definitive control boundary. AI can suggest only. Operators approve. Edge bridge dispatches only after approval. No direct PLC or blockchain control."
+            >
+              <SafetyBoundaryMatrix />
+            </ExplainThis>
+          )}
           {activeTab === "proofLedger" && (
+            <ExplainThis
+              label="Proof Ledger"
+              explanation="Proof Ledger anchors only evidence hashes for audit traceability. Operational telemetry and command payloads are not written on-chain."
+            >
               <ProofLedgerPanel
               healthMode={runtimeMode}
               healthProofMode={proofMode}
@@ -312,16 +363,22 @@ export function IoTMakerCenter() {
               proofStatus={proofStatus}
               latestEvidence={latestEvidencePacket}
               onAnchorComplete={refreshProofStatus}
-            />
+              />
+            </ExplainThis>
           )}
           {activeTab === "setup" && (
-            <div className="grid gap-4">
-              <SetupExportPanel />
-              <div className="rounded border border-command-line/60 bg-black/20 p-3">
-                <p className="text-xs uppercase tracking-[0.16em] text-cyan-300">Server-side env visibility</p>
-                <EnvChecklist entries={activeEnvChecks} />
+            <ExplainThis
+              label="Setup Export"
+              explanation="Server-side environment manifest for predictable bootstrapping. This feature exports local values for demo and connected setup only."
+            >
+              <div className="grid gap-4">
+                <SetupExportPanel />
+                <div className="rounded border border-command-line/60 bg-black/20 p-3">
+                  <p className="text-xs uppercase tracking-[0.16em] text-cyan-300">Server-side env visibility</p>
+                  <EnvChecklist entries={activeEnvChecks} />
+                </div>
               </div>
-            </div>
+            </ExplainThis>
           )}
         </div>
 

@@ -11,10 +11,10 @@ export function DemoModePanel() {
           Demo mode runs synthetic telemetry and deterministic advisory logic. No cloud-side control channels are used.
         </p>
         <ul className="space-y-2 text-xs text-command-muted">
-          <li>• Scenario set is fixed to the five required commissioning test cases.</li>
-          <li>• AI provider is mocked unless `AI_PROVIDER` is configured with valid keys.</li>
-          <li>• Operator approval is still required by default.</li>
-          <li>• Only evidence hashes are prepared for proof anchoring.</li>
+          <li>* Scenario set is fixed to the five required commissioning test cases.</li>
+          <li>* AI provider is mocked unless `AI_PROVIDER` is configured with valid keys.</li>
+          <li>* Operator approval is still required by default.</li>
+          <li>* Only evidence hashes are prepared for proof anchoring.</li>
         </ul>
       </Panel>
       <CommandFlowTestRunner />

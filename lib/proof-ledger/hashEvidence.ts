@@ -1,5 +1,5 @@
 // lib/proof-ledger/hashEvidence.ts
-// Server-side only — uses Node.js crypto.
+// Server-side only -- uses Node.js crypto.
 // Do NOT import from client components.
 
 import crypto from "crypto";

@@ -13,10 +13,7 @@ export function TutorialOverlay() {
 
   // Re-calculate the rect whenever the step changes or window resizes
   useEffect(() => {
-    if (!isActive || !step) {
-      setRect(null);
-      return;
-    }
+    if (!isActive || !step) return;
 
     let rafId: number;
     let retries = 0;

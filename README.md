@@ -1,153 +1,319 @@
-# Tsubaki-Nakashima AI Digital Twin Command Center
+﻿# Tsubaki-Nakashima AI Command Center — ZRT IoT Maker
 
-![Executive Overview](https://raw.githubusercontent.com/zrt219/tsubaki-nakashima-ai/main/docs/overview.png)
+A recursive agentic cyber-physical AI prototype.
 
-An enterprise-grade cyber-physical digital twin prototype for live CNC telemetry, edge-to-cloud event streaming, AI-assisted machine-state analysis, and operator-approved command dispatch.
+[![Next.js](https://img.shields.io/badge/Next.js-Prototype-000000?logo=nextdotjs)](https://nextjs.org/docs)
+[![Supabase](https://img.shields.io/badge/Supabase-Mock%2FConnected-3fcf8e?logo=supabase)](https://supabase.com/docs)
+[![AWS IoT](https://img.shields.io/badge/AWS%20IoT-Testnet%20Broker-f90?logo=amazon-aws)](https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html)
+[![Gemini-ready](https://img.shields.io/badge/Gemini-Ready-8e44ad?logo=google)](https://ai.google.dev/gemini-api/docs/function-calling)
+[![OpenAI-ready](https://img.shields.io/badge/OpenAI-Ready-10A37F?logo=openai)](https://platform.openai.com/docs/guides/function-calling)
+[![Claude-ready](https://img.shields.io/badge/Claude-Ready-ff9800?logo=anthropic)](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)
+[![Llama-ready](https://img.shields.io/badge/Llama-Ready-00b6ff?logo=meta)](https://docs.llama.meta.com/docs/tools/)
+[![XRPL Testnet](https://img.shields.io/badge/XRPL%20Testnet-Anchor-2a3eb1)](https://xrpl.org/docs/concepts/payment-system/memos-and-uris)
+[![Hedera Testnet](https://img.shields.io/badge/Hedera%20Testnet-Anchor-8b5cf6)](https://docs.hedera.com/hedera/sdks-and-apis/networks#testnet)
+[![Operator-Gated](https://img.shields.io/badge/Operator--Gated-Enabled-0ea5e9)](./docs/sources/source-claim-matrix.md)
+[![Demo Mode](https://img.shields.io/badge/Demo%20Mode-Mock%20First-ef4444)](#16-local-development)
 
-The system connects a simulated CNC edge environment, AWS IoT Core MQTT messaging, Supabase real-time persistence, a Next.js command dashboard, and a Gemini-powered AI copilot. The AI can analyze the latest machine state and propose structured actions, but all commands are intercepted by a human-in-the-loop approval gate before any edge command is dispatched.
+## 1. Live Demo
 
-**Live Production URL:** [https://tsubaki-nakashima-ai-67fz54661-zrt219s-projects.vercel.app/](https://tsubaki-nakashima-ai-67fz54661-zrt219s-projects.vercel.app/)
+- **Live URL**: https://tsubaki-nakashima-ai-zrt.vercel.app/
+- **Core routes**: [`/iot-maker`](/iot-maker), [`/source`](/source), [`/tutorials`](/tutorials), [`/logs`](/logs)
+- **GitHub URL**: local repository workspace path (public URL not provided in this package)
+- **Run 5-Second Demo**: click the main simulation button in [`/iot-maker`](/iot-maker) or run `node scripts/simulate-live-data.js`
 
-## 🔄 Core Loop
+## 2. What This Is
 
-`Simulator → AWS IoT MQTT → Supabase → Next.js → Gemini → Approval Modal → Command Topic → Event Ledger`
+ZRT IoT Maker is an independent project prototype for a recursive agentic commissioning studio. It demonstrates an operator-aware workflow for cyber-physical systems.
 
-## 🛡️ Safety Position
+- This is **not** an official Tsubaki-Nakashima deployment.
+- This is **not** a direct machine-control service.
+- This is a **bounded prototype** for a recursive AI-command cycle: telemetry → agents → tool proposal → eval gate → operator confirmation → dispatch simulation.
 
-This project is designed as an advisory-first cyber-physical control prototype.
-* AI can analyze telemetry.
-* AI can propose structured machine actions.
-* Operators must approve actions.
-* Commands are logged before dispatch.
-* The system is suitable for simulation, shadow-mode testing, and future controlled edge-device demos.
-* No unsafe direct machine autonomy is claimed.
+## 3. Why It Matters Now
 
-## 🏗️ Architecture
+- LLM providers are increasingly moving from plain text completions to structured tool calls.
+- Model and context adapters are becoming the operational spine of production AI integrations.
+- Agentic systems are now being benchmarked for resilience, task horizon, traceability, and policy compliance.
+- Long-horizon and multi-agent loops now require logs, traces, eval gates, and operator approvals.
+- Cyber-physical AI must keep explicit command boundaries before any physical action path.
 
-This project spans from the Edge to the Cloud:
+## 4. 5-Second Reflex Demo
 
-1. **The Edge Simulator (`/scripts/aws-iot-bridge.js`)**: Streams live IoT telemetry (Spindle Speed, Thermal Drift, Vibration) and bridges communication directly via AWS IoT Core using MQTT.
-2. **The AWS Nervous System**: AWS IoT Core acts as the central message broker, enabling bi-directional communication between the cloud interface and simulated or authorized edge devices.
-3. **The Supabase Memory**: Data is piped into a Supabase PostgreSQL database, establishing an immutable historical state and providing a real-time data layer for the frontend.
-4. **The Vercel Application**: A Next.js dashboard visualizes the live Supabase streams in an immersive, highly active dark-mode UI with moving sparklines and scrolling event ledgers.
-5. **The Gemini Brain**: Gemini (using `gemini-2.5-flash` for high-frequency, cost-optimized logic) connects via a serverless `/api/chat` route. It reads the telemetry and has **Function Calling** capabilities to issue edge commands back to the CNC machine.
-6. **The Safety Gate**: A strict Human-in-the-Loop mechanism. When the AI attempts to fire an action, the UI throws an "Operator Approval Required" modal. No edge command is dispatched without explicit human consent.
-
-## 📸 Visual Tour
-
-*Note: Please record and place these GIFs in the `docs/gifs/` folder to activate this gallery.*
-
-### The UI Overdrive
-1. **Live Spindle Sparklines:** <br/> ![Spindle Sparkline](docs/images/01-spindle-sparkline.png)
-2. **Thermal Drift Analytics:** <br/> ![Thermal Drift](docs/gifs/02-thermal-drift.gif)
-3. **Vibration FFT Metrics:** <br/> ![Vibration FFT](docs/gifs/03-vibration-fft.gif)
-4. **Scrolling Event Ledger:** <br/> ![Event Ledger](docs/gifs/04-event-ledger.gif)
-5. **Network Latency Pings:** <br/> ![Network Pings](docs/gifs/05-network-pings.gif)
-
-### The Gemini AI Copilot
-6. **Initializing Terminal:** <br/> ![Terminal Init](docs/gifs/06-terminal-init.gif)
-7. **Querying Telemetry Context:** <br/> ![Telemetry Query](docs/gifs/07-telemetry-query.gif)
-8. **AI Diagnostics (The Dolphins):** <br/> ![AI Diagnostics](docs/gifs/08-ai-diagnostics.gif)
-9. **Function Calling (Proposing Action):** <br/> ![Function Calling](docs/gifs/09-function-calling.gif)
-
-### The Human Approval Gate
-10. **Action Intercepted (Warning State):** <br/> ![Intercept Warning](docs/gifs/10-intercept-warning.gif)
-11. **Reviewing Command Arguments:** <br/> ![Command Review](docs/gifs/11-command-review.gif)
-12. **Authorizing Command:** <br/> ![Authorize Click](docs/gifs/12-authorize-click.gif)
-
-### AWS IoT & The Edge
-13. **MQTT Payload Dispatch:** <br/> ![MQTT Dispatch](docs/gifs/13-mqtt-dispatch.gif)
-14. **Bridge Script Inbound:** <br/> ![Bridge Inbound](docs/gifs/14-bridge-inbound.gif)
-15. **Supabase Real-time Sync:** <br/> ![Supabase Sync](docs/gifs/15-supabase-sync.gif)
-16. **Edge Device Response:** <br/> ![Edge Response](docs/gifs/16-edge-response.gif)
-
-### The Digital Twin Canvas
-17. **3D Mesh Rendering:** <br/> ![3D Mesh](docs/gifs/17-3d-mesh.gif)
-18. **Scenario Progress Bars:** <br/> ![Scenario Bars](docs/gifs/18-scenario-bars.gif)
-19. **Dark Mode UI Aesthetics:** <br/> ![Dark Mode UI](docs/gifs/19-dark-mode-ui.gif)
-20. **Full Dashboard Overview:** <br/> ![Dashboard Overview](docs/gifs/20-dashboard-overview.gif)
-
-## 🚀 Getting Started
-
-### Prerequisites
-*   Node.js 18+
-*   AWS Account (IoT Core)
-*   Supabase Account
-*   Google Gemini API Key
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/zrt219/tsubaki-nakashima-ai.git
-
-# Install dependencies
-npm install
-
-# Apply database migrations (injects 100k records!)
-npx supabase db reset
-
-# Start the edge simulator to pump live data to Supabase
-node scripts/simulate-live-data.js
-
-# Start the AWS IoT Bridge for two-way communication
-node scripts/aws-iot-bridge.js
-
-# Start the Next.js Command Center
-npm run dev
+```text
+0.0s telemetry generated
+0.4s Atlas diagnoses
+0.8s Scribe retrieves evidence
+1.2s Forge drafts tool proposal
+1.6s Sentinel evaluates
+2.0s Operator Gate required
+2.5s approval simulated
+3.0s IoT dispatch simulated
+3.5s evidence packet generated
+4.0s proof hash anchored
+4.5s verified memory candidate
+5.0s improvement proposal drafted
 ```
 
-### 🎮 Demo Script
+## 5. System Architecture
 
-To see the closed-loop system in action:
-1. Open the AI Copilot Terminal.
-2. Ask Gemini: *"Thermal drift is rising. What should we do?"*
-3. Gemini proposes a structured action (e.g., reduce spindle speed or inspect coolant loop).
-4. The UI blocks the action and requests approval.
-5. Operator clicks **AUTHORIZE**.
-6. An AWS IoT command is dispatched via the bridge script.
-7. The Event Ledger records the approval and hash.
+```mermaid
+flowchart TD
+  UI[Browser UI\n/, /iot-maker, /source, /tutorials, /logs]
+  A1[Next.js App Router]
+  A2[Supabase State Layer]
+  A3[AWS IoT MQTT Broker]
+  A4[Edge Bridge / CNC Simulator]
+  B1[AI Provider\nTool Proposal]
+  B2[Eval Gate]
+  B3[Operator Gate]
+  B4[IoT Dispatch Simulation]
+  C1[Evidence Packet]
+  C2[XRPL Testnet / Hedera Testnet]
 
-## 🛠️ Built With
+  UI --> A1
+  A1 --> A2
+  A1 --> A3
+  A3 --> A4
+  A1 --> B1
+  B1 --> B2
+  B2 --> B3
+  B3 --> B4
+  B4 --> C1
+  C1 --> C2
+```
 
-*   **Next.js (App Router)** - Framework
-*   **Framer Motion** - Fluid UI Animations
-*   **AWS IoT Core** - Edge-to-Cloud message brokering
-*   **Supabase** - PostgreSQL Database & Real-time Subscriptions
-*   **Google Gemini (2.5 Flash / 1.5 Pro)** - Agentic Copilot
-*   **Tailwind CSS** - Styling
-*   **Vercel** - Production Deployment
+## 6. Core Modules
 
----
+- Executive Overview
+- Digital Twin Command
+- IoT Maker
+- Reflex Agent Loop
+- Query Labs
+- Model Provider Arena
+- Proof Ledger
+- Dashboard Logs
+- Tutorials
+- Source Page
 
-## 📜 The Epic Journey
+## 7. Reflex Agent Loop
 
-Building this closed-loop prototype with a human approval gate was a masterclass in evolving a static user interface into a living, breathing cyber-physical system. Here is the chronological journey of how we built it:
+- **Atlas**: anomaly detection and diagnostic framing.
+- **Scribe**: evidence retrieval and source lookups.
+- **Forge**: structured tool-proposal generation.
+- **Sentinel**: eval gating and risk checks.
+- **Operator**: approval workflow and simulation-bound release.
 
-### Phase 1: From Mock to Reality
-We started with a beautiful but entirely static Next.js dashboard. It looked the part but lacked a true backend. The first major milestone was tearing out the hardcoded `lib/tn-ai-data.ts` mock data and wiring the components directly to a real **Supabase PostgreSQL database**. 
-* We established `app/page.tsx` as a Server Component to securely fetch data.
-* We mapped the database schema (`telemetry.sensor_readings` and `simulation.scenario_templates`) to the frontend components.
-* Suddenly, the Digital Twin Canvas was rendering real numbers. 
+The loop is recursive by design: every run captures structured events and proposals for the next pass.
 
-### Phase 2: The 100k "Live Data" Injection
-A command center only feels real when it's crunching massive amounts of data. To simulate a high-frequency industrial environment, we wrote a massive database migration (`028_massive_telemetry_seed.sql`). Using PostgreSQL's `generate_series`, we mathematically injected **~100,000 realistic telemetry records** (incorporating sinusoidal waves and random noise) across the spindle speed, coolant temperature, and vibration sensors to simulate 30 days of deep historical context.
+## 8. Tool Registry
 
-### Phase 3: The UI Overdrive
-Even with 100k records, the UI needed to *feel* alive. We completely overhauled the dashboard to run on continuous, independent high-frequency client-side loops:
-* **Live Sparklines:** Replaced static SVGs with dynamically animating charts that tick forward every second.
-* **Scrolling Event Ledger:** Built `LiveEventLedgerPanel` using Framer Motion to continuously pop in new system events (e.g., "Hash Verification", "Twin Mesh Update") and scroll them down the screen.
-* **Network Pings:** Added an overlay to the 3D Canvas showing a constantly jittering `LATENCY` and `IO Throughput` to simulate an active edge connection.
-* **Auto-Polling:** Configured the Next.js router to refresh the Server Components every 5 seconds so new Supabase data appears instantly without manual browser refreshes.
+### Allowed
 
-### Phase 4: The Master Architecture (Gemini + AWS IoT)
-With the dashboard pulsating with data, we implemented the final "Master Plan" to achieve a bi-directional digital twin using Gemini AI and AWS Free Tier.
-1. **The Brain (Gemini 2.5 Flash):** To protect our API credits, we optimized the payload to send only the latest telemetry state. We built an `AICopilotTerminal` directly into the UI where the operator can converse with the AI about the machine's live state.
-2. **Agentic Function Calling:** We empowered Gemini with "Tools". If instructed to "reduce spindle speed," Gemini generates a structured JSON function call (`set_spindle_speed`).
-3. **The Human Gate:** Safety first. We built an interceptor in the UI that catches Gemini's commands and flashes `⚠️ OPERATOR APPROVAL REQUIRED`. The AI cannot modify the machine without the operator clicking `AUTHORIZE`.
-4. **The Nervous System (AWS IoT):** We wrote bash scripts to automatically provision AWS IoT Certificates and created a Node.js bridge (`aws-iot-bridge.js`). When an operator authorizes an AI command, the bridge catches it from Supabase and fires an MQTT message over AWS IoT directly back to the simulated edge device, completing the loop.
+- `read_telemetry_snapshot`
+- `query_supabase_preset`
+- `ask_model_provider`
+- `propose_iot_command`
+- `run_safety_eval`
+- `request_operator_approval`
+- `simulate_iot_dispatch`
+- `create_evidence_packet`
+- `anchor_proof_hash`
+- `write_dashboard_log`
+- `propose_improvement`
+- `stage_memory_update`
 
-We successfully transformed a static React dashboard into an agentic, operator-gated industrial command center!
+### Blocked
 
----
-*Built with 💙 by [@zrt219](https://github.com/zrt219) & Antigravity*
+- `direct_plc_write`
+- `bypass_operator_gate`
+- `expose_secret`
+- `raw_telemetry_on_chain`
+- `smart_contract_machine_control`
+
+## 9. Query Labs
+
+### Supabase Query Lab (`/iot-maker`)
+
+- latest telemetry
+- recent events
+- active scenarios
+- command queue
+- proof anchors
+- health summary
+
+If Supabase is not configured, outputs are simulator payloads and explicitly marked as mock.
+
+### Gemini/Model Query Lab (`/iot-maker`)
+
+- mock mode first
+- Gemini-ready
+- OpenAI-ready
+- Claude-ready
+- Llama-ready
+- structured proposals only
+- Operator Gate required
+
+## 10. Proof Ledger
+
+- Mock proof mode by default
+- XRPL Testnet memo anchor option
+- Hedera Testnet contract-anchor option
+- evidence hash only is written on-chain
+- no raw telemetry, no prompts, no model secrets in chain payloads
+- no machine-control actions are ever placed on-chain
+
+## 11. Dashboard Logs
+
+Every reflex phase creates logs with:
+
+- phase name
+- tool/action name
+- actor
+- eval status
+- operator decision
+- simulation outcome
+
+Logs are inspectable, copyable, and exportable for auditability and handoff review.
+
+## 12. Tutorials
+
+- What is Tsubaki-Nakashima AI?
+- What is IoT Maker?
+- How command flow works
+- How Supabase fits
+- How Gemini fits
+- How blockchain fits
+- Safety model and operator gating
+
+## 13. Source / References Page
+
+The source layer is claim-grounded and maps architecture/design statements to the curated source library.
+
+- [SOURCES_300PLUS.md](docs/sources/SOURCES_300PLUS.md)
+- [source-catalog.json](docs/sources/source-catalog.json)
+- [source-claim-matrix.md](docs/sources/source-claim-matrix.md)
+- Linked routes: [source page](/source), [documentation](docs/sources/SOURCES_300PLUS.md), [query labs](/iot-maker), [dashboard logs](/logs)
+
+## 14. Safety Model
+
+- AI proposes, operator approves.
+- AWS IoT dispatches only after approval and only in demo/simulation mode.
+- Supabase stores safe state and logs.
+- Blockchain holds only proof hashes and proof metadata.
+- No raw telemetry, prompts, or proprietary telemetry payloads on-chain.
+- No direct machine-control APIs in client code.
+- Secrets remain server-only.
+- Operator consent remains explicit.
+
+## 15. Environment Variables
+
+### Demo mode
+
+- `NEXT_PUBLIC_SIMULATOR_PERSISTENCE_MODE`
+- `DATA_MODE`
+- `IOT_MODE`
+- `AI_PROVIDER`
+- `PROOF_MODE`
+- `REQUIRE_OPERATOR_APPROVAL`
+- `ALLOW_DIRECT_MACHINE_CONTROL`
+
+### Supabase
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+### AWS IoT
+
+- `AWS_REGION`
+- `AWS_IOT_ENDPOINT`
+- `AWS_IOT_CLIENT_ID`
+- `AWS_IOT_TOPIC_TELEMETRY`
+- `AWS_IOT_TOPIC_COMMANDS`
+
+### AI providers
+
+- `OPENAI_API_KEY`
+- `GEMINI_API_KEY`
+- `ANTHROPIC_API_KEY`
+- `LLAMA_API_KEY`
+
+### Proof ledger
+
+- `XRPL_TESTNET_WS`
+- `XRPL_TESTNET_JSON_RPC`
+- `XRPL_ANCHOR_SEED`
+- `XRPL_PROOF_DESTINATION`
+- `HEDERA_EVM_CHAIN_ID`
+- `HEDERA_EVM_RPC_URL`
+- `HEDERA_EVM_PRIVATE_KEY`
+- `HEDERA_PROOF_LEDGER_CONTRACT_ADDRESS`
+
+### Safety and boundaries
+
+- `SIMULATOR_SUPABASE_PROJECT_REF`
+- `SIMULATOR_FILE_STORE_PATH`
+- `AWS_IOT_TOPIC_COMMANDS`
+
+## 16. Local Development
+
+- `npm install`
+- `npm run dev`
+- `npm run build`
+- `node scripts/simulate-live-data.js`
+- `node scripts/aws-iot-bridge.js`
+
+## 17. Test / Verification
+
+- `npm run build`
+- `npm run lint`
+- `npm run typecheck`
+- 5-second demo
+- Query Lab run
+- Proof ledger mock
+- safety matrix
+- source page
+
+## 18. Media
+
+- hero screenshot
+- 5-second demo GIF placeholder
+- Reflex Agent Loop screenshot
+- Query Labs screenshot
+- Logs screenshot
+- Proof Ledger screenshot
+- Source Page screenshot
+
+## 19. Source Library
+
+The project ships a 300+ source library for review and traceability.
+
+- [SOURCES_300PLUS.md](docs/sources/SOURCES_300PLUS.md)
+- [source-catalog.json](docs/sources/source-catalog.json)
+- [source-claim-matrix.md](docs/sources/source-claim-matrix.md)
+
+## 20. Limitations
+
+- Independent prototype; not an official Tsubaki-Nakashima deployment.
+- Demo mode default; operator-gated behavior and connected-ready roadmap.
+- Testnets can reset and vary by epoch.
+- No direct machine-control path.
+- No raw telemetry or prompt payloads are written to public chains.
+- External APIs require server-side keys and environment hardening.
+
+## 21. Roadmap
+
+- real MCP adapter
+- real Supabase RLS-backed logs
+- AWS IoT connected mode hardening
+- XRPL/Hedera verification hardening
+- OpenTelemetry traces
+- real eval suite
+- hardware-in-the-loop demo
+- signed policy bundles
+- canary/shadow mode
+- multi-agent improvement queue
+
+## 22. Final Positioning
+
+Most AI demos stop at chat. ZRT IoT Maker shows the whole loop: telemetry, agents, tools, evals, operator approval, proof, and verified memory.

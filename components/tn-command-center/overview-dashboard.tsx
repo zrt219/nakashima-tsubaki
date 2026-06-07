@@ -1,17 +1,42 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { overviewEvents, overviewKpis } from "@/lib/tn-ai-data";
 import { useSimulatorStore } from "@/lib/simulator/store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
-import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { Icon, StatusChip, type IconName } from "@/components/tn-command-center/command-center-primitives";
 import { AICopilotTerminal } from "@/components/tn-command-center/ai-copilot-terminal";
 
-export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?: any, telemetryData?: any, scenarios?: any[] }) {
+type OverviewAsset = {
+  asset_type: string;
+  name: string;
+  operational_status: string;
+};
+
+type OverviewSignal = {
+  value_numeric?: number | null;
+  quality?: string;
+};
+
+type OverviewTelemetry = {
+  speed?: OverviewSignal | null;
+  temp?: OverviewSignal | null;
+  vib?: OverviewSignal | null;
+};
+
+type ScenarioSummary = {
+  id: string;
+  name: string;
+};
+
+const seededValue = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
+export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?: OverviewAsset; telemetryData?: OverviewTelemetry; scenarios?: ScenarioSummary[] }) {
   const { runId: latestRunId, state: latestRunState } = useSimulatorStore();
   const latestRun = { id: latestRunId, state: latestRunState };
   const router = useRouter();
@@ -77,7 +102,7 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
   );
 }
 
-function OverviewHero({ latestRun, asset }: { latestRun: { id: string, state: string } | null, asset?: any }) {
+function OverviewHero({ latestRun, asset }: { latestRun: { id: string, state: string } | null, asset?: OverviewAsset }) {
   return (
     <section className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 p-2">
       <div>
@@ -168,7 +193,7 @@ function NetworkPing() {
   );
 }
 
-function DigitalTwinCanvas({ telemetryData }: { telemetryData?: any }) {
+function DigitalTwinCanvas({ telemetryData }: { telemetryData?: OverviewTelemetry }) {
   const [timeline, setTimeline] = useState(100); // 100 is present, 0 is past
   const isCritical = timeline < 30; // Simulate an anomaly in the past
 
@@ -246,14 +271,14 @@ function DigitalTwinCanvas({ telemetryData }: { telemetryData?: any }) {
   );
 }
 
-function HUDMetric({ icon, label, value, unit, critical }: { icon: string; label: string; value: string; unit: string; critical?: boolean }) {
+function HUDMetric({ icon, label, value, unit, critical }: { icon: IconName; label: string; value: string; unit: string; critical?: boolean }) {
   return (
     <motion.div 
       layout
       className={`border ${critical ? "border-red-500/50 bg-red-900/20" : "border-command-line/40 bg-black/40"} p-2 backdrop-blur-md`}
     >
       <div className="flex items-center gap-2">
-        <Icon name={icon as any} className={`h-3 w-3 ${critical ? "text-red-400" : "text-cyan-400/60"}`} />
+        <Icon name={icon} className={`h-3 w-3 ${critical ? "text-red-400" : "text-cyan-400/60"}`} />
         <span className="text-[10px] text-command-muted">{label}</span>
       </div>
       <p className={`mt-1 font-mono text-lg font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.4)]`}>
@@ -263,7 +288,7 @@ function HUDMetric({ icon, label, value, unit, critical }: { icon: string; label
   );
 }
 
-function TelemetryBar({ telemetryData }: { telemetryData?: any }) {
+function TelemetryBar({ telemetryData }: { telemetryData?: OverviewTelemetry }) {
   const currentTemp = telemetryData?.temp?.value_numeric ? `+${(Number(telemetryData.temp.value_numeric) - 20.0).toFixed(1)} µm` : "+1.8 µm";
   const currentVib = telemetryData?.vib?.value_numeric ? `${Number(telemetryData.vib.value_numeric).toFixed(2)} mm/s` : "1.42 mm/s";
 
@@ -280,15 +305,13 @@ function TelemetryBar({ telemetryData }: { telemetryData?: any }) {
 }
 
 function LiveSparkline({ color }: { color: string }) {
-  const [points, setPoints] = useState<number[]>(() => Array.from({ length: 20 }, () => 7.5));
-  const [mounted, setMounted] = useState(false);
+  const [points, setPoints] = useState<number[]>(() => Array.from({ length: 20 }, (_, index) => seededValue(index + 1) * 15));
 
   useEffect(() => {
-    setPoints(Array.from({ length: 20 }, () => Math.random() * 15));
-    setMounted(true);
     const interval = setInterval(() => {
       setPoints(prev => {
-        const next = [...prev.slice(1), Math.random() * 15];
+        const nextSeed = prev[prev.length - 1] + prev.length + 1;
+        const next = [...prev.slice(1), seededValue(nextSeed) * 15];
         return next;
       });
     }, 1000);
@@ -321,7 +344,7 @@ function TelemetryBlock({ title, value, sub, color = "cyan" }: { title: string; 
   );
 }
 
-function ReplayableScenariosPanel({ latestRun, scenarios }: { latestRun: { id: string, state: string } | null, scenarios?: any[] }) {
+function ReplayableScenariosPanel({ latestRun, scenarios }: { latestRun: { id: string, state: string } | null, scenarios?: ScenarioSummary[] }) {
   return (
     <div className="border border-command-line/70 bg-black/30 p-4">
       <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Replayable Twin Scenarios</p>

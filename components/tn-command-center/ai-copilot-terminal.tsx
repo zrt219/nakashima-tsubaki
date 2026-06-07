@@ -16,7 +16,7 @@ type CopilotMessage = {
 
 type ActionExecutionState = "pending" | "sent";
 
-export function AICopilotTerminal({ telemetryData }: { telemetryData?: any }) {
+export function AICopilotTerminal({ telemetryData }: { telemetryData?: Record<string, unknown> }) {
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       role: "system",

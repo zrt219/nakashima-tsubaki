@@ -3,6 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import { Panel, SystemLine, StatusChip, Icon, ButtonLinkLike, ComparisonBlock } from "./command-center-primitives";
 import { governanceItems, overviewEvents } from "@/lib/tn-ai-data";
+import type { StatusKind } from "@/lib/tn-ai-data";
 
 export function GovernanceDashboard() {
   const containerVariants: Variants = {
@@ -129,7 +130,7 @@ export function GovernanceDashboard() {
                   <span className="text-[10px] text-cyan-400 font-mono">{iso.id}</span>
                   <p className="text-xs text-white">{iso.title}</p>
                 </div>
-                <StatusChip status={iso.status as any} compact />
+                <StatusChip status={iso.status as StatusKind} compact />
               </div>
             ))}
           </div>

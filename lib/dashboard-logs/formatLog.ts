@@ -15,3 +15,7 @@ export function compactLogLine(event: DashboardLogEvent): string {
   const duration = typeof event.durationMs === "number" ? ` (${event.durationMs}ms)` : "";
   return `[${event.timestamp}] ${event.summary}${duration}`;
 }
+
+export function formatEventPayload(event: DashboardLogEvent): string {
+  return JSON.stringify(event, null, 2);
+}

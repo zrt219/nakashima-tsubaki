@@ -1,6 +1,7 @@
 const { mqtt, iot } = require('aws-iot-device-sdk-v2');
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config({ path: '.env.local' });
 
 // Configuration
 const endpoint = process.env.AWS_IOT_ENDPOINT || "a164r36b79otag-ats.iot.us-east-2.amazonaws.com"; 
@@ -9,6 +10,21 @@ const keyPath = path.resolve(__dirname, '../certs/private.pem.key');
 const caPath = path.resolve(__dirname, '../certs/AmazonRootCA1.pem');
 const clientId = "TsubakiSpindle-Simulator-" + Math.floor(Math.random() * 100000);
 const topic = "dt/spindle/telemetry";
+const SLEEP_MS = Math.max(1, Number(process.env.SIMULATOR_PUBLISH_INTERVAL_MS || 100));
+const MAX_MESSAGES = Math.max(1, Number(process.env.SIMULATOR_MAX_MESSAGES || 100));
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function createPayload(messageId) {
+  return {
+    deviceId: "TsubakiSpindle",
+    timestamp: Date.now(),
+    speed: { value_numeric: 12000 + (Math.random() * 500 - 250) },
+    temp: { value_numeric: 45.0 + (Math.random() * 5.0) },
+    vib: { value_numeric: 0.10 + (Math.random() * 0.05) },
+    messageId
+  };
+}
 
 async function runSimulator() {
     console.log("Starting 100x Load Test Simulator...");
@@ -33,36 +49,18 @@ async function runSimulator() {
     await connection.connect();
     console.log("Connected successfully!");
 
-    let messageCount = 0;
-    const MAX_MESSAGES = 100;
-
     console.log(`Publishing ${MAX_MESSAGES} messages to ${topic}...`);
 
-    return new Promise((resolve) => {
-        const interval = setInterval(async () => {
-            messageCount++;
-            
-            const payload = {
-                deviceId: "TsubakiSpindle",
-                timestamp: Date.now(),
-                speed: { value_numeric: 12000 + (Math.random() * 500 - 250) },
-                temp: { value_numeric: 45.0 + (Math.random() * 5.0) },
-                vib: { value_numeric: 0.10 + (Math.random() * 0.05) },
-                messageId: messageCount
-            };
+    for (let messageCount = 1; messageCount <= MAX_MESSAGES; messageCount++) {
+        const payload = createPayload(messageCount);
+        await connection.publish(topic, JSON.stringify(payload), mqtt.QoS.AtLeastOnce);
+        console.log(`[${messageCount}/${MAX_MESSAGES}] Published telemetry payload`);
+        await sleep(SLEEP_MS);
+    }
 
-            await connection.publish(topic, JSON.stringify(payload), mqtt.QoS.AtLeastOnce);
-            console.log(`[${messageCount}/${MAX_MESSAGES}] Published telemetry payload`);
-
-            if (messageCount >= MAX_MESSAGES) {
-                clearInterval(interval);
-                console.log("Load test complete! Disconnecting...");
-                await connection.disconnect();
-                console.log("Disconnected.");
-                resolve();
-            }
-        }, 100); // Publish 10 messages per second
-    });
+    console.log("Load test complete! Disconnecting...");
+    await connection.disconnect();
+    console.log("Disconnected.");
 }
 
 runSimulator().catch(console.error);

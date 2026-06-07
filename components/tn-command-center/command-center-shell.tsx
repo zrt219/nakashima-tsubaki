@@ -9,6 +9,7 @@ import { ButtonLinkLike, Icon, StatusChip } from "@/components/tn-command-center
 import { TutorialOverlay } from "@/components/tn-command-center/tutorial-overlay";
 import { AgentTerminal } from "@/components/tn-command-center/agent-terminal";
 import { AgentSwarmCanvas } from "@/components/tn-command-center/agent-swarm-canvas";
+import type { TwinModelId, WebGLSignalState } from "@/components/tn-command-center/data-core-webgl";
 
 import { useSimulatorStore } from "@/lib/simulator/store";
 import { audioEngine } from "@/lib/simulator/ui-audio-engine";
@@ -29,12 +30,12 @@ export function CommandCenterShell({
   eventStream: EvidenceItem[];
   children: ReactNode;
   utilityActions?: ReactNode;
-  modelOverride?: any;
-  signalState?: any;
+  modelOverride?: TwinModelId;
+  signalState?: WebGLSignalState;
 }) {
   const { activeScenarioId, state } = useSimulatorStore();
 
-  let computedSignalState = signalState || "normal";
+  let computedSignalState: WebGLSignalState = signalState || "normal";
   if (!signalState && activeScenarioId) {
     if (state === "INCIDENT_SEEDED" || state === "SHADOW_EXECUTION_RUNNING") {
       computedSignalState = "watch";
@@ -45,7 +46,7 @@ export function CommandCenterShell({
     }
   }
 
-  const computedModelOverride = modelOverride || (activeScenarioId ? activeScenarioId : undefined);
+  const computedModelOverride = modelOverride || (activeScenarioId as TwinModelId | undefined);
 
   // Global Flashlight Mouse Tracking
   const mouseX = useMotionValue(0);
@@ -218,6 +219,29 @@ function CommandHeader({ utilityActions }: { utilityActions?: ReactNode }) {
   );
 }
 
+function normalizeAreaId(areaId: string) {
+  const mapping: Record<string, string> = {
+    overview: "atlas-overview",
+    roadmap: "ralphplan-ai",
+    rag: "ralphplan-ai",
+    twins: "digital-twin-architecture",
+    ledger: "chain-state-lab",
+    automation: "app-systems",
+    advisory: "event-horizon-lab",
+    governance: "uranium-systems",
+    architecture: "app-systems",
+    kpis: "app-systems",
+    qa: "app-systems",
+    cognitive: "ralphplan-ai",
+    iot_maker: "umattr",
+    logs: "event-horizon-lab",
+    tutorials: "app-systems",
+    source: "credentials"
+  };
+
+  return mapping[areaId] || areaId;
+}
+
 function LiveClock() {
   const [time, setTime] = useState<string>("00:00:00 UTC");
   
@@ -239,6 +263,8 @@ function LiveClock() {
 }
 
 function MissionRail({ activeAreaId }: { activeAreaId: string }) {
+  const normalizedActiveAreaId = normalizeAreaId(activeAreaId);
+
   return (
     <aside className="lg:sticky lg:top-[82px] lg:h-[calc(100vh-128px)]">
       <div className="glass-panel relative flex h-full flex-col overflow-hidden">
@@ -256,7 +282,7 @@ function MissionRail({ activeAreaId }: { activeAreaId: string }) {
 
         <nav className="flex-1 gap-2 space-y-1.5 overflow-y-auto p-3">
           {missionAreas.map((area) => {
-            const active = area.id === activeAreaId;
+            const active = area.id === normalizedActiveAreaId;
 
             return (
               <Link
@@ -373,14 +399,7 @@ function EventStream({ items }: { items: EvidenceItem[] }) {
 
 function TimeScrubber() {
   const { activeScenarioId, events } = useSimulatorStore();
-  const [mounted, setMounted] = useState(false);
   const [scrubIndex, setScrubIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
 
   if (!activeScenarioId || events.length === 0) return <div className="flex-1 border border-command-line/60 bg-black/60 p-2 backdrop-blur-md flex items-center gap-4 relative overflow-hidden opacity-0" />;
 

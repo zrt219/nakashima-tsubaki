@@ -47,7 +47,7 @@ const mockRows: Record<Preset, Array<Record<string, unknown>>> = {
       scenario_id: "thermal_drift",
       metric: "thermal_drift_um",
       value: 8.4,
-      unit: "µm",
+      unit: "um",
       updated_at: new Date().toISOString(),
       mode: "DEMO"
     },
@@ -138,32 +138,32 @@ function blockedKeywords(text: string) {
   return blocked.find((keyword) => lowered.includes(keyword));
 }
 
-async function runTelemetryPreset(client: ReturnType<typeof createClient>) {
+type AnySupabaseClient = ReturnType<typeof createClient> & { [key: string]: unknown };
+
+async function runTelemetryPreset(client: AnySupabaseClient) {
   const { data, error } = await client
-    .schema("telemetry")
-    .from("sensor_readings")
+    .from("telemetry.sensor_readings")
     .select("asset_id,metric_key,value_numeric,unit,quality,timestamp")
     .order("timestamp", { ascending: false })
     .limit(20);
   return { data, error };
 }
 
-async function runRecentEventsPreset(client: ReturnType<typeof createClient>) {
+async function runRecentEventsPreset(client: AnySupabaseClient) {
   const { data, error } = await client.from("event_ledger").select("id,event_type,summary,severity,created_at").order("created_at", { ascending: false }).limit(25);
   return { data, error };
 }
 
-async function runActiveScenariosPreset(client: ReturnType<typeof createClient>) {
+async function runActiveScenariosPreset(client: AnySupabaseClient) {
   const { data, error } = await client
-    .schema("simulation")
-    .from("scenario_templates")
+    .from("simulation.scenario_templates")
     .select("id,name,type,description,status")
     .order("name", { ascending: true })
     .limit(25);
   return { data, error };
 }
 
-async function runCommandQueuePreset(client: ReturnType<typeof createClient>) {
+async function runCommandQueuePreset(client: AnySupabaseClient) {
   const { data, error } = await client
     .from("command_events")
     .select("id,scenario_id,action,status,requested_at,approved_at")
@@ -172,17 +172,16 @@ async function runCommandQueuePreset(client: ReturnType<typeof createClient>) {
   return { data, error };
 }
 
-async function runProofAnchorsPreset(client: ReturnType<typeof createClient>) {
+async function runProofAnchorsPreset(client: AnySupabaseClient) {
   const { data, error } = await client
-    .schema("proof")
-    .from("anchors")
+    .from("proof.anchors")
     .select("id,run_id,scenario_id,evidence_hash,network,status,proof_mode,created_at,transaction_hash,block_number,contract_address,ledger_index")
     .order("created_at", { ascending: false })
     .limit(25);
   return { data, error };
 }
 
-async function runHealthSummaryPreset(client: ReturnType<typeof createClient>) {
+async function runHealthSummaryPreset(client: AnySupabaseClient) {
   const { data, error } = await client
     .from("health_checks")
     .select("id,check_name,status,notes,created_at")
@@ -247,7 +246,7 @@ export async function POST(req: Request) {
 
   const client = createClient(url, anonKey, {
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false }
-  });
+  }) as AnySupabaseClient;
 
   let rows: Array<Record<string, unknown>> = [];
   let queryError: string | null = null;
@@ -339,3 +338,4 @@ export async function POST(req: Request) {
     finishedAt,
   });
 }
+

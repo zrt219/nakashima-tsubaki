@@ -46,6 +46,10 @@ type TelemetryContext = {
   vib?: { value_numeric?: number | null };
 };
 
+type GeminiToolCallArgs = {
+  reason?: unknown;
+};
+
 function clampRpm(value: number) {
   return Math.max(0, Math.min(24000, Math.round(value)));
 }
@@ -57,6 +61,15 @@ function normalizeTelemetry(telemetryContext?: TelemetryContext) {
     latestVibration: telemetryContext?.vib?.value_numeric ?? null,
     assetStatus: "ACTIVE" as const
   };
+}
+
+function getToolCallReason(args: unknown) {
+  if (typeof args !== "object" || args === null || !("reason" in args)) {
+    return "";
+  }
+
+  const reason = (args as GeminiToolCallArgs).reason;
+  return typeof reason === "string" ? reason : "";
 }
 
 function buildDemoResponse(prompt: string, telemetryContext?: TelemetryContext, reason?: string) {
@@ -187,7 +200,7 @@ Analyze the situation. If the user asks to change a parameter or if you detect a
         model: geminiModel,
         functionName: call.name,
         args: call.args,
-        text: `I have analyzed the data and need to execute a physical command: **${call.name}**\n\nReasoning: ${(call.args as any).reason || "Optimizing parameters."}`
+        text: `I have analyzed the data and need to execute a physical command: **${call.name}**\n\nReasoning: ${getToolCallReason(call.args) || "Optimizing parameters."}`
       });
     }
 
@@ -197,13 +210,14 @@ Analyze the situation. If the user asks to change a parameter or if you detect a
       model: geminiModel,
       text: response.text() 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Gemini API Error:", error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       buildDemoResponse(
         prompt,
         telemetryContext,
-        `Remote Gemini is unavailable (${error.message}). The advisory engine stayed in deterministic local demo mode.`
+        `Remote Gemini is unavailable (${message}). The advisory engine stayed in deterministic local demo mode.`
       )
     );
   }

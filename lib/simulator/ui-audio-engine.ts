@@ -1,5 +1,9 @@
 "use client";
 
+type WindowWithWebkitAudioContext = Window & {
+  webkitAudioContext?: typeof AudioContext;
+};
+
 class UIAudioEngine {
   private ctx: AudioContext | null = null;
   private isInitialized = false;
@@ -10,7 +14,11 @@ class UIAudioEngine {
     
     // We instantiate on first user interaction to comply with browser autoplay policies
     try {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextCtor = window.AudioContext || (window as WindowWithWebkitAudioContext).webkitAudioContext;
+      if (!AudioContextCtor) {
+        throw new Error("Web Audio API not supported");
+      }
+      this.ctx = new AudioContextCtor();
       this.isInitialized = true;
     } catch (e) {
       console.warn("Web Audio API not supported", e);

@@ -1,0 +1,48 @@
+{
+    "auditDate":  "2026-06-07",
+    "totalSources":  540,
+    "uniqueIds":  true,
+    "issueCount":  0,
+    "issues":  [
+
+               ],
+    "categoryShortfalls":  [
+
+                           ],
+    "invalidIdFormatCount":  0,
+    "sampleHeadChecks":  [
+                             "HEAD_FAIL:Supabase / Postgres / RLS / realtime / storage:SRC-0257:ERR",
+                             "HEAD_FAIL:Supabase / Postgres / RLS / realtime / storage:SRC-0258:ERR",
+                             "HEAD_FAIL:Supabase / Postgres / RLS / realtime / storage:SRC-0259:403",
+                             "HEAD_FAIL:Security, governance, safety, AI risk:SRC-0399:418",
+                             "HEAD_FAIL:Security, governance, safety, AI risk:SRC-0400:418",
+                             "HEAD_FAIL:Security, governance, safety, AI risk:SRC-0401:403",
+                             "HEAD_FAIL:MCP and model-context tooling:SRC-0046:403",
+                             "HEAD_FAIL:MCP and model-context tooling:SRC-0047:403",
+                             "HEAD_FAIL:MCP and model-context tooling:SRC-0048:403",
+                             "HEAD_FAIL:UX, explainability, dashboards, observability:SRC-0496:ERR",
+                             "HEAD_FAIL:UX, explainability, dashboards, observability:SRC-0497:418",
+                             "HEAD_FAIL:UX, explainability, dashboards, observability:SRC-0498:418",
+                             "HEAD_FAIL:Industrial AI, manufacturing, bearings/precision manufacturing context:SRC-0454:ERR",
+                             "HEAD_FAIL:Industrial AI, manufacturing, bearings/precision manufacturing context:SRC-0455:301",
+                             "HEAD_FAIL:Industrial AI, manufacturing, bearings/precision manufacturing context:SRC-0456:403",
+                             "HEAD_FAIL:Next.js / Vercel / frontend production engineering:SRC-0303:ERR",
+                             "HEAD_FAIL:Next.js / Vercel / frontend production engineering:SRC-0304:ERR",
+                             "HEAD_FAIL:Next.js / Vercel / frontend production engineering:SRC-0305:ERR",
+                             "HEAD_FAIL:AI tool/function calling and structured outputs:SRC-0001:418",
+                             "HEAD_FAIL:AI tool/function calling and structured outputs:SRC-0002:ERR",
+                             "HEAD_FAIL:AI tool/function calling and structured outputs:SRC-0003:403",
+                             "HEAD_FAIL:Agentic systems, evals, traces, guardrails:SRC-0093:503",
+                             "HEAD_FAIL:Agentic systems, evals, traces, guardrails:SRC-0094:ERR",
+                             "HEAD_FAIL:Agentic systems, evals, traces, guardrails:SRC-0095:ERR",
+                             "HEAD_FAIL:Cyber-physical systems and digital twins:SRC-0151:ERR",
+                             "HEAD_FAIL:Cyber-physical systems and digital twins:SRC-0152:ERR",
+                             "HEAD_FAIL:Cyber-physical systems and digital twins:SRC-0153:403",
+                             "HEAD_FAIL:Blockchain proof anchoring / XRPL / Hedera / EVM:SRC-0345:404",
+                             "HEAD_FAIL:Blockchain proof anchoring / XRPL / Hedera / EVM:SRC-0346:ERR",
+                             "HEAD_FAIL:Blockchain proof anchoring / XRPL / Hedera / EVM:SRC-0347:308",
+                             "HEAD_FAIL:AWS IoT / edge / MQTT / device security:SRC-0210:418",
+                             "HEAD_FAIL:AWS IoT / edge / MQTT / device security:SRC-0211:418",
+                             "HEAD_FAIL:AWS IoT / edge / MQTT / device security:SRC-0212:ERR"
+                         ]
+}

@@ -2,30 +2,24 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useAgentSwarmStore, AgentType, SwarmAgent } from "@/lib/simulator/use-agent-swarm-store";
-import { Icon } from "./command-center-primitives";
+import { useAgentSwarmStore, SwarmAgent } from "@/lib/simulator/use-agent-swarm-store";
+import { Icon, type IconName } from "./command-center-primitives";
 import { audioEngine } from "@/lib/simulator/ui-audio-engine";
 
 export function AgentSwarmCanvas() {
   const { agents, setAgentTargets } = useAgentSwarmStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Agents follow mouse clicks when idle
   useEffect(() => {
-    if (!mounted) return;
     const handleGlobalClick = (e: MouseEvent) => {
       // Don't intercept clicks, just passively listen to redirect agents
       setAgentTargets(e.clientX, e.clientY);
     };
     window.addEventListener("click", handleGlobalClick);
     return () => window.removeEventListener("click", handleGlobalClick);
-  }, [mounted, setAgentTargets]);
+  }, [setAgentTargets]);
 
-  if (!mounted || agents.length === 0) return null;
+  if (agents.length === 0) return null;
 
   return (
     <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
@@ -42,6 +36,7 @@ function TwinHelper({ agent }: { agent: SwarmAgent }) {
   const [jitterY, setJitterY] = useState(0);
   const [domX, setDomX] = useState<number | null>(null);
   const [domY, setDomY] = useState<number | null>(null);
+  const hasTarget = Boolean(agent.assignedTargetId);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,11 +48,7 @@ function TwinHelper({ agent }: { agent: SwarmAgent }) {
 
   // DOM Targeting Loop
   useEffect(() => {
-    if (!agent.assignedTargetId) {
-      setDomX(null);
-      setDomY(null);
-      return;
-    }
+    if (!hasTarget) return;
 
     let animationFrameId: number;
 
@@ -74,10 +65,10 @@ function TwinHelper({ agent }: { agent: SwarmAgent }) {
 
     trackDomElement();
     return () => cancelAnimationFrame(animationFrameId);
-  }, [agent.assignedTargetId]);
+  }, [agent.assignedTargetId, hasTarget]);
 
   let colorClass = "text-cyan-400 border-cyan-400/50 bg-cyan-400/10 shadow-[0_0_15px_rgba(0,212,255,0.5)]";
-  let iconName = "search";
+  let iconName: IconName = "search";
 
   switch (agent.type) {
     case "fixer":
@@ -120,7 +111,7 @@ function TwinHelper({ agent }: { agent: SwarmAgent }) {
       <div className="relative flex flex-col items-center group">
         {/* The orb */}
         <div className={`relative flex h-8 w-8 items-center justify-center rounded-full border ${colorClass} backdrop-blur-md transition-all duration-300 group-hover:scale-110`}>
-          <Icon name={iconName as any} className="h-4 w-4" />
+          <Icon name={iconName} className="h-4 w-4" />
           
           {/* Status indicator ping */}
           <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">

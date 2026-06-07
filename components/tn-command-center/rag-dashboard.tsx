@@ -1,18 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+const seededValue = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
 export default function RagDashboard() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden text-cyan-400 font-mono">
       {/* Background/WebGL Placeholder (The hologram lives here) */}
@@ -105,15 +101,22 @@ export default function RagDashboard() {
               <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] bg-[size:10px_10px]" />
               {/* Scatter dots */}
               {Array.from({ length: 40 }).map((_, i) => (
+                (() => {
+                  const left = seededValue(i * 1.31 + 0.7) * 90 + 5;
+                  const top = seededValue(i * 2.17 + 1.3) * 90 + 5;
+                  const opacity = seededValue(i * 3.07 + 2.1) * 0.5 + 0.3;
+                  return (
                 <div 
                   key={i} 
                   className={`absolute rounded-full ${i % 3 === 0 ? 'bg-emerald-400 h-1.5 w-1.5' : i % 5 === 0 ? 'bg-purple-400 h-2 w-2' : 'bg-cyan-400 h-1 w-1'}`}
                   style={{
-                    left: `${Math.random() * 90 + 5}%`,
-                    top: `${Math.random() * 90 + 5}%`,
-                    opacity: Math.random() * 0.5 + 0.3
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    opacity
                   }}
                 />
+                  );
+                })()
               ))}
               {/* Active search radius */}
               <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-400/50 bg-emerald-400/10" />
@@ -130,13 +133,13 @@ export default function RagDashboard() {
             >
               <div className="flex justify-between items-center mb-1">
                 <div className="text-[10px] text-cyan-500 font-semibold tracking-wider group-hover:text-cyan-400">STREAM 0{item}</div>
-                <div className="text-[9px] text-gray-500">{(Math.random() * 10).toFixed(1)} MB/s</div>
+                <div className="text-[9px] text-gray-500">{(4.2 + item * 1.1).toFixed(1)} MB/s</div>
               </div>
               <div className="mt-2 h-[2px] w-full bg-gray-800 rounded overflow-hidden">
                 <motion.div 
                   className="h-full bg-cyan-500/80" 
                   initial={{ width: 0 }}
-                  animate={{ width: `${Math.random() * 60 + 20}%` }}
+                  animate={{ width: `${24 + item * 12}%` }}
                   transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
                 />
               </div>

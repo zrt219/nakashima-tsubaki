@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { DashboardLogFilter, DashboardLogEvent } from "@/lib/dashboard-logs/types";
 import { addLogEvent, clearLogs, filterLogs, readLogs } from "@/lib/dashboard-logs/logStore";
 import { DashboardLogFilters } from "@/components/logs/DashboardLogFilters";
@@ -9,15 +9,11 @@ import { DashboardLogDetailDrawer } from "@/components/logs/DashboardLogDetailDr
 import { compactLogLine } from "@/lib/dashboard-logs/formatLog";
 
 export function DashboardLogsPage() {
-  const [logs, setLogs] = useState<DashboardLogEvent[]>([]);
+  const [logs, setLogs] = useState<DashboardLogEvent[]>(() => readLogs());
   const [filters, setFilters] = useState<DashboardLogFilter>({});
   const [selected, setSelected] = useState<DashboardLogEvent | undefined>();
 
   const refresh = () => setLogs(readLogs());
-
-  useEffect(() => {
-    refresh();
-  }, []);
 
   const visibleLogs = useMemo(() => filterLogs(logs, filters), [logs, filters]);
 
