@@ -221,22 +221,21 @@ function CommandHeader({ utilityActions }: { utilityActions?: ReactNode }) {
 
 function normalizeAreaId(areaId: string) {
   const mapping: Record<string, string> = {
-    overview: "atlas-overview",
-    roadmap: "ralphplan-ai",
-    rag: "ralphplan-ai",
-    twins: "digital-twin-architecture",
-    ledger: "chain-state-lab",
-    automation: "app-systems",
-    advisory: "event-horizon-lab",
-    governance: "uranium-systems",
-    architecture: "app-systems",
-    kpis: "app-systems",
-    qa: "app-systems",
-    cognitive: "ralphplan-ai",
-    iot_maker: "umattr",
-    logs: "event-horizon-lab",
-    tutorials: "app-systems",
-    source: "credentials"
+    advisory: "automation",
+    iot_maker: "automation",
+    logs: "qa",
+    source: "qa",
+    tutorials: "roadmap",
+    "atlas-overview": "overview",
+    "ralphplan-ai": "rag",
+    umattr: "automation",
+    "chain-state-lab": "ledger",
+    "uranium-systems": "governance",
+    uo2x: "twins",
+    "digital-twin-architecture": "twins",
+    "event-horizon-lab": "qa",
+    "app-systems": "architecture",
+    credentials: "qa"
   };
 
   return mapping[areaId] || areaId;
