@@ -2,10 +2,14 @@
 
 import { motion } from "framer-motion";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { AcademicHeader } from "@/components/education/AcademicHeader";
+import { LearningTrigger } from "@/components/education/LearningTrigger";
 
 export function ArchitectureDashboard() {
   return (
     <div className="flex h-full flex-col gap-4">
+      <AcademicHeader topic="deterministic_twinning" />
+      <LearningTrigger topic="deterministic_twinning">
       {/* Top Header Metrics */}
       <motion.div 
         variants={{ hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } } }}
@@ -206,6 +210,7 @@ export function ArchitectureDashboard() {
           </div>
         </div>
       </motion.div>
+      </LearningTrigger>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { useSimulatorStore } from "@/lib/simulator/store";
 import { tutorialStore } from "@/lib/simulator/tutorial-store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, Panel, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { AcademicHeader } from "@/components/education/AcademicHeader";
 
 export function SimulatorLaunchpad() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export function SimulatorLaunchpad() {
           visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
         }}
       >
+        <AcademicHeader topic="deterministic_twinning" />
         <motion.div id="tutorial-welcome" variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.4 } } }} className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">Digital Twin Launchpad</h2>

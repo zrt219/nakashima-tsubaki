@@ -8,6 +8,8 @@ import {
   ExternalLink, Hash, Clock
 } from "lucide-react";
 import { processIoTAction } from "@/app/iot-maker/actions";
+import { AcademicHeader } from "@/components/education/AcademicHeader";
+import { LearningTrigger } from "@/components/education/LearningTrigger";
 
 export function IoTMakerCenter() {
   const [actionType, setActionType] = useState("MACHINE_CALIBRATION");
@@ -50,6 +52,7 @@ export function IoTMakerCenter() {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto space-y-8">
+        <AcademicHeader topic="high_freq_telemetry" />
         
         {/* Header Section */}
         <header className="flex items-center justify-between">
@@ -74,6 +77,7 @@ export function IoTMakerCenter() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Command Configuration */}
+          <LearningTrigger topic="high_freq_telemetry">
           <motion.div 
             className="bg-[#0c1222]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
             initial={{ opacity: 0, y: 20 }}
@@ -129,6 +133,7 @@ export function IoTMakerCenter() {
               </div>
             </div>
           </motion.div>
+          </LearningTrigger>
 
           {/* Right Column: Ledger Proof Journey */}
           <div className="space-y-6">

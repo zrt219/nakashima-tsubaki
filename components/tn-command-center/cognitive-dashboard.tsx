@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { CommandCenterShell, ShellActionLink } from "./command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
+import { AcademicHeader } from "@/components/education/AcademicHeader";
+import { LearningTrigger } from "@/components/education/LearningTrigger";
 
 type Node = {
   id: number;
@@ -79,9 +81,12 @@ export function CognitiveDashboard() {
       eventStream={overviewEvents}
       utilityActions={<ShellActionLink href="/simulator" label="Return to Simulator" tone="secondary" />}
     >
-      <div className="relative h-[calc(100vh-170px)] w-full overflow-hidden rounded-lg border border-purple-500/20 bg-black/10">
-        
-        {/* Background Grid */}
+      <div className="flex h-full flex-col p-4 xl:p-6 gap-4">
+        <AcademicHeader topic="llm_diagnostics" />
+        <LearningTrigger topic="llm_diagnostics">
+        <div className="relative h-[calc(100vh-170px)] w-full overflow-hidden rounded-lg border border-purple-500/20 bg-black/10">
+          
+          {/* Background Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(168,85,247,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         <div className="absolute top-4 left-4 z-10 p-4 border border-purple-500/30 bg-black/60 backdrop-blur-md">
@@ -135,6 +140,8 @@ export function CognitiveDashboard() {
           );
         })}
 
+        </div>
+        </LearningTrigger>
       </div>
     </CommandCenterShell>
   );
