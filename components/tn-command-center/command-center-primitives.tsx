@@ -28,7 +28,13 @@ export type IconName =
   | "power"
   | "github"
   | "history"
-  | "zap";
+  | "zap"
+  | "close"
+  | "book"
+  | "tag"
+  | "cpu"
+  | "workflow"
+  | "network";
 
 const statusMeta: Record<
   StatusKind,
@@ -440,6 +446,25 @@ export function Icon({ name, className = "" }: { name: IconName; className?: str
           className={common}
           d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
         />
+      )}
+      {name === "close" && <path className={common} d="M6 18L18 6M6 6l12 12" />}
+      {name === "book" && <path className={common} d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />}
+      {name === "tag" && <path className={common} d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z M7 7h.01" />}
+      {name === "cpu" && <path className={common} d="M4 4h16v16H4z M9 9h6v6H9z M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />}
+      {name === "workflow" && (
+        <>
+          <rect className={common} x="3" y="3" width="6" height="6" rx="1" />
+          <rect className={common} x="15" y="15" width="6" height="6" rx="1" />
+          <path className={common} d="M6 9v3a3 3 0 0 0 3 3h6" />
+        </>
+      )}
+      {name === "network" && (
+        <>
+          <rect className={common} x="16" y="16" width="6" height="6" rx="1" />
+          <rect className={common} x="2" y="16" width="6" height="6" rx="1" />
+          <rect className={common} x="9" y="2" width="6" height="6" rx="1" />
+          <path className={common} d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8" />
+        </>
       )}
     </svg>
   );

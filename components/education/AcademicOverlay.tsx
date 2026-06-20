@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLearning } from "./LearningContext";
 import { Icon } from "@/components/tn-command-center/command-center-primitives";
@@ -10,19 +10,41 @@ export function AcademicOverlay() {
   const { isLearningMode, activeTopic, setActiveTopic } = useLearning();
   const [activeTab, setActiveTab] = useState<"abstract" | "methodology" | "architecture" | "code">("abstract");
 
-  if (!isLearningMode || !activeTopic || !ACADEMIC_CURRICULUM[activeTopic]) return null;
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && activeTopic) {
+        setActiveTopic(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeTopic, setActiveTopic]);
 
-  const topic: CurriculumModule = ACADEMIC_CURRICULUM[activeTopic];
+  const show = isLearningMode && activeTopic && ACADEMIC_CURRICULUM[activeTopic];
+  const topic = show ? ACADEMIC_CURRICULUM[activeTopic] : null;
 
   return (
     <AnimatePresence>
-      <motion.div 
-        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 50, scale: 0.95 }}
-        transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-        className="fixed inset-x-4 bottom-4 top-24 z-[100] md:inset-x-24 md:bottom-24 lg:left-auto lg:right-12 lg:w-[800px] border border-fuchsia-500/50 bg-black/95 p-0 shadow-[0_0_80px_rgba(217,70,239,0.2)] backdrop-blur-2xl flex flex-col overflow-hidden rounded-xl"
-      >
+      {show && topic && (
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-4 md:p-12 lg:justify-end pointer-events-none">
+          {/* Backdrop */}
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px] pointer-events-auto cursor-pointer"
+            onClick={() => setActiveTopic(null)}
+          />
+          
+          <motion.div 
+            key="modal"
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.95 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+            className="relative pointer-events-auto z-10 w-full max-w-3xl max-h-[85vh] border border-fuchsia-500/50 bg-black/95 p-0 shadow-[0_0_80px_rgba(217,70,239,0.2)] flex flex-col overflow-hidden rounded-xl"
+          >
         {/* Header */}
         <div className="bg-fuchsia-950/30 border-b border-fuchsia-500/30 p-6 flex items-start justify-between">
           <div>
@@ -110,6 +132,8 @@ export function AcademicOverlay() {
           </div>
         </div>
       </motion.div>
+      </div>
+      )}
     </AnimatePresence>
   );
 }
@@ -117,20 +141,32 @@ export function AcademicOverlay() {
 export function LearningTrigger({ topic, children, className = "" }: { topic: string; children: React.ReactNode; className?: string }) {
   const { isLearningMode, setActiveTopic, activeTopic } = useLearning();
   
-  if (!isLearningMode) return <>{children}</>;
+  if (!isLearningMode) {
+    return (
+      <div className={className}>
+        {children}
+      </div>
+    );
+  }
 
   const isActive = activeTopic === topic;
 
   return (
     <div 
       className={`relative cursor-pointer transition-all duration-300 ${isActive ? 'ring-2 ring-fuchsia-500 ring-offset-2 ring-offset-black bg-fuchsia-500/10' : 'hover:ring-1 hover:ring-fuchsia-500/50'} ${className}`}
-      onClick={() => setActiveTopic(topic)}
+      onClick={(e) => {
+        // Do not prevent default so nested interactives still work, but we set topic
+        setActiveTopic(topic);
+      }}
     >
       {/* Educational pulsing beacon */}
-      <div className="absolute -top-2 -right-2 z-[60] flex h-5 w-5">
+      <div className="absolute -top-2 -right-2 z-[60] flex h-5 w-5 pointer-events-none">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-400 opacity-75"></span>
         <span className="relative inline-flex rounded-full h-5 w-5 bg-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.8)] items-center justify-center">
-            <Icon name="book" className="h-2.5 w-2.5 text-white" />
+            {/* The Icon is purely decorative, no need for the name 'book' if it's not defined, fallback to empty svg */}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5 text-white">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+            </svg>
         </span>
       </div>
       <div className={isActive ? "opacity-100" : "opacity-90"}>
