@@ -8,7 +8,6 @@ function TypewriterText({ text, speed = 25 }: { text: string; speed?: number }) 
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
-    setDisplayed("");
     let i = 0;
     const interval = setInterval(() => {
       setDisplayed(text.substring(0, i));
@@ -92,6 +91,8 @@ function ConfigModal() {
 }
 
 function CertificateView({ score }: { score: number }) {
+  const hash = "0x8f7a6b5c4d3e2f1a9b8c7d6e5f4a3b2c";
+  
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-xl">
       <motion.div 
@@ -117,7 +118,7 @@ function CertificateView({ score }: { score: number }) {
           </div>
           <div>
             <p className="text-[10px] text-command-muted uppercase tracking-widest">Verification Hash</p>
-            <p className="text-xs font-mono text-emerald-300/70 mt-3 break-all">0x{(Math.random() * 1e16).toString(16).padEnd(16, '0')}</p>
+            <p className="text-xs font-mono text-emerald-300/70 mt-3 break-all">{hash}</p>
           </div>
         </div>
 
@@ -152,9 +153,6 @@ export function TutorialOverlay() {
     if (!isActive || !activeStep) return;
     let rafId: number;
     let retries = 0;
-    setElementFound(false);
-    setSelectedQuizOption(null);
-    setQuizAnswered(false);
 
     const measure = () => {
       const el = document.getElementById(activeStep.targetElementId);
@@ -172,7 +170,7 @@ export function TutorialOverlay() {
       }
     };
 
-    measure();
+    requestAnimationFrame(measure);
     window.addEventListener("resize", measure);
     const interval = setInterval(measure, 500);
 
@@ -239,7 +237,7 @@ export function TutorialOverlay() {
             <div className="absolute inset-0 rounded-full border border-cyan-200/50" />
           </div>
 
-          <div className="relative flex w-[400px] flex-col gap-3 overflow-hidden rounded-xl border border-cyan-400/30 bg-[#0c1222]/95 p-5 shadow-[0_0_50px_rgba(0,212,255,0.2)] backdrop-blur-2xl">
+          <div key={activeStep.id} className="relative flex w-[400px] flex-col gap-3 overflow-hidden rounded-xl border border-cyan-400/30 bg-[#0c1222]/95 p-5 shadow-[0_0_50px_rgba(0,212,255,0.2)] backdrop-blur-2xl">
             <div className="absolute top-6 -left-2 h-4 w-4 rotate-45 border-b border-l border-cyan-400/30 bg-[#0c1222]" />
 
             <div className="flex items-center justify-between z-10 border-b border-cyan-400/20 pb-2">
