@@ -6,148 +6,111 @@ import { TutorialCard, TutorialDefinition } from "@/components/tutorials/Tutoria
 import { TutorialChecklist } from "@/components/tutorials/TutorialChecklist";
 import { TutorialProgress } from "@/components/tutorials/TutorialProgress";
 
-const STORAGE_KEY = "tn-tutorial-progress-v1";
+const STORAGE_KEY = "tn-tutorial-progress-v2";
 
 const TUTORIALS: TutorialDefinition[] = [
   {
     id: "what-is-nakashima",
-    title: "What is Tsubaki-Nakashima AI?",
-    beginner: "A quick guided introduction to the simulation-first command center and what it models.",
-    technical:
-      "This stack demonstrates advisory AI, digital twin telemetry, approval gating, and hash-based provenance without direct machine control.",
-    tryNowLabel: "Open Cognition Center",
+    title: "MISSION: COGNITIVE UPLINK",
+    accent: "indigo",
+    missionBrief: "Welcome to the simulation-first command center. Your first objective is to understand the AI's boundaries.",
+    tacticalSpecs: "Demonstrates advisory AI, digital twin telemetry, and hash-based provenance without physical machine control.",
+    tryNowLabel: "Enter Cognition Center",
     tryNowHref: "/cognitive",
     steps: [
       {
-        title: "Core objective",
-        beginner: "Understand that this is a portfolio prototype for advisory-first industrial AI.",
-        technical: "Observe the dashboard shells and event stream as a deterministic operator interface.",
+        title: "Initialize Observer Mode",
+        missionBrief: "Calibrate your HUD. You are observing deterministic simulations, not live hardware.",
+        tacticalSpecs: "Observe the dashboard shells. Operations are bounded strictly to the simulation and persistence layers.",
       },
       {
-        title: "Telemetry and twin map",
-        beginner: "Look at simulated twin scenarios and why physical control is outside this app's scope.",
-        technical: "Signals stay in simulator and persistence layers; no write authority exists in browser.",
+        title: "Observe Telemetry Ghosting",
+        missionBrief: "Watch how physical conditions are mirrored without exposing the actual factory floor to cyber threats.",
+        tacticalSpecs: "Signals stay within the WebGL twin layer; no write-authority edge agents are executed.",
       },
     ],
   },
   {
     id: "what-is-iot-maker",
-    title: "What is IoT Maker?",
-    beginner: "Learn the commissioning map for demos, readiness checks, and safe command flow.",
-    technical:
-      "Use `/iot-maker` to validate required services, run command flow tests, and inspect proof anchoring status.",
-    tryNowLabel: "Open IoT Maker",
+    title: "MISSION: IOT MAKER ONBOARDING",
+    accent: "amber",
+    missionBrief: "Learn how to seed anomalies and safely dispatch command recommendations.",
+    tacticalSpecs: "Use `/iot-maker` to validate AWS IoT / STS services and inspect Supabase event persistence.",
+    tryNowLabel: "Initialize IoT Maker",
     tryNowHref: "/iot-maker",
     steps: [
       {
-        title: "Demo vs connected",
-        beginner: "Run in mock mode first, then connect optional cloud services when env vars are present.",
-        technical: "Connected mode requires readiness checks for keys and broker configuration.",
+        title: "Configure the Matrix",
+        missionBrief: "Ensure all external integrations (AWS, Supabase, Ledgers) are green-lit before proceeding.",
+        tacticalSpecs: "Validates `NEXT_PUBLIC_PROOF_MODE` and loads respective client adapters.",
       },
       {
-        title: "Command flow test",
-        beginner: "Execute the same anomaly-to-proof workflow with explicit approval simulation.",
-        technical: "Dispatch never occurs in demo mode unless operator approval is simulated.",
-      },
-    ],
-  },
-  {
-    id: "command-flow",
-    title: "How does the command flow work?",
-    beginner: "Follow how telemetry, recommendation, approval, and dispatch simulation connect together.",
-    technical: "A deterministic workflow logs each phase into safe event and proof artifacts.",
-    tryNowLabel: "Run Command Test",
-    tryNowHref: "/iot-maker",
-    steps: [
-      {
-        title: "Telemetry generation",
-        beginner: "Synthetic sensor readings are generated with bounded anomaly scenarios.",
-        technical: "Telemetry schema is validated before recommendation proposals.",
-      },
-      {
-        title: "AI proposal and approval",
-        beginner: "A recommendation is proposed and held pending operator action.",
-        technical: "Safety checks and operator-gate rules are enforced before dispatch simulation.",
+        title: "Run Command Flow Simulation",
+        missionBrief: "Inject a payload, review the AI advisory, and authorize the shadow execution.",
+        tacticalSpecs: "Dispatch remains simulated in 'demo' mode. Generates an evidence hash upon completion.",
       },
     ],
   },
   {
     id: "supabase-fit",
-    title: "How does Supabase fit in?",
-    beginner: "Understand the safe persistence model for events, scenarios, and proof records.",
-    technical: "Supabase is used with server-side queries and public-safe read patterns in this prototype.",
-    tryNowLabel: "Open Query Lab",
+    title: "MISSION: PERSISTENCE LAYER",
+    accent: "emerald",
+    missionBrief: "Dive into the raw event ledger to see how actions are recorded.",
+    tacticalSpecs: "Utilizes Next.js Server Actions with Supabase Postgres for immutable event append logs.",
+    tryNowLabel: "Access Database Logs",
     tryNowHref: "/iot-maker",
     steps: [
       {
-        title: "Query presets",
-        beginner: "Use safe preset queries for quick visibility.",
-        technical: "Preset routes prevent unsafe SQL and avoid destructive commands.",
+        title: "Query Safe Presets",
+        missionBrief: "Pull down the latest telemetry and active scenarios directly from the core.",
+        tacticalSpecs: "REST endpoints abstract unsafe raw SQL. Requires Row-Level Security (RLS) configured.",
       },
       {
-        title: "Mode visibility",
-        beginner: "Demo mode returns mock rows when env is not configured.",
-        technical: "Connected mode attempts real read-only Supabase table queries under server key guardrails.",
-      },
-    ],
-  },
-  {
-    id: "gemini-fit",
-    title: "How does Gemini fit in?",
-    beginner: "Learn how AI prompts are tested without allowing live machine control.",
-    technical: "Structured outputs and tool proposals are inspected and logged; operator action is always separate.",
-    tryNowLabel: "Open Gemini Test",
-    tryNowHref: "/iot-maker",
-    steps: [
-      {
-        title: "Presets and responses",
-        beginner: "Use summary and recommendation prompts to observe advisory-only behavior.",
-        technical: "Proposed tool payloads are logged and must pass operator-gate checks.",
-      },
-      {
-        title: "Safety path",
-        beginner: "See how approval and control are blocked from model output.",
-        technical: "No secrets are logged and no control APIs are executed directly from tool output.",
+        title: "Verify Audit Trail",
+        missionBrief: "Check the ledger. Every anomaly and operator action leaves a fingerprint.",
+        tacticalSpecs: "Queries `proof.anchors` to surface post-incident provenance trails.",
       },
     ],
   },
   {
     id: "blockchain-fit",
-    title: "How does blockchain fit in?",
-    beginner: "Understand what goes on-chain versus what stays server-side.",
-    technical: "Only evidence hashes are anchored, never raw telemetry or commands.",
-    tryNowLabel: "Open Proof Ledger",
+    title: "MISSION: BLOCKCHAIN AUDIT TRACE",
+    accent: "rose",
+    missionBrief: "Follow an evidence hash from the local ledger directly to the public testnets.",
+    tacticalSpecs: "Uses XRPL AccountSet Memos and Hedera EVM Smart Contracts to anchor deterministic SHA-256 hashes.",
+    tryNowLabel: "Inspect Proof Ledger",
     tryNowHref: "/iot-maker",
     steps: [
       {
-        title: "Hash-only anchoring",
-        beginner: "Proof records lock an evidence identity, not operational payloads.",
-        technical: "XRPL and Hedera paths stay proof-only and maintain approval/dispatched separation.",
+        title: "Cryptographic Sealing",
+        missionBrief: "Understand that we do not broadcast live data. We only broadcast the mathematical proof.",
+        tacticalSpecs: "Canonicalizes telemetry via deterministic JSON sorting before generating a SHA-256 digest.",
       },
       {
-        title: "Verification surface",
-        beginner: "Review proof status and verifier output in the IoT Maker proof tab.",
-        technical: "Use mock mode by default; connected chains require explicit mode/env configuration.",
+        title: "Verify On-Chain",
+        missionBrief: "Follow the transaction link and verify the exact hash exists in a public, immutable block.",
+        tacticalSpecs: "Parses EVM events and XRPL memos to reconstruct the anchor verification externally.",
       },
     ],
   },
   {
-    id: "safety-model",
-    title: "Safety model",
-    beginner: "Learn the command authority model from proposal through audit.",
-    technical: "AI can recommend, operator approves, edge bridge dispatches approved commands, and logs remain immutable.",
-    tryNowLabel: "Open Safety Ledger",
-    tryNowHref: "/iot-maker",
+    id: "recursive-memory",
+    title: "MISSION: RECURSIVE EDGE MEMORY",
+    accent: "fuchsia",
+    missionBrief: "Demonstrate Double Edge Automations where the AI learns from past runs and alters its recommendations.",
+    tacticalSpecs: "Triggers scenario-22. First run generates a reflex memory. Second run queries the persistent memory loop to override standard baseline logic.",
+    tryNowLabel: "Run Digital Twin",
+    tryNowHref: "/simulator",
     steps: [
       {
-        title: "Authority boundary",
-        beginner: "No direct PLC or actuator call can occur from model output.",
-        technical: "Operator gate and approval matrix enforce manual intervention and policy checks.",
+        title: "Seed Initial Anomaly",
+        missionBrief: "Inject progressive high-frequency chatter into the twin.",
+        tacticalSpecs: "The system attempts a baseline feed reduction. Operator approval seals this action into the 'Reflex Memory' index.",
       },
       {
-        title: "Audit trace",
-        beginner: "Every flow writes a trace in event ledgers and logs.",
-        technical: "Proof integrity and safety checks reduce unsafe dispatch and hidden control paths.",
+        title: "Trigger Recursion Loop",
+        missionBrief: "Seed the exact same anomaly a second time to witness learning.",
+        tacticalSpecs: "The advisory engine intercepts the memory of the failed feed reduction and preemptively halts the spindle instead.",
       },
     ],
   },
@@ -197,20 +160,19 @@ export function TutorialsPage() {
   const resetProgress = () => setCompletedIds(new Set());
 
   return (
-    <section className="space-y-4">
-      <Panel title="Beginner Tutorials" kicker="How the command center works" icon="flow" accent="violet">
+    <section className="space-y-4 pb-20">
+      <Panel title="Command Center Missions" kicker="Tactical Operations" icon="flow" accent="cyan">
         <p className="text-sm text-slate-200">
-          These walkthroughs explain the stack in plain terms, then connect each idea to the same safe
-          production-minded interfaces used in this app.
+          Welcome to the TN Precision AI Command Center. These missions will calibrate your understanding of the deterministic digital twin and the multi-chain evidence layer.
         </p>
-        <p className="mt-2 text-xs text-command-muted">
-          This is an independent demo prototype. It does not control live production machinery.
+        <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-cyan-400">
+          STATUS: SIMULATION MODE ACTIVE. ALL PHYSICAL CONTROLS ARE ISOLATED.
         </p>
       </Panel>
 
       <TutorialProgress total={TUTORIALS.length} completed={progress} onReset={resetProgress} />
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {TUTORIALS.map((tutorial) => (
           <TutorialCard
             key={tutorial.id}

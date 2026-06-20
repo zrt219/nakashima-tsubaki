@@ -34,26 +34,30 @@ create index if not exists proof_anchors_status_idx on proof.anchors(status);
 
 alter table proof.anchors enable row level security;
 
-create policy if not exists "Authenticated users can read proof summaries"
+drop policy if exists "Authenticated users can read proof summaries" on proof.anchors;
+create policy "Authenticated users can read proof summaries"
   on proof.anchors
   for select
   to authenticated
   using (true);
 
-create policy if not exists "Service role can insert proof anchors"
+drop policy if exists "Service role can insert proof anchors" on proof.anchors;
+create policy "Service role can insert proof anchors"
   on proof.anchors
   for insert
   to service_role
   with check (true);
 
-create policy if not exists "Service role can update proof anchors"
+drop policy if exists "Service role can update proof anchors" on proof.anchors;
+create policy "Service role can update proof anchors"
   on proof.anchors
   for update
   to service_role
   using (true)
   with check (true);
 
-create policy if not exists "Service role can delete proof anchors"
+drop policy if exists "Service role can delete proof anchors" on proof.anchors;
+create policy "Service role can delete proof anchors"
   on proof.anchors
   for delete
   to service_role

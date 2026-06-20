@@ -120,8 +120,32 @@ export const SCENARIOS: TwinScenarioDefinition[] = [
     recommendations: [
       { id: "rec-3", text: "Quarantine Session & Block Execution", rationale: "SEC-209 strictly prohibits direct PLC actuation without cryptographically signed operator shadowing.", confidence: 0.99, requiresApproval: false, shadowActionAvailable: false }
     ]
-  }
-,
+  },
+  {
+    id: "scenario-22-recursive-edge",
+    slug: "recursive-bearing-wear",
+    name: "Recursive Edge Automation",
+    shortName: "Recursive",
+    difficulty: "Advanced",
+    category: "vibration",
+    riskLevel: "Critical",
+    modelIds: ["advisory-icosahedron-core", "vibration-resonance-tunnel"],
+    beginnerSummary: "The spindle bearing is showing signs of progressive wear. I use Recursive Memory to learn from past runs. Run this scenario twice to see my recommendation change!",
+    technicalSummary: "Demonstrates Double Edge Automations and Recursive Memory. The first execution attempts a feed micro-adjustment and writes a Reflex Memory. If triggered again, the AI queries the memory and preemptively halts the machine.",
+    incidentSeed: { name: "Bearing Cage Instability", description: "Injects progressive high-frequency chatter.", delaySeconds: 3 },
+    signals: [
+      {
+        id: "sig-vib-rec", name: "High-Freq Chatter", unit: "g", baseline: 0.5, watchThreshold: 1.5, warningThreshold: 3.0, criticalThreshold: 5.0, noiseAmplitude: 0.2, rampRate: 10, incidentMagnitude: 4.8
+      }
+    ],
+    evidencePlan: [mockEvidenceCorpus[1], mockEvidenceCorpus[3]],
+    recommendations: [
+      { id: "rec-22-baseline", text: "Apply Dynamic Feed Reduction", rationale: "Vibration threshold exceeded. A dynamic edge automation will attempt to govern feed rates. (Baseline Memory)", confidence: 0.85, requiresApproval: true, shadowActionAvailable: true }
+    ],
+    tutorialHints: [
+      { target: "OperatorDecisionPanel", message: "Approving this action will write a 'run_memory' to the Reflex Engine." }
+    ]
+  },
   {
     id: "scenario-04-coolant",
     slug: "coolant-starvation",

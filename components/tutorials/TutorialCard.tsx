@@ -7,11 +7,12 @@ import { TutorialStep } from "@/components/tutorials/TutorialStep";
 export type TutorialDefinition = {
   id: string;
   title: string;
-  beginner: string;
-  technical: string;
+  missionBrief: string;
+  tacticalSpecs: string;
   tryNowHref: string;
   tryNowLabel: string;
-  steps: Array<{ title: string; beginner: string; technical: string }>;
+  accent?: "cyan" | "violet" | "emerald" | "amber" | "indigo" | "rose";
+  steps: Array<{ title: string; missionBrief: string; tacticalSpecs: string }>;
 };
 
 type TutorialCardProps = {
@@ -22,20 +23,20 @@ type TutorialCardProps = {
 
 export function TutorialCard({ tutorial, isCompleted, onToggleComplete }: TutorialCardProps) {
   return (
-    <Panel title={tutorial.title} kicker="Beginner tutorial" icon="flow" accent="cyan">
-      <p className="text-sm text-slate-200">{tutorial.beginner}</p>
-      <p className="mt-2 text-xs text-command-muted">{tutorial.technical}</p>
+    <Panel title={tutorial.title} kicker="Mission Briefing" icon="flow" accent={tutorial.accent || "cyan"}>
+      <p className="text-sm text-slate-200">{tutorial.missionBrief}</p>
+      <p className="mt-2 text-[11px] uppercase tracking-wider text-command-muted border-l-2 border-command-muted pl-2">{tutorial.tacticalSpecs}</p>
 
       <div className="mt-3">
-        <p className="text-xs uppercase tracking-[0.14em] text-cyan-300">Learn sequence</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400">Execution Sequence</p>
         <ol className="mt-2 space-y-2">
           {tutorial.steps.map((step, index) => (
             <TutorialStep
               key={step.title}
               index={index + 1}
               title={step.title}
-              beginner={step.beginner}
-              technical={step.technical}
+              missionBrief={step.missionBrief}
+              tacticalSpecs={step.tacticalSpecs}
             />
           ))}
         </ol>

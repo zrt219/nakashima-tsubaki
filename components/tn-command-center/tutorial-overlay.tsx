@@ -5,16 +5,40 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTutorialStore, tutorialStore, TUTORIAL_STEPS } from "@/lib/simulator/tutorial-store";
 import { Icon } from "./command-center-primitives";
 
+function TypewriterText({ text, speed = 25 }: { text: string; speed?: number }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    setDisplayed("");
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayed(text.substring(0, i));
+      i++;
+      if (i > text.length) clearInterval(interval);
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return <span>{displayed}</span>;
+}
+
 export function TutorialOverlay() {
   const { isActive, currentStepIndex } = useTutorialStore();
   const step = TUTORIAL_STEPS[currentStepIndex];
 
   const [rect, setRect] = useState<DOMRect | null>(null);
 
-  // Re-calculate the rect whenever the step changes or window resizes
+  // Floating animation for the orb
+  const [floatY, setFloatY] = useState(0);
+  useEffect(() => {
+    const i = setInterval(() => {
+      setFloatY(Math.sin(Date.now() / 500) * 8);
+    }, 50);
+    return () => clearInterval(i);
+  }, []);
+
   useEffect(() => {
     if (!isActive || !step) return;
-
     let rafId: number;
     let retries = 0;
 
@@ -22,23 +46,16 @@ export function TutorialOverlay() {
       const el = document.getElementById(step.targetElementId);
       if (el) {
         setRect(el.getBoundingClientRect());
-        
-        // If requireAction is true, add click listener to the element to auto-advance
         if (step.requireAction) {
-          const advance = () => {
-            tutorialStore.next();
-          };
+          const advance = () => tutorialStore.next();
           el.addEventListener("click", advance, { once: true });
-          return () => {
-            el.removeEventListener("click", advance);
-          };
+          return () => el.removeEventListener("click", advance);
         }
       } else {
         if (retries < 20) {
           retries++;
           rafId = requestAnimationFrame(measure);
         } else {
-          // Fallback to center screen if element never mounts
           setRect(new DOMRect(window.innerWidth / 2 - 100, window.innerHeight / 2 - 100, 200, 200));
         }
       }
@@ -46,7 +63,6 @@ export function TutorialOverlay() {
 
     measure();
     window.addEventListener("resize", measure);
-    // Poll slowly just in case the element moves due to layout shifts
     const interval = setInterval(measure, 500);
 
     return () => {
@@ -58,101 +74,83 @@ export function TutorialOverlay() {
 
   if (!isActive || !step) return null;
 
-  // Use a giant shadow for the mask, or if center placement, just full overlay
   const isCenter = step.placement === "center" || !rect;
 
-  const targetStyle = isCenter
-    ? {
-        top: "50%",
-        left: "50%",
-        width: 0,
-        height: 0,
-        x: "-50%",
-        y: "-50%"
-      }
-    : {
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-        x: 0,
-        y: 0
-      };
+  const top = isCenter ? "50%" : step.placement === "bottom" ? rect.bottom + 20 : step.placement === "top" ? rect.top - 200 : rect.top;
+  const left = isCenter ? "50%" : step.placement === "left" ? rect.left - 340 : step.placement === "right" ? rect.right + 20 : rect.left;
 
   return (
     <AnimatePresence>
       <div className="pointer-events-none fixed inset-0 z-[9999]">
-        {/* The Spotlight Hole */}
+        {/* Subtle spotlight focus on the element */}
+        {!isCenter && rect && (
+          <motion.div
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, top: rect.top, left: rect.left, width: rect.width, height: rect.height }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="absolute rounded-lg border-2 border-cyan-400/50 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)]"
+          />
+        )}
+        
+        {/* The Sentient Orb & Chat Bubble */}
         <motion.div
           layout
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            ...targetStyle
-          }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="absolute rounded-lg border-2 border-cyan-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.85),0_0_20px_rgba(0,212,255,0.5)]"
-        />
-
-        {/* The Tooltip Card */}
-        <motion.div
-          layout
-          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 25, delay: 0.1 }}
-          className="pointer-events-auto absolute flex w-80 flex-col gap-3 overflow-hidden border border-cyan-400/50 bg-black/80 p-5 shadow-[0_0_40px_rgba(0,212,255,0.2)] backdrop-blur-xl"
-          style={{
-            top: isCenter ? "50%" : step.placement === "bottom" ? rect.bottom + 20 : step.placement === "top" ? rect.top - 200 : rect.top,
-            left: isCenter ? "50%" : step.placement === "left" ? rect.left - 340 : step.placement === "right" ? rect.right + 20 : rect.left,
-            transform: isCenter ? "translate(-50%, -50%)" : "none"
-          }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1, y: floatY }}
+          transition={{ layout: { type: "spring", stiffness: 300, damping: 30 } }}
+          className="pointer-events-auto absolute flex items-start gap-4"
+          style={{ top, left, transform: isCenter ? "translate(-50%, -50%)" : "none" }}
         >
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent" />
-          
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-400">
-              Guided Tour • {currentStepIndex + 1}/{TUTORIAL_STEPS.length}
-            </span>
-            <button
-              onClick={() => tutorialStore.finish()}
-              className="text-command-muted transition-colors hover:text-white"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+          {/* Glowing Sentient Orb Mascot */}
+          <div className="relative mt-2 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 to-blue-600 shadow-[0_0_30px_rgba(0,212,255,0.8)] border border-white/20">
+            <div className="h-6 w-6 rounded-full bg-white/80 blur-sm animate-pulse" />
+            <div className="absolute inset-0 rounded-full border border-cyan-200/50" />
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold text-white">{step.title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-slate-300">{step.description}</p>
-          </div>
+          {/* Chat Bubble Tooltip */}
+          <div className="relative flex w-80 flex-col gap-3 overflow-hidden rounded-xl border border-cyan-400/30 bg-[#0c1222]/90 p-5 shadow-[0_0_40px_rgba(0,212,255,0.15)] backdrop-blur-xl">
+            {/* Pointer Triangle */}
+            <div className="absolute top-6 -left-2 h-4 w-4 rotate-45 border-b border-l border-cyan-400/30 bg-[#0c1222]" />
 
-          <div className="mt-2 flex items-center justify-between">
-            {currentStepIndex > 0 ? (
-              <button
-                onClick={() => tutorialStore.prev()}
-                className="text-xs font-semibold text-command-muted transition hover:text-white"
-              >
-                Back
-              </button>
-            ) : (
-              <div />
-            )}
-
-            {!step.requireAction ? (
-              <button
-                onClick={() => tutorialStore.next()}
-                className="btn-glow flex items-center gap-2 border border-cyan-400/40 bg-cyan-400/[0.1] px-4 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-400/[0.2]"
-              >
-                Next Step
-                <Icon name="arrow" className="h-3.5 w-3.5 -rotate-90" />
-              </button>
-            ) : (
-              <span className="animate-pulse text-xs font-semibold text-cyan-400/80">
-                Click highlighted area to advance...
+            <div className="flex items-center justify-between z-10">
+              <span className="text-[10px] font-bold tracking-[0.2em] text-cyan-400">
+                AI SUB-AGENT
               </span>
-            )}
+              <button
+                onClick={() => tutorialStore.finish()}
+                className="text-slate-400 transition-colors hover:text-white"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="z-10">
+              <h3 className="text-sm font-semibold text-white uppercase tracking-wider">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-300 min-h-[80px]">
+                <TypewriterText text={step.description} />
+              </p>
+            </div>
+
+            <div className="mt-1 flex items-center justify-between z-10">
+              {currentStepIndex > 0 ? (
+                <button onClick={() => tutorialStore.prev()} className="text-xs font-semibold text-slate-400 hover:text-white">
+                  &larr; Back
+                </button>
+              ) : <div />}
+
+              {!step.requireAction ? (
+                <button onClick={() => tutorialStore.next()} className="btn-glow rounded-md bg-cyan-500/20 px-3 py-1.5 text-xs font-bold text-cyan-200 hover:bg-cyan-500/30 border border-cyan-500/30">
+                  Proceed
+                </button>
+              ) : (
+                <span className="animate-pulse text-xs font-semibold text-cyan-400/80">
+                  Awaiting your input...
+                </span>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>

@@ -6,7 +6,8 @@ import type { EvidencePacket, ProofAnchorResult, ProofMode } from "./types";
 import { buildPartialHashes } from "./hashEvidence";
 import { getExplorerUrl } from "./explorer";
 import { mockProofAdapter } from "./adapters/mockProofAdapter";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase/factories";
+import { type SupabaseClient } from "@supabase/supabase-js";
 
 export type ProofSummary = {
   id: string;
@@ -65,19 +66,13 @@ async function getAdapter(mode?: ProofMode) {
 }
 
 function getSupabaseAdminClient(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key || typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
     return null;
   }
 
-  try {
-    return createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    }) as SupabaseClient;
-  } catch {
-    return null;
-  }
+  return createSupabaseServiceRoleClient({
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
 }
 
 function normalizeProofStatus(status: ProofAnchorResult["status"]): ProofSummary["status"] {

@@ -3,21 +3,21 @@
 type TutorialStepProps = {
   index: number;
   title: string;
-  beginner: string;
-  technical: string;
+  missionBrief: string;
+  tacticalSpecs: string;
 };
 
-export function TutorialStep({ index, title, beginner, technical }: TutorialStepProps) {
+export function TutorialStep({ index, title, missionBrief, tacticalSpecs }: TutorialStepProps) {
   return (
-    <li className="space-y-2 border border-command-line/45 bg-black/25 p-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300">
-        Step {index} — {title}
-      </p>
-      <p className="text-sm text-slate-200">{beginner}</p>
-      <p className="text-xs text-command-muted">
-        Technical: {technical}
-      </p>
+    <li className="flex gap-3 text-sm">
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cyan-950 text-[10px] font-bold text-cyan-400">
+        {index}
+      </span>
+      <div>
+        <strong className="text-slate-200">{title}</strong>
+        <p className="mt-0.5 text-slate-400">{missionBrief}</p>
+        <p className="mt-1 font-mono text-[10px] text-command-muted/80">{tacticalSpecs}</p>
+      </div>
     </li>
   );
 }
-

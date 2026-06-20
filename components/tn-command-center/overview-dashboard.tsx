@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { overviewEvents, overviewKpis } from "@/lib/tn-ai-data";
 import { useSimulatorStore } from "@/lib/simulator/store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip, type IconName } from "@/components/tn-command-center/command-center-primitives";
 import { AICopilotTerminal } from "@/components/tn-command-center/ai-copilot-terminal";
+import { useLearning } from "@/components/education/LearningContext";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 type OverviewAsset = {
   asset_type: string;
@@ -55,6 +58,7 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
       eventStream={overviewEvents}
       utilityActions={
         <>
+          <LearningModeToggle />
           <ShellActionLink href="/simulator" label="Launch Twin Simulator" />
         </>
       }
@@ -99,6 +103,23 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
         <AICopilotTerminal telemetryData={telemetryData} />
       </div>
     </CommandCenterShell>
+  );
+}
+
+function LearningModeToggle() {
+  const { isLearningMode, toggleLearningMode } = useLearning();
+  return (
+    <button
+      onClick={toggleLearningMode}
+      className={`flex items-center gap-2 border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all ${
+        isLearningMode 
+          ? "border-fuchsia-500/50 bg-fuchsia-500/20 text-fuchsia-300 shadow-[0_0_15px_rgba(217,70,239,0.3)]" 
+          : "border-command-line/50 bg-black/40 text-command-muted hover:bg-black/60 hover:text-white"
+      }`}
+    >
+      <Icon name="book" className="h-3 w-3" />
+      {isLearningMode ? "LEARNING MODE ACTIVE" : "ENABLE LEARNING MODE"}
+    </button>
   );
 }
 
@@ -203,7 +224,7 @@ function DigitalTwinCanvas({ telemetryData }: { telemetryData?: OverviewTelemetr
   const currentVib = telemetryData?.vib?.value_numeric ? Number(telemetryData.vib.value_numeric).toFixed(2) : "1.42";
 
   return (
-    <section className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/20 bg-black/30 p-4 shadow-[0_0_30px_rgba(0,212,255,0.02)] backdrop-blur-md">
+    <LearningTrigger topic="digital_twin" className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/20 bg-black/30 p-4 shadow-[0_0_30px_rgba(0,212,255,0.02)] backdrop-blur-md">
       {/* Scanline FX */}
       <div className={`absolute top-0 left-0 right-0 h-[1px] ${isCritical ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)]"} opacity-0 animate-[scan_4s_ease-in-out_infinite]`} />
       
@@ -267,7 +288,7 @@ function DigitalTwinCanvas({ telemetryData }: { telemetryData?: OverviewTelemetr
           </div>
         </div>
       </div>
-    </section>
+    </LearningTrigger>
   );
 }
 
@@ -444,7 +465,7 @@ function LiveEventLedgerPanel() {
   }, []);
 
   return (
-    <div className="border border-command-line/70 bg-black/30 p-4 overflow-hidden h-[240px] flex flex-col">
+    <LearningTrigger topic="immutable_ledger" className="border border-command-line/70 bg-black/30 p-4 overflow-hidden h-[240px] flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Live Event Ledger</p>
         <div className="flex items-center gap-2">
@@ -476,7 +497,7 @@ function LiveEventLedgerPanel() {
           ))}
         </AnimatePresence>
       </div>
-    </div>
+    </LearningTrigger>
   );
 }
 
@@ -488,6 +509,25 @@ function OverviewRail({ latestRun }: { latestRun: { id: string, state: string } 
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
         
+        {/* IDE ADVERTISEMENT */}
+        <section className="relative overflow-hidden border border-fuchsia-500/50 bg-fuchsia-950/30 p-4">
+          <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 to-transparent" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="flex h-2 w-2 rounded-full bg-fuchsia-400 animate-ping absolute opacity-75" />
+              <span className="h-2 w-2 rounded-full bg-fuchsia-500 relative" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-400">New Feature</p>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">Smart Contract Policy Editor</h3>
+            <p className="text-[10px] text-fuchsia-200/80 mb-3 leading-relaxed">
+              Write, compile, and deploy governance contracts natively from the browser. Now supporting XRPL EVM Sidechain & Hedera Testnet!
+            </p>
+            <Link href="/ide" className="inline-flex w-full justify-center border border-fuchsia-500/50 bg-fuchsia-500/20 py-2 text-[10px] font-bold uppercase tracking-widest text-fuchsia-300 transition-colors hover:bg-fuchsia-500/40">
+              Launch IDE
+            </Link>
+          </div>
+        </section>
+
         {/* Knowledge Retrieval */}
         <section>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-command-muted">Command Intelligence</p>

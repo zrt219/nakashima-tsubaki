@@ -1,409 +1,219 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { overviewEvents } from "@/lib/tn-ai-data";
-import { IoTMakerHero } from "@/components/iot-maker/IoTMakerHero";
-import { RuntimeModeBanner } from "@/components/iot-maker/RuntimeModeBanner";
-import { IoTMakerTopology } from "@/components/iot-maker/IoTMakerTopology";
-import { DemoModePanel } from "@/components/iot-maker/DemoModePanel";
-import { ConnectedModePanel } from "@/components/iot-maker/ConnectedModePanel";
-import { ReadinessCheckGrid } from "@/components/iot-maker/ReadinessCheckGrid";
-import { CommandFlowTestRunner } from "@/components/iot-maker/CommandFlowTestRunner";
-import { SafetyBoundaryMatrix } from "@/components/iot-maker/SafetyBoundaryMatrix";
-import { SetupExportPanel } from "@/components/iot-maker/SetupExportPanel";
-import { ProofLedgerPanel } from "@/components/iot-maker/proof-ledger/ProofLedgerPanel";
-import { GeminiQueryLab } from "@/components/iot-maker/gemini-lab/GeminiQueryLab";
-import { SupabaseQueryLab } from "@/components/iot-maker/supabase-lab/SupabaseQueryLab";
-import type {
-  LastEvidencePacket,
-  ProofStatusResponse,
-} from "@/components/iot-maker/proof-ledger/ProofLedgerPanel";
-import { EnvChecklist } from "@/components/iot-maker/EnvChecklist";
-import { IoTMakerEventLedger } from "@/components/iot-maker/IoTMakerEventLedger";
-import type { ReadinessCheck } from "@/lib/iot-maker/types";
-import { ExplainThis } from "@/components/education/ExplainThis";
-
-type TabId =
-  | "queryLabs"
-  | "topology"
-  | "demo"
-  | "connected"
-  | "readiness"
-  | "commandFlow"
-  | "safety"
-  | "proofLedger"
-  | "setup";
-
-type HealthResponse = {
-  runtimeMode: "demo" | "partial" | "connected" | "blocked";
-  services: ReadinessCheck[];
-  envChecks: Array<{
-    key: string;
-    present: boolean;
-    masked: string;
-    required: "demo" | "connected" | "optional";
-    serverOnly: boolean;
-    description: string;
-  }>;
-  warnings: string[];
-  safetyStatus: {
-    approvalGateActive: boolean;
-    directMachineControlDisabled: boolean;
-  };
-  proofStatus: {
-    mode: "mock" | "xrpl_testnet" | "hedera_testnet" | "disabled";
-    mockReady: boolean;
-    xrplReady: boolean;
-    hederaReady: boolean;
-    xrplConfig: {
-      ws: boolean;
-      seed: boolean;
-      destination: boolean;
-      jsonRpc: boolean;
-    };
-    hederaConfig: {
-      rpcUrl: boolean;
-      privateKey: boolean;
-      contractAddress: boolean;
-      chainId: string | null;
-    };
-  };
-  generatedAt: string;
-};
-
-type CommandFlowReport = {
-  runId?: string;
-  scenarioId?: string;
-  runtimeMode?: "demo" | "partial" | "connected" | "blocked";
-  proofMode?: "mock" | "xrpl_testnet" | "hedera_testnet" | "disabled";
-  dispatchStatus?: string;
-  operatorApprovalStatus?: "required" | "approved" | "rejected" | "blocked";
-  evidence?: {
-    sha256Hex?: string;
-    bytes32?: string;
-    packet?: {
-      telemetrySnapshotHash?: string;
-      aiRecommendationHash?: string;
-      operatorApprovalHash?: string;
-      commandDispatchHash?: string;
-      eventLedgerHash?: string;
-      createdAt?: string;
-      scenarioId?: string;
-      runId?: string;
-      mode?: string;
-    };
-  };
-  proofAnchor?: {
-    network?: string;
-    status?: string;
-    evidenceHash?: string;
-    evidenceBytes32?: string;
-    transactionHash?: string;
-    blockNumber?: number;
-    ledgerIndex?: number;
-    explorerUrl?: string;
-  };
-  generatedAt?: string;
-};
-
-type LedgerEvent = {
-  id: string;
-  timestamp: string;
-  source: string;
-  event: string;
-  detail: string;
-};
-
-const TABS = [
-  { id: "topology", label: "Topology" },
-  { id: "demo", label: "Demo Mode" },
-  { id: "connected", label: "Connected Mode" },
-  { id: "readiness", label: "Readiness Checks" },
-  { id: "commandFlow", label: "Command Flow Test" },
-  { id: "queryLabs", label: "Query Labs" },
-  { id: "safety", label: "Safety Boundary" },
-  { id: "proofLedger", label: "Proof Ledger" },
-  { id: "setup", label: "Setup Export" },
-] as const;
-
-function normalizeReadinessChecks(checks: ReadinessCheck[] = []) {
-  return checks.map((check) => ({
-    ...check,
-    status: check.status
-  }));
-}
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Activity, Zap, ShieldCheck, Cpu, 
+  ArrowRight, FileCheck, Anchor, 
+  ExternalLink, Hash, Clock
+} from "lucide-react";
+import { processIoTAction } from "@/app/iot-maker/actions";
 
 export function IoTMakerCenter() {
-  const [activeTab, setActiveTab] = useState<TabId>("topology");
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [proofStatus, setProofStatus] = useState<ProofStatusResponse | null>(null);
-  const [lastFlow, setLastFlow] = useState<CommandFlowReport | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [runtimeMode, setRuntimeMode] = useState<"demo" | "partial" | "connected" | "blocked">("demo");
-  const [isSafe, setIsSafe] = useState(true);
+  const [actionType, setActionType] = useState("MACHINE_CALIBRATION");
+  const [parameter, setParameter] = useState("10");
+  const [status, setStatus] = useState<"idle" | "hashing" | "anchoring" | "success" | "error">("idle");
+  const [result, setResult] = useState<any>(null);
 
-  const [ledgerEvents, setLedgerEvents] = useState<LedgerEvent[]>([]);
+  const handleExecute = async () => {
+    setStatus("hashing");
+    
+    // Simulate hashing visualization delay
+    await new Promise(r => setTimeout(r, 800));
+    setStatus("anchoring");
 
-  const activeChecks = health ? normalizeReadinessChecks(health.services) : [];
-  const activeEnvChecks = health ? health.envChecks : [];
+    const formData = new FormData();
+    formData.set("action_type", actionType);
+    formData.set("parameter", parameter);
 
-  const proofMode = health?.proofStatus.mode ?? "mock";
-  const proofReadiness = health?.proofStatus
-    ? {
-        mockReady: health.proofStatus.mockReady,
-        xrplReady: health.proofStatus.xrplReady,
-        hederaReady: health.proofStatus.hederaReady,
-        xrplConfig: health.proofStatus.xrplConfig,
-        hederaConfig: health.proofStatus.hederaConfig,
-      }
-    : {
-        mockReady: true,
-        xrplReady: false,
-        hederaReady: false,
-        xrplConfig: { ws: false, seed: false, destination: false, jsonRpc: false },
-        hederaConfig: { rpcUrl: false, privateKey: false, contractAddress: false, chainId: null },
-      };
-
-  const latestEvidencePacket = useMemo<LastEvidencePacket | null>(() => {
-    if (!lastFlow?.evidence?.packet) return null;
-    return {
-      runId: lastFlow.evidence.packet.runId,
-      scenarioId: lastFlow.evidence.packet.scenarioId,
-      telemetrySnapshotHash: lastFlow.evidence.packet.telemetrySnapshotHash,
-      aiRecommendationHash: lastFlow.evidence.packet.aiRecommendationHash,
-      operatorApprovalHash: lastFlow.evidence.packet.operatorApprovalHash,
-      commandDispatchHash: lastFlow.evidence.packet.commandDispatchHash,
-      eventLedgerHash: lastFlow.evidence.packet.eventLedgerHash,
-      createdAt: lastFlow.evidence.packet.createdAt,
-      mode: lastFlow.evidence.packet.mode,
-    };
-  }, [lastFlow]);
-
-  const handleFlowComplete = (report: CommandFlowReport) => {
-    setLastFlow(report);
-    const now = new Date().toISOString();
-    const event: LedgerEvent = {
-      id: `${report.runId ?? now}-${report.generatedAt ?? now}`,
-      timestamp: now,
-      source: "command_flow",
-      event: "Command Flow Test Completed",
-      detail: `run=${report.runId ?? "n/a"}, scenario=${report.scenarioId ?? "n/a"}, mode=${report.runtimeMode ?? "n/a"}, approval=${report.operatorApprovalStatus ?? "n/a"}, dispatch=${report.dispatchStatus ?? "n/a"}`,
-    };
-    setLedgerEvents((prev) => [event, ...prev].slice(0, 8));
-    refreshProofStatus();
-  };
-
-  const loadHealth = async () => {
     try {
-      const healthRes = await fetch("/api/iot-maker/health");
-      if (!healthRes.ok) {
-        throw new Error("Health endpoint unavailable.");
+      const res = await processIoTAction(formData);
+      if (res.success) {
+        setResult(res.data);
+        setStatus("success");
+      } else {
+        setStatus("error");
+        console.error("Action failed:", res.error);
       }
-      const data = (await healthRes.json()) as HealthResponse;
-      setHealth(data);
-      setRuntimeMode(data.runtimeMode);
-      setIsSafe(
-        Boolean(data.safetyStatus?.approvalGateActive) && Boolean(data.safetyStatus?.directMachineControlDisabled)
-      );
-      setLoadError(null);
-    } catch (error: unknown) {
-      setLoadError(error instanceof Error ? error.message : "Failed to load IoT maker health.");
-      setRuntimeMode("blocked");
-      setIsSafe(false);
+    } catch (err) {
+      setStatus("error");
+      console.error(err);
     }
   };
-
-  const loadProofStatus = async () => {
-    try {
-      const proofRes = await fetch("/api/proof-ledger/status");
-      if (!proofRes.ok) {
-        throw new Error("Proof status endpoint unavailable.");
-      }
-      const data = (await proofRes.json()) as ProofStatusResponse;
-      setProofStatus(data);
-    } catch {
-      setProofStatus(null);
-    }
-  };
-
-  const refreshProofStatus = () => {
-    loadProofStatus();
-  };
-
-  useEffect(() => {
-    const bootTimer = window.setTimeout(() => {
-      void loadHealth();
-      void loadProofStatus();
-    }, 0);
-    const interval = setInterval(() => {
-      void loadHealth();
-      void loadProofStatus();
-    }, 30000);
-    return () => {
-      window.clearTimeout(bootTimer);
-      clearInterval(interval);
-    };
-  }, []);
 
   return (
-    <div className="space-y-4">
-      <IoTMakerHero />
-      <RuntimeModeBanner runtimeMode={runtimeMode} proofMode={proofMode} isSafe={isSafe} />
-
-      {loadError && (
-        <div className="border border-red-400/40 bg-red-500/10 p-3 text-xs text-red-100">
-          {loadError}
-        </div>
-      )}
-
-      <div className="grid gap-4 xl:grid-cols-[1fr_auto]">
-        <div className="rounded border border-command-line/60 bg-black/20 p-2">
-          <div className="mb-3 flex flex-wrap gap-2">
-          {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                className={`border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${
-                  activeTab === tab.id
-                    ? "border-cyan-400/60 bg-cyan-400/15 text-cyan-100"
-                    : "border-command-line/40 bg-black/30 text-command-muted hover:border-cyan-400/40 hover:text-cyan-200"
-                }`}
-                onClick={() => setActiveTab(tab.id as TabId)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {activeTab === "topology" && (
-            <ExplainThis
-              label="Topology"
-              explanation="This diagram shows how the browser, Vercel runtime, Supabase, AWS IoT, AI provider, operator gate, edge bridge, and proof ledger connect in advisory-first commissioning."
-            >
-              <IoTMakerTopology />
-            </ExplainThis>
-          )}
-          {activeTab === "demo" && (
-            <ExplainThis
-              label="Demo Mode"
-              explanation="Demo Mode generates synthetic telemetry, runs deterministic advisory logic, and never sends real machine control. No cloud or field-bus commands are dispatched."
-            >
-              <DemoModePanel />
-            </ExplainThis>
-          )}
-          {activeTab === "connected" && (
-            <ExplainThis
-              label="Connected Mode"
-              explanation="Connected Mode shows what is available when cloud keys are present. It is a readiness and safety view, not an automatic live control path."
-            >
-              <ConnectedModePanel checks={activeChecks} envChecks={activeEnvChecks} warnings={health?.warnings ?? []} />
-            </ExplainThis>
-          )}
-          {activeTab === "readiness" && (
-            <ExplainThis
-              label="Readiness Checks"
-              explanation="These readiness checks show the explicit prerequisites for advisory execution and connected integration. A failed check blocks dispatch and keeps the flow safe."
-            >
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-                <ReadinessCheckGrid checks={activeChecks} />
-                <div className="rounded border border-cyan-900/60 bg-black/30 p-3">
-                  <p className="text-xs uppercase tracking-[0.16em] text-cyan-300">Ready-state summary</p>
-                  <ul className="mt-2 space-y-1 text-[11px] text-slate-300">
-                    <li>Mode: {runtimeMode}</li>
-                    <li>Proof mode: {proofMode}</li>
-                    <li>Operator approval gate active: {String(health?.safetyStatus.approvalGateActive ?? false)}</li>
-                    <li>Direct machine control disabled: {String(health?.safetyStatus.directMachineControlDisabled ?? false)}</li>
-                    <li>Connected prerequisites satisfied: {String(activeChecks.every((item) => item.status === "ready" || !item.requiredForConnected ? item.status !== "blocked" : true))}</li>
-                  </ul>
-                </div>
-              </div>
-            </ExplainThis>
-          )}
-          {activeTab === "commandFlow" && (
-            <ExplainThis
-              label="Command Flow Test"
-              explanation="Run a full commissioning cycle: telemetry packet, recommendation, operator approval check, dispatch simulation, evidence hashing, and proof anchor."
-            >
-              <CommandFlowTestRunner onComplete={handleFlowComplete} />
-            </ExplainThis>
-          )}
-          {activeTab === "queryLabs" && (
-            <div className="grid gap-4 xl:grid-cols-2">
-              <ExplainThis
-                label="Supabase Query Lab"
-                explanation="Read-only query presets are safe by default. In Demo Mode results are simulated so you can validate schema intent without live database risk."
-              >
-                <SupabaseQueryLab />
-              </ExplainThis>
-              <ExplainThis
-                label="Gemini Query Lab"
-                explanation="Test advisory prompts and structured action proposals. Tool proposals are visible but require operator policy for execution."
-              >
-                <GeminiQueryLab />
-              </ExplainThis>
-            </div>
-          )}
-          {activeTab === "safety" && (
-            <ExplainThis
-              label="Safety Boundary"
-              explanation="The matrix is the definitive control boundary. AI can suggest only. Operators approve. Edge bridge dispatches only after approval. No direct PLC or blockchain control."
-            >
-              <SafetyBoundaryMatrix />
-            </ExplainThis>
-          )}
-          {activeTab === "proofLedger" && (
-            <ExplainThis
-              label="Proof Ledger"
-              explanation="Proof Ledger anchors only evidence hashes for audit traceability. Operational telemetry and command payloads are not written on-chain."
-            >
-              <ProofLedgerPanel
-              healthMode={runtimeMode}
-              healthProofMode={proofMode}
-              proofReadiness={proofReadiness}
-              proofStatus={proofStatus}
-              latestEvidence={latestEvidencePacket}
-              onAnchorComplete={refreshProofStatus}
-              />
-            </ExplainThis>
-          )}
-          {activeTab === "setup" && (
-            <ExplainThis
-              label="Setup Export"
-              explanation="Server-side environment manifest for predictable bootstrapping. This feature exports local values for demo and connected setup only."
-            >
-              <div className="grid gap-4">
-                <SetupExportPanel />
-                <div className="rounded border border-command-line/60 bg-black/20 p-3">
-                  <p className="text-xs uppercase tracking-[0.16em] text-cyan-300">Server-side env visibility</p>
-                  <EnvChecklist entries={activeEnvChecks} />
-                </div>
-              </div>
-            </ExplainThis>
-          )}
-        </div>
-
-        <div className="xl:w-[320px]">
-          <IoTMakerEventLedger events={ledgerEvents.length > 0 ? ledgerEvents : []} />
-          <div className="mt-3 border border-cyan-900/40 bg-black/40 p-3 text-xs text-cyan-200">
-            <p className="font-semibold uppercase tracking-[0.16em]">Local ledger state</p>
-            <p className="mt-2 text-slate-300">
-              {lastFlow
-                ? `${lastFlow.runId ?? "No run"} / ${lastFlow.scenarioId ?? "n/a"} / ${lastFlow.runtimeMode ?? "n/a"}`
-                : "Run command flow to add events."
-              }
-            </p>
-          </div>
-        </div>
+    <div className="w-full h-full relative overflow-y-auto overflow-x-hidden p-6 text-white custom-scrollbar">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[100px] mix-blend-screen" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[80px] mix-blend-screen" />
       </div>
 
-      <div className="text-xs text-command-muted">
-        Safety notes:
-        <ul className="mt-2 list-disc space-y-1 pl-4">
-          <li>Only evidence hashes are anchored. Operational data remains off-chain.</li>
-          <li>Blockchain networks are proof channels only. They cannot execute machine control.</li>
-          <li>Operator approval remains the gate for command proposal acceptance.</li>
-          <li>This route is mock-safe and testnet oriented by design.</li>
-        </ul>
+      <div className="relative z-10 max-w-5xl mx-auto space-y-8">
+        
+        {/* Header Section */}
+        <header className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-light tracking-tight text-white mb-2 flex items-center gap-3">
+              <Zap className="w-8 h-8 text-amber-400" />
+              IoT Maker
+            </h1>
+            <p className="text-white/60 text-lg">Direct Command & Multi-Chain Ledger Proofs</p>
+          </div>
+          
+          <div className="flex gap-4">
+            <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <div>
+                <div className="text-xs text-white/50">Active Proof Mode</div>
+                <div className="text-sm font-medium">{process.env.NEXT_PUBLIC_PROOF_MODE || "MOCK"}</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column: Command Configuration */}
+          <motion.div 
+            className="bg-[#0c1222]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex items-center gap-2 mb-6 text-white/80">
+              <Cpu className="w-5 h-5" />
+              <h2 className="text-xl font-medium">Command Matrix</h2>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-white/60 mb-2">Action Type</label>
+                <select 
+                  value={actionType}
+                  onChange={(e) => setActionType(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  disabled={status === "hashing" || status === "anchoring"}
+                >
+                  <option value="MACHINE_CALIBRATION">Machine Calibration</option>
+                  <option value="SPINDLE_SPEED_OVERRIDE">Spindle Speed Override</option>
+                  <option value="EMERGENCY_HALT">Emergency Halt</option>
+                  <option value="THERMAL_RESET">Thermal Reset</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/60 mb-2">Parameter / Value</label>
+                <input 
+                  type="text" 
+                  value={parameter}
+                  onChange={(e) => setParameter(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="e.g. 1000 RPM"
+                  disabled={status === "hashing" || status === "anchoring"}
+                />
+              </div>
+
+              <div className="pt-4">
+                <button
+                  onClick={handleExecute}
+                  disabled={status === "hashing" || status === "anchoring"}
+                  className="w-full group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-indigo-600 px-6 py-4 font-medium text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    {status === "idle" || status === "error" || status === "success" ? (
+                      <>Execute & Anchor <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                    ) : (
+                      <>{status === "hashing" ? "Canonicalizing & Hashing..." : "Anchoring to Ledger..."}</>
+                    )}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column: Ledger Proof Journey */}
+          <div className="space-y-6">
+            <AnimatePresence mode="popLayout">
+              {status !== "idle" && (
+                <motion.div
+                  key="hashing-step"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-[#0c1222]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-2 rounded-lg ${status === "hashing" ? "bg-amber-500/20 text-amber-400 animate-pulse" : "bg-emerald-500/20 text-emerald-400"}`}>
+                      <Hash className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Deterministic Hashing</h3>
+                      <p className="text-xs text-white/50">SHA-256 Digest generated from payload</p>
+                    </div>
+                  </div>
+                  
+                  {(status === "anchoring" || status === "success") && result && (
+                    <div className="bg-black/40 rounded-lg p-3 font-mono text-xs text-emerald-400 break-all border border-white/5">
+                      {result.anchorResult.evidence_hash}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {(status === "anchoring" || status === "success") && (
+                <motion.div
+                  key="anchoring-step"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-[#0c1222]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-2 rounded-lg ${status === "anchoring" ? "bg-indigo-500/20 text-indigo-400 animate-pulse" : "bg-emerald-500/20 text-emerald-400"}`}>
+                      <Anchor className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Blockchain Anchor</h3>
+                      <p className="text-xs text-white/50">Broadcasting proof to distributed ledger</p>
+                    </div>
+                  </div>
+
+                  {status === "success" && result && (
+                    <div className="space-y-3">
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
+                        <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                          <FileCheck className="w-4 h-4" />
+                          <span className="font-medium text-sm">Successfully Anchored</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <div className="text-xs text-white/40 mb-1 flex items-center gap-1"><Clock className="w-3 h-3"/> Block / Index</div>
+                            <div className="text-sm font-medium">{result.anchorResult.block_number || result.anchorResult.ledger_index || "N/A"}</div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-white/40 mb-1">Transaction</div>
+                            <div className="text-sm font-medium truncate" title={result.anchorResult.transaction_hash}>
+                              {result.anchorResult.transaction_hash?.substring(0, 10)}...
+                            </div>
+                          </div>
+                        </div>
+
+                        {result.anchorResult.explorer_url && (
+                          <a 
+                            href={result.anchorResult.explorer_url} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="mt-4 flex items-center justify-center gap-2 w-full py-2 bg-black/30 hover:bg-black/50 transition-colors rounded-lg text-sm text-indigo-300 hover:text-indigo-200 border border-indigo-500/20"
+                          >
+                            View on Explorer <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
   );

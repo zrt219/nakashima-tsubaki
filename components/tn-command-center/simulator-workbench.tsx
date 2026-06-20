@@ -8,6 +8,8 @@ import { SCENARIOS } from "@/lib/simulator/scenarios";
 import type { SimulatorEventType, SimulatorState } from "@/lib/simulator/types";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, Panel, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { loadReflexMemoryRecords, storeReflexMemoryRecord } from "@/lib/reflex-agents/reflexMemory";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 const WORKFLOW_STEPS: Array<{
   id: SimulatorState;
@@ -58,6 +60,29 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
     }
   }, [effectiveState, state, transitionState]);
 
+  // RECURSIVE MEMORY HOOK: If this is the recursive scenario, check if we have run it before.
+  let currentRecommendations = scenario?.recommendations || [];
+  let isRecursiveOverride = false;
+  
+  if (scenario?.id === "scenario-22-recursive-edge") {
+    // Has this been approved before in memory?
+    const memories = loadReflexMemoryRecords();
+    const pastMemory = memories.find(m => m.summary.includes("scenario-22-recursive-edge") && m.type === "run_memory");
+    if (pastMemory) {
+      isRecursiveOverride = true;
+      currentRecommendations = [
+        {
+          id: "rec-22-recursive-override",
+          text: "EMERGENCY M05 SPINDLE STOP",
+          rationale: "Recursive Memory Override: I remember that dynamic feed reduction failed to arrest chatter in a previous run. Preemptively halting spindle to prevent catastrophic bearing failure.",
+          confidence: 0.99,
+          requiresApproval: true,
+          shadowActionAvailable: false
+        }
+      ];
+    }
+  }
+
   if (!scenario || storeRunId !== runId) {
     return (
       <CommandCenterShell activeAreaId="twins" eventStream={[]}>
@@ -87,6 +112,22 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
   const handleApproval = (_recId: string, status: "approved" | "rejected") => {
     if (status === "approved") {
       logEvent("operator_approved", "operator", "Operator approved recommendation", "success");
+      
+      // RECURSIVE MEMORY: If they approve scenario-22, let's artificially write a memory so it triggers next time.
+      if (scenario?.id === "scenario-22-recursive-edge") {
+        storeReflexMemoryRecord({
+          id: `run_memory-${storeRunId}-${Date.now()}`,
+          type: "run_memory",
+          title: `Verified run memory ${storeRunId}`,
+          summary: `Verified evidence from telemetry, eval, and operator decision for scenario scenario-22-recursive-edge.`,
+          evidence: ["run=" + storeRunId],
+          confidence: 0.9,
+          sourceRunId: storeRunId,
+          createdAt: new Date().toISOString(),
+          status: "stored"
+        });
+      }
+
       transitionState("SHADOW_EXECUTION_RUNNING");
       logEvent("shadow_execution_started", "system", "Shadow execution staged after operator approval", "info");
 
@@ -254,18 +295,24 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
                 visible: { opacity: 1, x: 0, scale: 1, transition: { type: "spring", bounce: 0.4, damping: 12 } }
               }}
             >
+              <LearningTrigger topic="rag_mechanics">
               <Panel title="Advisory Engine" icon="rag" kicker="RAG & Knowledge" action={<StatusChip status="ready" compact />}>
                 <div className="text-sm text-slate-300">Context retrieval complete.</div>
                 {currentStepIndex >= recommendationStepIndex && (
                   <div className="mt-4 space-y-4">
-                    <h3 className="text-xs uppercase tracking-widest text-cyan-400">Generated Recommendations</h3>
-                    <div className="border border-cyan-500/30 bg-cyan-900/10 p-4 shadow-[0_0_15px_rgba(0,212,255,0.1)]">
-                      <div className="font-semibold text-white">Advisory Generated</div>
-                      <p className="mt-2 text-sm text-slate-300">{scenario.recommendations[0]?.text}</p>
+                    <h3 className="text-xs uppercase tracking-widest text-cyan-400">
+                      {isRecursiveOverride ? "Recursive Memory Triggered" : "Generated Recommendations"}
+                    </h3>
+                    <div className={`border p-4 shadow-[0_0_15px_rgba(0,212,255,0.1)] ${isRecursiveOverride ? "border-fuchsia-500/50 bg-fuchsia-900/20" : "border-cyan-500/30 bg-cyan-900/10"}`}>
+                      <div className={`font-semibold ${isRecursiveOverride ? "text-fuchsia-400" : "text-white"}`}>
+                        {isRecursiveOverride ? "Preemptive Override Generated" : "Advisory Generated"}
+                      </div>
+                      <p className="mt-2 text-sm text-slate-300">{currentRecommendations[0]?.text}</p>
                     </div>
                   </div>
                 )}
               </Panel>
+              </LearningTrigger>
             </motion.div>
           )}
 
@@ -279,11 +326,12 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
                 visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", bounce: 0.5, damping: 10 } }
               }}
             >
+              <LearningTrigger topic="human_in_the_loop">
               <Panel title="Operator Gate" icon="shield" kicker="Human in the loop required" action={<StatusChip status="approval" compact />}>
                 <div className="space-y-4">
-                  {scenario.recommendations.map(rec => (
-                    <div key={rec.id} className="border border-amber-500/40 bg-amber-900/20 p-4">
-                      <div className="text-sm font-bold text-amber-400">{rec.text}</div>
+                  {currentRecommendations.map(rec => (
+                    <div key={rec.id} className={`border p-4 ${isRecursiveOverride ? "border-fuchsia-500/40 bg-fuchsia-900/20" : "border-amber-500/40 bg-amber-900/20"}`}>
+                      <div className={`text-sm font-bold ${isRecursiveOverride ? "text-fuchsia-400" : "text-amber-400"}`}>{rec.text}</div>
                       <p className="mt-2 text-xs text-slate-300">{rec.rationale}</p>
 
                       {effectiveState === "APPROVAL_REQUIRED" && !approvalDecision ? (

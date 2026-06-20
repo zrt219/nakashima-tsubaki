@@ -213,6 +213,13 @@ export function ExecutiveDashboard() {
                  </span>
                  <p className="relative text-[8px] uppercase text-red-200 mt-0.5 tracking-widest">Requires MFA Auth</p>
                </button>
+               
+               <div className="pt-2 border-t border-red-500/30">
+                 <p className="text-[9px] uppercase text-red-400/60 mb-2">Advanced Governance</p>
+                 <Link href="/ide" className="block w-full border border-cyan-500/40 bg-cyan-900/20 py-2 text-center text-xs font-bold uppercase tracking-widest text-cyan-400 transition hover:bg-cyan-900/40 hover:text-cyan-300">
+                   Smart Contract Policy Editor
+                 </Link>
+               </div>
              </div>
            </div>
         </motion.div>

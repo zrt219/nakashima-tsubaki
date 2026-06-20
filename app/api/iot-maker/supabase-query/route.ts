@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabasePublicClient, getSupabasePublicConfig } from "@/lib/supabase/factories";
 import { createLogEvent } from "@/lib/dashboard-logs/logStore";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
@@ -138,11 +139,12 @@ function blockedKeywords(text: string) {
   return blocked.find((keyword) => lowered.includes(keyword));
 }
 
-type AnySupabaseClient = ReturnType<typeof createClient> & { [key: string]: unknown };
+type AnySupabaseClient = SupabaseClient & { [key: string]: unknown };
 
 async function runTelemetryPreset(client: AnySupabaseClient) {
   const { data, error } = await client
-    .from("telemetry.sensor_readings")
+    .schema("telemetry")
+    .from("sensor_readings")
     .select("asset_id,metric_key,value_numeric,unit,quality,timestamp")
     .order("timestamp", { ascending: false })
     .limit(20);
@@ -156,7 +158,8 @@ async function runRecentEventsPreset(client: AnySupabaseClient) {
 
 async function runActiveScenariosPreset(client: AnySupabaseClient) {
   const { data, error } = await client
-    .from("simulation.scenario_templates")
+    .schema("simulation")
+    .from("scenario_templates")
     .select("id,name,type,description,status")
     .order("name", { ascending: true })
     .limit(25);
@@ -174,7 +177,8 @@ async function runCommandQueuePreset(client: AnySupabaseClient) {
 
 async function runProofAnchorsPreset(client: AnySupabaseClient) {
   const { data, error } = await client
-    .from("proof.anchors")
+    .schema("proof")
+    .from("anchors")
     .select("id,run_id,scenario_id,evidence_hash,network,status,proof_mode,created_at,transaction_hash,block_number,contract_address,ledger_index")
     .order("created_at", { ascending: false })
     .limit(25);
@@ -227,11 +231,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Blocked SQL contains forbidden keyword: ${blocked}` }, { status: 400 });
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const hasConfig = Boolean(getSupabasePublicConfig());
   const started = new Date().toISOString();
 
-  if (!url || !anonKey) {
+  if (!hasConfig) {
     const result = buildMockResult({ preset, startedAt: started, endedAt: new Date().toISOString() });
     createLogEvent({
       source: "supabase",
@@ -244,9 +247,22 @@ export async function POST(req: Request) {
     return NextResponse.json(result);
   }
 
-  const client = createClient(url, anonKey, {
+  const client = createSupabasePublicClient({
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false }
   }) as AnySupabaseClient;
+
+  if (!client) {
+    const result = buildMockResult({ preset, startedAt: started, endedAt: new Date().toISOString() });
+    createLogEvent({
+      source: "supabase",
+      type: "supabase_query_simulated",
+      severity: "warning",
+      summary: `Supabase query simulated for ${preset} (client initialization failed).`,
+      mode: "mock",
+      details: { preset, rows: result.rowCount }
+    });
+    return NextResponse.json(result);
+  }
 
   let rows: Array<Record<string, unknown>> = [];
   let queryError: string | null = null;

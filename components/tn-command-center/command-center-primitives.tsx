@@ -153,7 +153,7 @@ export function Panel({
   kicker: string;
   icon: IconName;
   action?: ReactNode;
-  accent?: "cyan" | "amber" | "violet" | "emerald";
+  accent?: "cyan" | "amber" | "violet" | "emerald" | "indigo" | "rose";
   children: ReactNode;
 }) {
   const accentColors = {
@@ -176,6 +176,16 @@ export function Panel({
       icon: "border-emerald-400/30 bg-emerald-400/[0.08] text-emerald-200",
       kicker: "text-emerald-400/60",
       bar: "bg-gradient-to-r from-emerald-400/60 via-emerald-300/30 to-transparent"
+    },
+    indigo: {
+      icon: "border-indigo-400/30 bg-indigo-400/[0.08] text-indigo-200",
+      kicker: "text-indigo-400/60",
+      bar: "bg-gradient-to-r from-indigo-400/60 via-indigo-300/30 to-transparent"
+    },
+    rose: {
+      icon: "border-rose-400/30 bg-rose-400/[0.08] text-rose-200",
+      kicker: "text-rose-400/60",
+      bar: "bg-gradient-to-r from-rose-400/60 via-rose-300/30 to-transparent"
     }
   };
 
