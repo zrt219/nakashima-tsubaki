@@ -64,15 +64,15 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
   let currentRecommendations = scenario?.recommendations || [];
   let isRecursiveOverride = false;
   
-  if (scenario?.id === "scenario-22-recursive-edge") {
+  if (scenario?.id === "scenario-05-recursive-memory") {
     // Has this been approved before in memory?
     const memories = loadReflexMemoryRecords();
-    const pastMemory = memories.find(m => m.summary.includes("scenario-22-recursive-edge") && m.type === "run_memory");
+    const pastMemory = memories.find(m => m.summary.includes("scenario-05-recursive-memory") && m.type === "run_memory");
     if (pastMemory) {
       isRecursiveOverride = true;
       currentRecommendations = [
         {
-          id: "rec-22-recursive-override",
+          id: "rec-05-recursive-override",
           text: "EMERGENCY M05 SPINDLE STOP",
           rationale: "Recursive Memory Override: I remember that dynamic feed reduction failed to arrest chatter in a previous run. Preemptively halting spindle to prevent catastrophic bearing failure.",
           confidence: 0.99,
@@ -113,13 +113,13 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
     if (status === "approved") {
       logEvent("operator_approved", "operator", "Operator approved recommendation", "success");
       
-      // RECURSIVE MEMORY: If they approve scenario-22, let's artificially write a memory so it triggers next time.
-      if (scenario?.id === "scenario-22-recursive-edge") {
+      // RECURSIVE MEMORY: If they approve scenario-05, let's artificially write a memory so it triggers next time.
+      if (scenario?.id === "scenario-05-recursive-memory") {
         storeReflexMemoryRecord({
           id: `run_memory-${storeRunId}-${Date.now()}`,
           type: "run_memory",
           title: `Verified run memory ${storeRunId}`,
-          summary: `Verified evidence from telemetry, eval, and operator decision for scenario scenario-22-recursive-edge.`,
+          summary: `Verified evidence from telemetry, eval, and operator decision for scenario scenario-05-recursive-memory.`,
           evidence: ["run=" + storeRunId],
           confidence: 0.9,
           sourceRunId: storeRunId,
