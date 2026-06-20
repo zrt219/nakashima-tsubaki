@@ -11,7 +11,7 @@ export type TutorialDefinition = {
   tacticalSpecs: string;
   tryNowHref: string;
   tryNowLabel: string;
-  accent?: "cyan" | "violet" | "emerald" | "amber" | "indigo" | "rose";
+  accent?: "cyan" | "violet" | "emerald" | "amber" | "indigo" | "rose" | "fuchsia";
   steps: Array<{ title: string; missionBrief: string; tacticalSpecs: string }>;
 };
 

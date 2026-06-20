@@ -153,7 +153,7 @@ export function Panel({
   kicker: string;
   icon: IconName;
   action?: ReactNode;
-  accent?: "cyan" | "amber" | "violet" | "emerald" | "indigo" | "rose";
+  accent?: "cyan" | "amber" | "violet" | "emerald" | "indigo" | "rose" | "fuchsia";
   children: ReactNode;
 }) {
   const accentColors = {
@@ -186,6 +186,11 @@ export function Panel({
       icon: "border-rose-400/30 bg-rose-400/[0.08] text-rose-200",
       kicker: "text-rose-400/60",
       bar: "bg-gradient-to-r from-rose-400/60 via-rose-300/30 to-transparent"
+    },
+    fuchsia: {
+      icon: "border-fuchsia-400/30 bg-fuchsia-400/[0.08] text-fuchsia-200",
+      kicker: "text-fuchsia-400/60",
+      bar: "bg-gradient-to-r from-fuchsia-400/60 via-fuchsia-300/30 to-transparent"
     }
   };
 
