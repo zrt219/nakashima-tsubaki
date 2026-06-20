@@ -58,7 +58,7 @@ export function SimulatorLaunchpad() {
             </p>
           </div>
           <button
-            onClick={() => tutorialStore.start()}
+            onClick={() => tutorialStore.openConfig()}
             className="btn-glow flex items-center gap-2 border border-violet-400/40 bg-violet-400/[0.1] px-4 py-2 text-sm font-semibold text-violet-100 transition-all hover:border-violet-400/80 hover:bg-violet-400/[0.2] hover:shadow-[0_0_20px_rgba(155,109,255,0.3)]"
           >
             <Icon name="play" className="h-4 w-4" />
