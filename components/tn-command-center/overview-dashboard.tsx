@@ -224,7 +224,7 @@ function DigitalTwinCanvas({ telemetryData }: { telemetryData?: OverviewTelemetr
   const currentVib = telemetryData?.vib?.value_numeric ? Number(telemetryData.vib.value_numeric).toFixed(2) : "1.42";
 
   return (
-    <LearningTrigger topic="digital_twin" className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/20 bg-black/30 p-4 shadow-[0_0_30px_rgba(0,212,255,0.02)] backdrop-blur-md">
+    <LearningTrigger topic="what_is_nakashima" className="relative mt-2 flex min-h-[500px] w-full flex-col overflow-hidden border border-cyan-400/20 bg-black/30 p-4 shadow-[0_0_30px_rgba(0,212,255,0.02)] backdrop-blur-md">
       {/* Scanline FX */}
       <div className={`absolute top-0 left-0 right-0 h-[1px] ${isCritical ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" : "bg-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.8)]"} opacity-0 animate-[scan_4s_ease-in-out_infinite]`} />
       
@@ -465,7 +465,7 @@ function LiveEventLedgerPanel() {
   }, []);
 
   return (
-    <LearningTrigger topic="immutable_ledger" className="border border-command-line/70 bg-black/30 p-4 overflow-hidden h-[240px] flex flex-col">
+    <LearningTrigger topic="blockchain_fit" className="border border-command-line/70 bg-black/30 p-4 overflow-hidden h-[240px] flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-command-muted">Live Event Ledger</p>
         <div className="flex items-center gap-2">

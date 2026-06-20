@@ -157,7 +157,7 @@ export function SolidityIDE() {
           </button>
         </Panel>
 
-        <LearningTrigger topic="double_edge">
+        <LearningTrigger topic="blockchain_fit">
         <Panel title="Network Deployment" icon="network" kicker="EVM Target" action={<StatusChip status="testnet" compact />}>
           <div className="space-y-4">
             <div>

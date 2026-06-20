@@ -295,7 +295,7 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
                 visible: { opacity: 1, x: 0, scale: 1, transition: { type: "spring", bounce: 0.4, damping: 12 } }
               }}
             >
-              <LearningTrigger topic="rag_mechanics">
+              <LearningTrigger topic="recursive_memory">
               <Panel title="Advisory Engine" icon="rag" kicker="RAG & Knowledge" action={<StatusChip status="ready" compact />}>
                 <div className="text-sm text-slate-300">Context retrieval complete.</div>
                 {currentStepIndex >= recommendationStepIndex && (
@@ -326,7 +326,7 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
                 visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", bounce: 0.5, damping: 10 } }
               }}
             >
-              <LearningTrigger topic="human_in_the_loop">
+              <LearningTrigger topic="recursive_memory">
               <Panel title="Operator Gate" icon="shield" kicker="Human in the loop required" action={<StatusChip status="approval" compact />}>
                 <div className="space-y-4">
                   {currentRecommendations.map(rec => (
@@ -372,6 +372,7 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
                   ))}
                 </div>
               </Panel>
+              </LearningTrigger>
             </motion.div>
           )}
 

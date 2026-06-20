@@ -5,12 +5,13 @@ import { Panel } from "@/components/tn-command-center/command-center-primitives"
 import { TutorialCard, TutorialDefinition } from "@/components/tutorials/TutorialCard";
 import { TutorialChecklist } from "@/components/tutorials/TutorialChecklist";
 import { TutorialProgress } from "@/components/tutorials/TutorialProgress";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 const STORAGE_KEY = "tn-tutorial-progress-v2";
 
 const TUTORIALS: TutorialDefinition[] = [
   {
-    id: "what-is-nakashima",
+    id: "what_is_nakashima",
     title: "MISSION: COGNITIVE UPLINK",
     accent: "indigo",
     missionBrief: "Welcome to the simulation-first command center. Your first objective is to understand the AI's boundaries.",
@@ -31,7 +32,7 @@ const TUTORIALS: TutorialDefinition[] = [
     ],
   },
   {
-    id: "what-is-iot-maker",
+    id: "what_is_iot_maker",
     title: "MISSION: IOT MAKER ONBOARDING",
     accent: "amber",
     missionBrief: "Learn how to seed anomalies and safely dispatch command recommendations.",
@@ -52,7 +53,7 @@ const TUTORIALS: TutorialDefinition[] = [
     ],
   },
   {
-    id: "supabase-fit",
+    id: "supabase_fit",
     title: "MISSION: PERSISTENCE LAYER",
     accent: "emerald",
     missionBrief: "Dive into the raw event ledger to see how actions are recorded.",
@@ -73,7 +74,7 @@ const TUTORIALS: TutorialDefinition[] = [
     ],
   },
   {
-    id: "blockchain-fit",
+    id: "blockchain_fit",
     title: "MISSION: BLOCKCHAIN AUDIT TRACE",
     accent: "rose",
     missionBrief: "Follow an evidence hash from the local ledger directly to the public testnets.",
@@ -94,7 +95,7 @@ const TUTORIALS: TutorialDefinition[] = [
     ],
   },
   {
-    id: "recursive-memory",
+    id: "recursive_memory",
     title: "MISSION: RECURSIVE EDGE MEMORY",
     accent: "fuchsia",
     missionBrief: "Demonstrate Double Edge Automations where the AI learns from past runs and alters its recommendations.",
@@ -174,12 +175,13 @@ export function TutorialsPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {TUTORIALS.map((tutorial) => (
-          <TutorialCard
-            key={tutorial.id}
-            tutorial={tutorial}
-            isCompleted={completedIds.has(tutorial.id)}
-            onToggleComplete={toggleCompletion}
-          />
+          <LearningTrigger key={tutorial.id} topic={tutorial.id}>
+            <TutorialCard
+              tutorial={tutorial}
+              isCompleted={completedIds.has(tutorial.id)}
+              onToggleComplete={toggleCompletion}
+            />
+          </LearningTrigger>
         ))}
       </div>
 
