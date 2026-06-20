@@ -37,21 +37,21 @@ export function TutorialOverlay() {
     return () => clearInterval(i);
   }, []);
 
+  const [elementFound, setElementFound] = useState(false);
+
   useEffect(() => {
     if (!isActive || !step) return;
     let rafId: number;
     let retries = 0;
+    setElementFound(false);
 
     const measure = () => {
       const el = document.getElementById(step.targetElementId);
       if (el) {
         setRect(el.getBoundingClientRect());
-        if (step.requireAction) {
-          const advance = () => tutorialStore.next();
-          el.addEventListener("click", advance, { once: true });
-          return () => el.removeEventListener("click", advance);
-        }
+        setElementFound(true);
       } else {
+        setElementFound(false);
         if (retries < 20) {
           retries++;
           rafId = requestAnimationFrame(measure);
@@ -71,6 +71,16 @@ export function TutorialOverlay() {
       clearInterval(interval);
     };
   }, [isActive, step]);
+
+  useEffect(() => {
+    if (!isActive || !step || !step.requireAction || !elementFound) return;
+    const el = document.getElementById(step.targetElementId);
+    if (!el) return;
+
+    const advance = () => tutorialStore.next();
+    el.addEventListener("click", advance, { once: true });
+    return () => el.removeEventListener("click", advance);
+  }, [isActive, step, elementFound]);
 
   if (!isActive || !step) return null;
 

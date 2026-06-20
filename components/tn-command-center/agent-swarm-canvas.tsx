@@ -104,9 +104,9 @@ function TwinHelper({ agent }: { agent: SwarmAgent }) {
         mass: 1.5,
         restDelta: 0.001
       }}
-      className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-help"
-      whileHover={{ scale: 1.1 }}
-      onMouseEnter={() => audioEngine.playHover()}
+      className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      // whileHover={{ scale: 1.1 }}
+      // onMouseEnter={() => audioEngine.playHover()}
     >
       <div className="relative flex flex-col items-center group">
         {/* The orb */}
