@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { CommandCenterShell, ShellActionLink } from "./command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
 import { AcademicHeader } from "@/components/education/AcademicHeader";
-import { LearningTrigger } from "@/components/education/LearningTrigger";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 type Node = {
   id: number;

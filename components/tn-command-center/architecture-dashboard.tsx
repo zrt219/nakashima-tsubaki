@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 import { AcademicHeader } from "@/components/education/AcademicHeader";
-import { LearningTrigger } from "@/components/education/LearningTrigger";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 export function ArchitectureDashboard() {
   return (

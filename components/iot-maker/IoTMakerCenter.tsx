@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { processIoTAction } from "@/app/iot-maker/actions";
 import { AcademicHeader } from "@/components/education/AcademicHeader";
-import { LearningTrigger } from "@/components/education/LearningTrigger";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 export function IoTMakerCenter() {
   const [actionType, setActionType] = useState("MACHINE_CALIBRATION");
