@@ -33,7 +33,7 @@ export function InteractiveCourseShell({ moduleId, children }: InteractiveCourse
 
   // True LLM Integration
   const { messages, append, isLoading, setMessages } = useChat({
-    api: "/api/chat",
+    api: "/api/subagent",
     id: `course-${moduleId}-${currentStepIndex}`,
   });
 
@@ -54,7 +54,13 @@ ${currentStep.dialogue.expanded}
 
 Explain this to them dynamically in your unique voice. Keep it to the requested tone length.
 If XP is 0, mock them for being a noob. If XP is high, respect their grind.
-DO NOT repeat exactly what was in the facts above. Be original and formatted nicely with markdown if needed.`;
+DO NOT repeat exactly what was in the facts above. Be original and formatted nicely with markdown if needed.
+
+CRITICAL FORMATTING REQUIREMENT:
+You MUST start your response EXACTLY with this formatted header on its own line:
+MODULE ${currentStepIndex + 1}: ${currentStep.title.toUpperCase()}
+
+Then put a blank line, and then start your snarky explanation.`;
 
     append({
       role: "user",
