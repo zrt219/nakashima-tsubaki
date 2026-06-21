@@ -140,28 +140,28 @@ export const missionAreas: MissionArea[] = [
   },
   {
     id: "kpis",
-    index: "09",
+    index: "10",
     title: "KPI Dashboard",
     descriptor: "Executive signal board",
-    icon: "chart",
+    icon: "kpi",
     href: "/kpi",
-    status: "simulated"
-  },
-  {
-    id: "qa",
-    index: "10",
-    title: "QA Evidence Report",
-    descriptor: "Verification packet",
-    icon: "evidence",
-    href: "/qa",
     status: "ready"
   },
   {
-    id: "cognitive",
+    id: "qa",
     index: "11",
-    title: "Cognitive Swarm Brain",
-    descriptor: "Live neural decision graph",
-    icon: "twin",
+    title: "QA Evidence Registry",
+    descriptor: "Verification packet",
+    icon: "logs",
+    href: "/qa",
+    status: "simulated"
+  },
+  {
+    id: "cognitive",
+    index: "12",
+    title: "Cognitive Swarm",
+    descriptor: "Live neural decisions",
+    icon: "twins",
     href: "/cognitive",
     status: "simulated"
   }
