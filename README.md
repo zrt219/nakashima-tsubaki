@@ -21,8 +21,6 @@
 
 > **"The convergence of AI cognition, deterministic digital twinning, and cryptographic provenance — built for the precision manufacturing industry of 2026."**
 
-![Overview Dashboard](public/docs/01_overview_dashboard.png)
-
 **Live Demo →** [tsubaki-nakashima-ai-mdm6h8td5-zrt219s-projects.vercel.app](https://tsubaki-nakashima-ai-mdm6h8td5-zrt219s-projects.vercel.app)
 
 </div>
@@ -125,8 +123,6 @@ This is not speculation. It is the conclusion drawn from synthesizing 33 peer-re
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-![Architecture Overview](public/docs/08_purdue_architecture.png)
-
 ### 3.2 Data Flow Architecture
 
 The platform implements a **unidirectional data flow** inspired by the Event Sourcing pattern (Fowler, 2024). All state mutations are immutable events that:
@@ -168,14 +164,11 @@ Each of the 11 modules represents a discrete domain of industrial AI knowledge. 
 
 **Purpose:** The command center's primary situational awareness interface.
 
-![Overview Dashboard](public/docs/01_overview_dashboard.png)
-
 The overview module integrates live telemetry from up to 48 concurrent sensor channels, visualized as:
 - **3D WebGL spindle model** rotating in real-time at reported RPM
 - **Sparkline arrays** for vibration (Hz), temperature (°C), and acoustic emission (dB)
 - **Health score composite** weighted by the OEE formula: `OEE = Availability × Performance × Quality`
 - **Event stream** showing the last 100 immutable ledger events
-
 
 #### Architecture Flow
 ```mermaid
@@ -200,8 +193,6 @@ graph TD
 
 **Purpose:** A staged deployment framework for transitioning from human-operated to AI-augmented to fully autonomous manufacturing.
 
-![AI Adoption Roadmap](public/docs/02_roadmap_module.png)
-
 The roadmap implements a **three-phase adoption model** derived from Smith (2025):
 
 | Phase | Name | Description | HITL Level |
@@ -211,7 +202,6 @@ The roadmap implements a **three-phase adoption model** derived from Smith (2025
 | Phase 3 | **Autonomous Mode** | AI actuates within deterministic bounds | AI-primary |
 
 The platform is currently designed to operate in **Phase 2 (Advisory Mode)** by default, with the governance engine preventing any Phase 3 actuation unless explicit HITL sign-off has been cryptographically recorded on the ledger.
-
 
 #### Adoption State Machine
 ```mermaid
@@ -247,8 +237,6 @@ stateDiagram-v2
 
 **Purpose:** Replace static, outdated Standard Operating Procedures (SOPs) with a dynamically-retrieved, AI-synthesized knowledge layer.
 
-![RAG Knowledge Graph](public/docs/03_rag_knowledge_graph.png)
-
 #### How the RAG Engine Works
 
 1. **Ingestion:** Maintenance manuals, ISO 9001 standards, P&IDs, and historical incident reports are chunked and embedded using `text-embedding-3-small` (1536 dimensions) into Supabase's pgvector extension.
@@ -264,7 +252,6 @@ stateDiagram-v2
 3. **Augmentation:** The top-5 retrieved chunks are injected into the LLM context window alongside the raw sensor data.
 
 4. **Generation:** Gemini 2.5 Flash synthesizes the retrieved knowledge and sensor data into a human-readable **Evidence Packet** for the operator.
-
 
 #### RAG Data Pipeline
 ```mermaid
@@ -320,7 +307,6 @@ Vibration Amplitude (mm/s)
 
 The digital twin monitors the P-F interval continuously, allowing maintenance interventions to be scheduled before the functional failure point.
 
-
 #### Cyber-Physical Sync
 ```mermaid
 graph TD
@@ -343,8 +329,6 @@ graph TD
 ### Module 5: Cryptographic Provenance Ledger
 
 **Purpose:** Create an immutable, tamper-evident audit trail of every decision, alarm, intervention, and AI recommendation made on the factory floor.
-
-![Provenance Ledger](public/docs/05_provenance_ledger.png)
 
 #### The Immutability Guarantee
 
@@ -375,7 +359,6 @@ A typical ledger entry:
 }
 ```
 
-
 #### Ledger Transaction Flow
 ```mermaid
 sequenceDiagram
@@ -403,8 +386,6 @@ sequenceDiagram
 
 **Purpose:** Provide AI-generated actionable recommendations while ensuring human accountability for every consequential action.
 
-![HITL Advisory](public/docs/06_hitl_advisory.png)
-
 The HITL framework implements a **three-tier approval matrix**:
 
 | Risk Level | Action Example | HITL Requirement |
@@ -420,7 +401,6 @@ Every approval is:
 3. Immutably linked to the AI recommendation that triggered it
 
 This creates a **complete accountability chain** — regulators, insurers, and quality auditors can trace every action from raw sensor data to human decision to physical outcome.
-
 
 #### HITL Decision Matrix
 ```mermaid
@@ -446,8 +426,6 @@ flowchart TD
 
 **Purpose:** Enforce hard deterministic boundaries that no AI system — regardless of its reasoning — can violate.
 
-![Safety Governance](public/docs/07_safety_governance.png)
-
 The governance engine implements what the research community calls **"sandboxed cognition"**: the AI is free to reason, recommend, and learn — but every potential physical action is first evaluated against a deterministic policy matrix.
 
 ```typescript
@@ -467,7 +445,6 @@ const POLICY_MATRIX = {
 ```
 
 The engine evaluates every AI recommendation against these policies in **<1ms** before it is ever presented to an operator for approval.
-
 
 #### Deterministic Bounds Checking
 ```mermaid
@@ -501,8 +478,6 @@ graph TD
 
 **Purpose:** Map the platform's capabilities onto the established ISA-95 / Purdue Enterprise Reference Architecture (PERA) — the gold standard for industrial network segmentation.
 
-![Purdue Architecture](public/docs/08_purdue_architecture.png)
-
 #### The 5-Level Purdue Hierarchy
 
 | Level | Name | Components in This Platform |
@@ -519,7 +494,6 @@ The platform bridges **Levels 3-5**, providing:
 - Secure OPC UA/MQTT northbound data push from Level 3
 - AI reasoning and RAG knowledge retrieval at Level 5
 - HITL-gated southbound setpoint adjustments back to Level 2
-
 
 #### Purdue Model Bridge
 ```mermaid
@@ -549,8 +523,6 @@ graph TD
 
 **Purpose:** Continuous real-time computation and anomaly detection across the three pillars of Overall Equipment Effectiveness (OEE).
 
-![KPI OEE Dashboard](public/docs/09_kpi_oee_dashboard.png)
-
 #### The OEE Formula Decomposed
 
 $$OEE = Availability \times Performance \times Quality$$
@@ -565,7 +537,6 @@ Where:
 - **Z-score anomaly detection** triggering alerts at 2σ deviations
 - **Rolling baseline** computed over 30/60/90-day windows
 - **Pareto analysis** of the top failure contributors
-
 
 #### OEE Calculation Graph
 ```mermaid
@@ -593,8 +564,6 @@ flowchart LR
 
 **Purpose:** Automated visual inspection of manufactured parts using computer vision models to replace subjective human visual inspection.
 
-![QA Visual Inspection](public/docs/10_qa_visual_inspection.png)
-
 The QA module integrates with computer vision inference pipelines that perform:
 - **Dimensional inspection** using structured light 3D scanning
 - **Surface defect detection** using convolutional neural networks (ResNet-50 backbone)
@@ -614,7 +583,6 @@ The system maintains a defect taxonomy:
     ├── Missing Component
     └── Incorrect Orientation
 ```
-
 
 #### Edge Vision QA
 ```mermaid
@@ -637,8 +605,6 @@ flowchart TD
 ### Module 11: Cognitive Swarm Multi-Agent Architecture
 
 **Purpose:** Orchestrate multiple specialized AI agents that work in parallel across different domains of the factory floor, with each agent possessing deep expertise in its assigned domain.
-
-![Cognitive Swarm](public/docs/11_cognitive_swarm.png)
 
 The Cognitive Swarm implements a **hierarchical multi-agent architecture**:
 
@@ -665,7 +631,6 @@ Each agent can:
 - Publish findings to the orchestrator agent via function calling
 - Trigger HITL approval workflows for recommendations above risk threshold
 - Anchor their reasoning chain to the cryptographic ledger
-
 
 #### Multi-Agent Swarm Topology
 ```mermaid
@@ -984,8 +949,6 @@ The Nakashima platform addresses this through **strict Purdue zone segmentation*
 ### 14.1 XP & Level Architecture
 
 The platform implements a **competency-based progression system** to ensure operators genuinely understand the AI systems they are supervising.
-
-![Course Completion](public/docs/14_course_quiz_completion.png)
 
 ```
 Level 1:  "Process Technician"    (0–100 XP)
