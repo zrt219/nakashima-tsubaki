@@ -156,6 +156,23 @@ function OverviewHero({ latestRun, asset }: { latestRun: { id: string, state: st
             <Icon name="search" className="h-4 w-4" /> TRACEABILITY
           </div>
         </div>
+
+        <div className="mt-8 flex flex-wrap gap-4">
+          <Link
+            href="/simulator?tutorial=true"
+            className="group relative inline-flex h-12 items-center justify-center gap-3 overflow-hidden rounded bg-cyan-500 hover:bg-cyan-400 px-8 font-mono text-sm font-black uppercase tracking-widest text-black transition-all duration-300 shadow-[0_0_30px_rgba(0,212,255,0.4)] hover:shadow-[0_0_60px_rgba(0,212,255,0.8)]"
+          >
+            <Icon name="play" className="h-5 w-5 animate-pulse" />
+            Launch Interactive Academy
+          </Link>
+          <Link
+            href="/tutorials"
+            className="group relative inline-flex h-12 items-center justify-center gap-3 overflow-hidden rounded border border-cyan-500/50 bg-black/40 hover:bg-cyan-500/10 px-8 font-mono text-sm font-bold uppercase tracking-widest text-cyan-400 transition-all duration-300"
+          >
+            <Icon name="book" className="h-5 w-5" />
+            View Curriculum
+          </Link>
+        </div>
       </div>
       
       {/* Active Milestone Block */}

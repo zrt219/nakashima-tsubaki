@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { SCENARIOS } from "@/lib/simulator/scenarios";
 import { useSimulatorStore } from "@/lib/simulator/store";
@@ -12,9 +12,20 @@ import { AcademicHeader } from "@/components/education/AcademicHeader";
 
 export function SimulatorLaunchpad() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setScenario } = useSimulatorStore();
   const [selectedId, setSelectedId] = useState<string | null>(SCENARIOS[0].id);
   const [isStarting, setIsStarting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams?.get("tutorial") === "true") {
+      // Delay slightly to ensure component mounted properly
+      const timer = setTimeout(() => {
+        tutorialStore.openConfig();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   const activeScenario = SCENARIOS.find(s => s.id === selectedId)!;
 

@@ -208,6 +208,25 @@ function CommandHeader({ utilityActions }: { utilityActions?: ReactNode }) {
               <span>@zrt219</span>
             </div>
           </motion.a>
+
+          {/* GLOBAL ACADEMY CTA */}
+          <motion.button 
+            onClick={() => {
+              if (window.location.pathname !== "/simulator") {
+                window.location.href = "/simulator?tutorial=true";
+              } else {
+                import('@/lib/simulator/tutorial-store').then(({ tutorialStore }) => tutorialStore.openConfig());
+              }
+            }}
+            variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.6 } } }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group relative flex h-[34px] items-center justify-center gap-2 overflow-hidden rounded bg-cyan-500 hover:bg-cyan-400 px-6 font-mono text-[12px] font-black uppercase tracking-widest text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,212,255,0.5)] hover:shadow-[0_0_40px_rgba(0,212,255,0.8)] z-50 animate-pulse"
+          >
+            <Icon name="play" className="h-4 w-4" />
+            <span>Launch Academy</span>
+          </motion.button>
+
           {utilityActions && (
             <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.5 } } }}>
               {utilityActions}
@@ -225,7 +244,6 @@ function normalizeAreaId(areaId: string) {
     iot_maker: "automation",
     logs: "qa",
     source: "qa",
-    tutorials: "roadmap",
     "atlas-overview": "overview",
     "ralphplan-ai": "rag",
     umattr: "automation",

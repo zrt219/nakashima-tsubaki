@@ -123,11 +123,20 @@ export const missionAreas: MissionArea[] = [
   {
     id: "architecture",
     index: "08",
-    title: "Vendor Architecture",
-    descriptor: "Open stack comparison",
-    icon: "stack",
+    title: "System Architecture",
+    descriptor: "Infrastructure mapping",
+    icon: "architecture",
     href: "/architecture",
-    status: "review"
+    status: "ready"
+  },
+  {
+    id: "tutorials",
+    index: "09",
+    title: "Industrial Academy",
+    descriptor: "Interactive curriculum",
+    icon: "book",
+    href: "/tutorials",
+    status: "ready"
   },
   {
     id: "kpis",
