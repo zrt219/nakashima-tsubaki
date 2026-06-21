@@ -10,6 +10,7 @@ import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-cen
 import { Icon, StatusChip, type IconName } from "@/components/tn-command-center/command-center-primitives";
 import { AICopilotTerminal } from "@/components/tn-command-center/ai-copilot-terminal";
 import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
+import { LearningTrigger } from "@/components/education/AcademicOverlay";
 
 type OverviewAsset = {
   asset_type: string;
@@ -328,11 +329,15 @@ function TelemetryBar({ telemetryData }: { telemetryData?: OverviewTelemetry }) 
 }
 
 function LiveSparkline({ color }: { color: string }) {
-  const [points, setPoints] = useState<number[]>(() => Array.from({ length: 20 }, (_, index) => seededValue(index + 1) * 15));
+  const [points, setPoints] = useState<number[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    setPoints(Array.from({ length: 20 }, (_, index) => seededValue(index + 1) * 15));
     const interval = setInterval(() => {
       setPoints(prev => {
+        if (prev.length === 0) return Array.from({ length: 20 }, (_, index) => seededValue(index + 1) * 15);
         const nextSeed = prev[prev.length - 1] + prev.length + 1;
         const next = [...prev.slice(1), seededValue(nextSeed) * 15];
         return next;
@@ -340,6 +345,13 @@ function LiveSparkline({ color }: { color: string }) {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  if (!mounted || points.length === 0) {
+    return (
+      <svg className="h-6 w-16 opacity-70" viewBox="0 0 100 20" preserveAspectRatio="none">
+      </svg>
+    );
+  }
 
   const polylineStr = points.map((p, i) => `${i * 5},${18 - p}`).join(" ");
 

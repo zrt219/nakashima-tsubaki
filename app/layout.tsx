@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
           <LearningProvider>
             <main className="flex min-h-screen flex-col bg-slate-950 font-sans text-slate-50 antialiased selection:bg-cyan-500/30 selection:text-cyan-50">
