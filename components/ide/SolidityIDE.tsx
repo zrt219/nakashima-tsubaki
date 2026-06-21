@@ -45,7 +45,7 @@ export function SolidityIDE() {
   const [logs, setLogs] = useState<string[]>([]);
   const [isCompiling, setIsCompiling] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
-  const [compiledData, setCompiledData] = useState<{ abi: any; bytecode: string; contractName: string } | null>(null);
+  const [compiledData, setCompiledData] = useState<{ abi: unknown[]; bytecode: string; contractName: string } | null>(null);
 
   const logToConsole = (msg: string) => {
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
@@ -71,8 +71,8 @@ export function SolidityIDE() {
         logToConsole(`Successfully compiled contract: ${data.contractName}`);
         setCompiledData({ abi: data.abi, bytecode: data.bytecode, contractName: data.contractName });
       }
-    } catch (err: any) {
-      logToConsole(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      logToConsole(`Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsCompiling(false);
     }
@@ -118,8 +118,8 @@ export function SolidityIDE() {
       
       logToConsole(`Success! Contract deployed to: ${address}`);
       
-    } catch (err: any) {
-      logToConsole(`Deployment Error: ${err.message}`);
+    } catch (err: unknown) {
+      logToConsole(`Deployment Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsDeploying(false);
     }

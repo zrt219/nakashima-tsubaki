@@ -15,7 +15,7 @@ export function IoTMakerCenter() {
   const [actionType, setActionType] = useState("MACHINE_CALIBRATION");
   const [parameter, setParameter] = useState("10");
   const [status, setStatus] = useState<"idle" | "hashing" | "anchoring" | "success" | "error">("idle");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{ anchorResult?: { evidence_hash: string; explorer_url?: string } } | null>(null);
 
   const handleExecute = async () => {
     setStatus("hashing");

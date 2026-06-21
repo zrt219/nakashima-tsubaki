@@ -47,13 +47,14 @@ export class XRPLAdapter implements ProofAdapter {
         wallet_address: wallet.address,
         explorer_url: `https://testnet.xrpl.org/transactions/${txHash}`,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown XRPL error";
       console.error("[XRPLAdapter] Anchor failed:", error);
       return {
         success: false,
         evidence_hash: hash,
         evidence_bytes32: bytes32,
-        error: error.message || "Unknown XRPL error",
+        error: errorMessage,
       };
     } finally {
       await this.client.disconnect();

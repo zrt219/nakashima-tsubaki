@@ -72,7 +72,7 @@ export function AcademicOverlay() {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as "abstract" | "methodology" | "architecture" | "code")}
               className={`flex-1 py-3 text-[11px] font-bold uppercase tracking-wider transition ${
                 activeTab === tab.id
                   ? "border-b-2 border-fuchsia-400 text-fuchsia-300 bg-fuchsia-500/10"

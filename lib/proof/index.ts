@@ -46,12 +46,13 @@ export class ProofLedger {
     // 2. Pass to the chosen adapter to anchor
     try {
       return await this.adapter.anchor(evidence, hash, bytes32);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Adapter failed to anchor";
       return {
         success: false,
         evidence_hash: hash,
         evidence_bytes32: bytes32,
-        error: error.message || "Adapter failed to anchor",
+        error: errorMessage,
       };
     }
   }

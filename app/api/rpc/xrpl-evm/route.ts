@@ -15,8 +15,9 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
-  } catch (err: any) {
+  } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
     console.error("RPC Proxy error:", err);
-    return NextResponse.json({ error: "RPC Proxy Error", details: err.message }, { status: 500 });
+    return NextResponse.json({ error: "RPC Proxy Error", details: errorMessage }, { status: 500 });
   }
 }

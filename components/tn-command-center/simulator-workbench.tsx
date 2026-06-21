@@ -116,7 +116,7 @@ export function SimulatorWorkbench({ runId }: { runId: string }) {
       // RECURSIVE MEMORY: If they approve scenario-05, let's artificially write a memory so it triggers next time.
       if (scenario?.id === "scenario-05-recursive-memory") {
         storeReflexMemoryRecord({
-          id: `run_memory-${storeRunId}-${Date.now()}`,
+          id: `run_memory-${storeRunId}-${new Date().getTime()}`,
           type: "run_memory",
           title: `Verified run memory ${storeRunId}`,
           summary: `Verified evidence from telemetry, eval, and operator decision for scenario scenario-05-recursive-memory.`,

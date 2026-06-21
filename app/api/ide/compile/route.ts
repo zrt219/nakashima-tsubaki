@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     const output = JSON.parse(solc.compile(JSON.stringify(input)));
 
     if (output.errors) {
-      const errors = output.errors.filter((e: any) => e.severity === "error");
+      const errors = output.errors.filter((e: { severity: string }) => e.severity === "error");
       if (errors.length > 0) {
         return NextResponse.json({ error: "Compilation Failed", details: errors }, { status: 400 });
       }
@@ -54,8 +54,9 @@ export async function POST(req: Request) {
       abi: contract.abi,
       bytecode: contract.evm.bytecode.object,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
     console.error("Compilation error:", err);
-    return NextResponse.json({ error: "Internal Compilation Error", details: err.message }, { status: 500 });
+    return NextResponse.json({ error: "Internal Compilation Error", details: errorMessage }, { status: 500 });
   }
 }

@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 
 export function canonicalize(evidence: EvidencePacket): string {
   // Sort keys deeply to ensure deterministic output
-  const sortObject = (obj: any): any => {
+  const sortObject = (obj: unknown): unknown => {
     if (obj === null || typeof obj !== "object") {
       return obj;
     }
@@ -11,9 +11,9 @@ export function canonicalize(evidence: EvidencePacket): string {
       return obj.map(sortObject);
     }
     const sortedKeys = Object.keys(obj).sort();
-    const result: any = {};
+    const result: Record<string, unknown> = {};
     for (const key of sortedKeys) {
-      result[key] = sortObject(obj[key]);
+      result[key] = sortObject((obj as Record<string, unknown>)[key]);
     }
     return result;
   };

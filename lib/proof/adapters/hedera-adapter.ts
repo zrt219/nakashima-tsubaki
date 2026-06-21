@@ -48,13 +48,14 @@ export class HederaAdapter implements ProofAdapter {
         wallet_address: wallet.address,
         explorer_url: `https://hashscan.io/testnet/transaction/${receipt.hash}`,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown Hedera error";
       console.error("[HederaAdapter] Anchor failed:", error);
       return {
         success: false,
         evidence_hash: hash,
         evidence_bytes32: bytes32,
-        error: error.message || "Unknown Hedera error",
+        error: errorMessage,
       };
     }
   }

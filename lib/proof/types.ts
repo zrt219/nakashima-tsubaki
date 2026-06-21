@@ -15,7 +15,7 @@ export interface EvidencePacket {
   timestamp: string;
   actor: string;
   action_type: string;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
   approval_status: "approved" | "rejected" | "auto_approved";
 }
 

@@ -58,7 +58,6 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
       eventStream={overviewEvents}
       utilityActions={
         <>
-          <LearningModeToggle />
           <ShellActionLink href="/simulator" label="Launch Twin Simulator" />
         </>
       }
