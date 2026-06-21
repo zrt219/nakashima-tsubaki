@@ -16,6 +16,7 @@ import {
   Sparkles,
   LucideIcon
 } from "lucide-react";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 interface Milestone {
   id: string;
@@ -138,7 +139,8 @@ export function RoadmapDashboard() {
   const [hoveredPhase, setHoveredPhase] = useState<string | null>(null);
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden font-sans">
+    <InteractiveCourseShell moduleId="roadmap">
+      <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden font-sans">
       {/* Decorative top title floating */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -354,5 +356,6 @@ export function RoadmapDashboard() {
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
       <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
     </div>
+    </InteractiveCourseShell>
   );
 }

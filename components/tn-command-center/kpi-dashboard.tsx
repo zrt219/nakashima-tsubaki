@@ -5,6 +5,7 @@ import { motion, Transition } from "framer-motion";
 import { overviewEvents } from "@/lib/tn-ai-data";
 import { CommandCenterShell } from "@/components/tn-command-center/command-center-shell";
 import { Icon } from "@/components/tn-command-center/command-center-primitives";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 type TelemetryPoint = {
   metric_key: string;
@@ -26,7 +27,8 @@ export function KpiDashboard({ telemetryData = [] }: { telemetryData?: Telemetry
       eventStream={overviewEvents}
       rightRail={<RightRailAnomalies />}
     >
-      <div className="flex flex-col justify-between h-[calc(100vh-140px)] pointer-events-none">
+      <InteractiveCourseShell moduleId="kpis">
+        <div className="flex flex-col justify-between h-[calc(100vh-140px)] pointer-events-none p-4 overflow-y-auto">
         
         {/* TOP: Header metrics */}
         <motion.div 
@@ -62,7 +64,8 @@ export function KpiDashboard({ telemetryData = [] }: { telemetryData?: Telemetry
           <BottomRailFleetOverview />
         </motion.div>
 
-      </div>
+        </div>
+      </InteractiveCourseShell>
     </CommandCenterShell>
   );
 }

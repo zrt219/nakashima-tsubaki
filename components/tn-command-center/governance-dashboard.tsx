@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import { Panel, SystemLine, StatusChip, Icon, ButtonLinkLike, ComparisonBlock } from "./command-center-primitives";
 import { governanceItems, overviewEvents } from "@/lib/tn-ai-data";
 import type { StatusKind } from "@/lib/tn-ai-data";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 export function GovernanceDashboard() {
   const containerVariants: Variants = {
@@ -25,6 +26,7 @@ export function GovernanceDashboard() {
   };
 
   return (
+    <InteractiveCourseShell moduleId="governance">
     <motion.div 
       variants={containerVariants}
       initial="hidden"
@@ -211,5 +213,6 @@ export function GovernanceDashboard() {
       </motion.div>
 
     </motion.div>
+    </InteractiveCourseShell>
   );
 }

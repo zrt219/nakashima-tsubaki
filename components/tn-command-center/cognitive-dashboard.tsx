@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { CommandCenterShell, ShellActionLink } from "./command-center-shell";
 import { overviewEvents } from "@/lib/tn-ai-data";
-import { AcademicHeader } from "@/components/education/AcademicHeader";
-import { LearningTrigger } from "@/components/education/AcademicOverlay";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 type Node = {
   id: number;
@@ -81,9 +80,8 @@ export function CognitiveDashboard() {
       eventStream={overviewEvents}
       utilityActions={<ShellActionLink href="/simulator" label="Return to Simulator" tone="secondary" />}
     >
+      <InteractiveCourseShell moduleId="cognitive">
       <div className="flex h-full flex-col p-4 xl:p-6 gap-4">
-        <AcademicHeader topic="llm_diagnostics" />
-        <LearningTrigger topic="llm_diagnostics">
         <div className="relative h-[calc(100vh-170px)] w-full overflow-hidden rounded-lg border border-purple-500/20 bg-black/10">
           
           {/* Background Grid */}
@@ -141,8 +139,8 @@ export function CognitiveDashboard() {
         })}
 
         </div>
-        </LearningTrigger>
       </div>
+      </InteractiveCourseShell>
     </CommandCenterShell>
   );
 }

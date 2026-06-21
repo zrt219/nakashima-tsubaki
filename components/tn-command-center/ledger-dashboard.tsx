@@ -2,10 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 export function LedgerDashboard() {
   return (
-    <div className="flex h-full flex-col gap-4">
+    <InteractiveCourseShell moduleId="ledger">
+      <div className="flex h-full flex-col gap-4 p-6">
       {/* Top Header Metrics */}
       <motion.div 
         variants={{ hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } } }}
@@ -144,5 +146,6 @@ export function LedgerDashboard() {
         </motion.div>
       </motion.div>
     </div>
+    </InteractiveCourseShell>
   );
 }

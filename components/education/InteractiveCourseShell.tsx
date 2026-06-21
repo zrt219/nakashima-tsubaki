@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useChat } from "ai/react";
 import { useCourseStore, CourseModuleId } from "@/lib/education/course-store";
 import { COURSE_CATALOG } from "@/lib/education/course-content";
 import { Icon } from "@/components/tn-command-center/command-center-primitives";
@@ -13,7 +14,7 @@ interface InteractiveCourseShellProps {
 }
 
 export function InteractiveCourseShell({ moduleId, children }: InteractiveCourseShellProps) {
-  const { tone, setTone, awardBadge, badges } = useCourseStore();
+  const { tone, setTone, awardBadge, badges, xp, level, addXp } = useCourseStore();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
@@ -29,6 +30,40 @@ export function InteractiveCourseShell({ moduleId, children }: InteractiveCourse
   const currentStep = course.steps[currentStepIndex];
   const isComplete = currentStepIndex >= course.steps.length - 1;
   const hasBadge = !!badges[moduleId];
+
+  // True LLM Integration
+  const { messages, append, isLoading, setMessages } = useChat({
+    api: "/api/chat",
+    id: `course-${moduleId}-${currentStepIndex}`,
+  });
+
+  // Generate dynamic content when the step or tone changes
+  useEffect(() => {
+    if (!currentStep) return;
+    
+    // Clear previous messages to show fresh thought process
+    setMessages([]);
+
+    const prompt = `You are a snarky, hyper-intelligent AI Sub-Agent breaking the 4th wall in a Cyber-Physical UI. 
+The user is learning the ${course.title} module, Step ${currentStepIndex + 1}: ${currentStep.title}.
+Their requested detail level (tone) is: ${tone.toUpperCase()}.
+Their current XP is ${xp} (Level ${level}).
+
+Here are the facts they need to learn this step:
+${currentStep.dialogue.expanded}
+
+Explain this to them dynamically in your unique voice. Keep it to the requested tone length.
+If XP is 0, mock them for being a noob. If XP is high, respect their grind.
+DO NOT repeat exactly what was in the facts above. Be original and formatted nicely with markdown if needed.`;
+
+    append({
+      role: "user",
+      content: prompt,
+    });
+    
+    // Award 10 XP for reading a new step (only once per step visit, simplistically handled here)
+    addXp(10);
+  }, [currentStepIndex, tone, moduleId]); // Re-trigger on step or tone change
 
   const handleNext = () => {
     if (isComplete) {
@@ -74,7 +109,7 @@ export function InteractiveCourseShell({ moduleId, children }: InteractiveCourse
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-fuchsia-400 uppercase tracking-widest flex items-center gap-2">
               <Icon name="brain" className="w-4 h-4 animate-pulse" />
-              Sub-Agent Guide
+              Sub-Agent <span className="text-[10px] text-command-muted ml-2">// LVL {level} (XP: {xp})</span>
             </h2>
             {hasBadge && (
               <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/50 flex items-center gap-1">
@@ -117,11 +152,17 @@ export function InteractiveCourseShell({ moduleId, children }: InteractiveCourse
               <div className="absolute -top-3 -left-3 bg-fuchsia-500 text-black p-1.5 rounded-full shadow-[0_0_15px_rgba(217,70,239,0.5)]">
                 <Icon name="terminal" className="w-4 h-4" />
               </div>
-              <TypewriterText 
-                key={`${currentStep.id}-${tone}`} 
-                text={currentStep.dialogue[tone]} 
-                speed={15} 
-              />
+              {isLoading && messages.length === 0 ? (
+                <div className="flex items-center gap-2 text-fuchsia-400/50 text-xs uppercase animate-pulse tracking-widest">
+                  <Icon name="terminal" className="w-3 h-3 animate-spin" /> Synthesizing knowledge...
+                </div>
+              ) : (
+                <TypewriterText 
+                  key={`${currentStep.id}-${tone}-${messages.length}`} 
+                  text={messages.filter(m => m.role === 'assistant').pop()?.content || ""} 
+                  speed={15} 
+                />
+              )}
             </div>
           </div>
 

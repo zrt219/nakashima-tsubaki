@@ -18,6 +18,7 @@
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.107.0",
     "@types/three": "^0.184.1",
+    "ai": "^3.1.25",
     "aws-iot-device-sdk-v2": "^1.26.0",
     "dotenv": "^17.4.2",
     "ethers": "^6.16.0",

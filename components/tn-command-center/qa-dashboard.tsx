@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 import { overviewEvents } from "@/lib/tn-ai-data";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 export function QaDashboard() {
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
@@ -18,6 +19,7 @@ export function QaDashboard() {
         <ShellActionLink href="/ledger" label="View Ledger Entry" tone="secondary" />
       }
     >
+      <InteractiveCourseShell moduleId="qa">
       <div className="relative h-[calc(100vh-170px)] w-full overflow-hidden rounded-lg border border-cyan-400/20 bg-black/10">
         
         {/* Floating Crosshairs / Canvas Grid */}
@@ -128,6 +130,7 @@ export function QaDashboard() {
         </AnimatePresence>
 
       </div>
+      </InteractiveCourseShell>
     </CommandCenterShell>
   );
 }

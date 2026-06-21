@@ -20,6 +20,15 @@ interface CourseState {
   badges: Record<string, CourseBadge>;
   awardBadge: (moduleId: CourseModuleId, score: number) => void;
   
+  // RPG Mechanics
+  xp: number;
+  level: number;
+  addXp: (amount: number) => void;
+  
+  // Cognitive Memory
+  memories: string[];
+  addMemory: (memory: string) => void;
+  
   // Active module state
   activeModuleId: CourseModuleId | null;
   setActiveModule: (id: CourseModuleId | null) => void;
@@ -42,6 +51,19 @@ export const useCourseStore = create<CourseState>((set) => ({
     }
   })),
   
+  xp: 0,
+  level: 1,
+  addXp: (amount) => set((state) => {
+    const newXp = state.xp + amount;
+    const newLevel = Math.floor(newXp / 100) + 1; // 100 XP per level
+    return { xp: newXp, level: newLevel };
+  }),
+  
+  memories: [],
+  addMemory: (memory) => set((state) => ({
+    memories: [...state.memories, memory]
+  })),
+
   activeModuleId: null,
   setActiveModule: (id) => set({ activeModuleId: id }),
   

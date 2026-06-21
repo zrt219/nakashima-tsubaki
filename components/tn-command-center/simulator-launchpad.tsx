@@ -9,6 +9,7 @@ import { tutorialStore } from "@/lib/simulator/tutorial-store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, Panel, StatusChip } from "@/components/tn-command-center/command-center-primitives";
 import { AcademicHeader } from "@/components/education/AcademicHeader";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 export function SimulatorLaunchpad() {
   const router = useRouter();
@@ -51,6 +52,7 @@ export function SimulatorLaunchpad() {
         </>
       }
     >
+      <InteractiveCourseShell moduleId="twins">
       <motion.div 
         className="flex h-full flex-col p-4 xl:p-6"
         initial="hidden"
@@ -172,6 +174,7 @@ export function SimulatorLaunchpad() {
           </div>
         </motion.div>
       </motion.div>
+      </InteractiveCourseShell>
     </CommandCenterShell>
   );
 }

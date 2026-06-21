@@ -9,8 +9,7 @@ import { useSimulatorStore } from "@/lib/simulator/store";
 import { CommandCenterShell, ShellActionLink } from "@/components/tn-command-center/command-center-shell";
 import { Icon, StatusChip, type IconName } from "@/components/tn-command-center/command-center-primitives";
 import { AICopilotTerminal } from "@/components/tn-command-center/ai-copilot-terminal";
-import { useLearning } from "@/components/education/LearningContext";
-import { LearningTrigger } from "@/components/education/AcademicOverlay";
+import { InteractiveCourseShell } from "@/components/education/InteractiveCourseShell";
 
 type OverviewAsset = {
   asset_type: string;
@@ -63,12 +62,14 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
       }
       rightRail={<OverviewRail latestRun={latestRun} />}
     >
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        <OverviewHero latestRun={latestRun} asset={asset} />
+      <InteractiveCourseShell moduleId="overview">
+        <div className="flex flex-col gap-4 p-4 h-full overflow-y-auto custom-scrollbar">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            <OverviewHero latestRun={latestRun} asset={asset} />
       </motion.div>
 
       <motion.div 
@@ -101,24 +102,9 @@ export function OverviewDashboard({ asset, telemetryData, scenarios }: { asset?:
       <div className="mt-3">
         <AICopilotTerminal telemetryData={telemetryData} />
       </div>
+        </div>
+      </InteractiveCourseShell>
     </CommandCenterShell>
-  );
-}
-
-function LearningModeToggle() {
-  const { isLearningMode, toggleLearningMode } = useLearning();
-  return (
-    <button
-      onClick={toggleLearningMode}
-      className={`flex items-center gap-2 border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all ${
-        isLearningMode 
-          ? "border-fuchsia-500/50 bg-fuchsia-500/20 text-fuchsia-300 shadow-[0_0_15px_rgba(217,70,239,0.3)]" 
-          : "border-command-line/50 bg-black/40 text-command-muted hover:bg-black/60 hover:text-white"
-      }`}
-    >
-      <Icon name="book" className="h-3 w-3" />
-      {isLearningMode ? "LEARNING MODE ACTIVE" : "ENABLE LEARNING MODE"}
-    </button>
   );
 }
 
