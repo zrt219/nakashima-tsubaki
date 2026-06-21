@@ -13,7 +13,11 @@ interface InteractiveCourseShellProps {
   children: React.ReactNode;
 }
 
-export function InteractiveCourseShell({ moduleId, children }: InteractiveCourseShellProps) {
+export function InteractiveCourseShell(props: InteractiveCourseShellProps) {
+  return <InteractiveCourseShellInner key={props.moduleId} {...props} />;
+}
+
+function InteractiveCourseShellInner({ moduleId, children }: InteractiveCourseShellProps) {
   const { tone, setTone, awardBadge, badges, xp, level, addXp } = useCourseStore();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showQuiz, setShowQuiz] = useState(false);
