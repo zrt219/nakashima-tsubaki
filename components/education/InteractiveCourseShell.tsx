@@ -36,7 +36,7 @@ function InteractiveCourseShellInner({ moduleId, children }: InteractiveCourseSh
   const hasBadge = !!badges[moduleId];
 
   // True LLM Integration
-  const { messages, append, isLoading, setMessages } = useChat({
+  const { messages, append, isLoading, setMessages, error } = useChat({
     api: "/api/subagent",
     id: `course-${moduleId}-${currentStepIndex}`,
   });
@@ -172,10 +172,16 @@ Then put a blank line, and then start your organic response.`;
                 <div className="flex items-center gap-2 text-fuchsia-400/50 text-xs uppercase animate-pulse tracking-widest">
                   <Icon name="terminal" className="w-3 h-3 animate-spin" /> Synthesizing knowledge...
                 </div>
+              ) : error ? (
+                <TypewriterText 
+                  key={`error-${currentStep.id}`} 
+                  text={"SYSTEM ALERT: " + error.message} 
+                  speed={15} 
+                />
               ) : (
                 <TypewriterText 
                   key={`${currentStep.id}-${tone}-${messages.length}`} 
-                  text={messages.filter(m => m.role === 'assistant').pop()?.content || ""} 
+                  text={messages.filter(m => m.role === 'assistant').pop()?.content || "SYSTEM ALERT: I am operating in low-power fallback mode. The GEMINI_API_KEY environment variable is not configured. I am currently cut off from the main intelligence core."} 
                   speed={15} 
                 />
               )}

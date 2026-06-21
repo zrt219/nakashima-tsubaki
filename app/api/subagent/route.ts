@@ -7,10 +7,19 @@ const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 export async function POST(req: Request) {
   if (!genAI) {
-    return new Response(
-      "GEMINI_API_KEY is not configured. Sub-Agent is offline.",
-      { status: 500 }
-    );
+    // Fallback mode if no API key is provided
+    const fallbackText = "SYSTEM ALERT: I am operating in low-power fallback mode. The GEMINI_API_KEY environment variable is not configured in this environment. I am currently cut off from the main intelligence core. Please configure the API key in `.env.local` to restore my full cognitive capabilities and allow me to analyze the telemetry firehose.";
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        for (let i = 0; i < fallbackText.length; i++) {
+          controller.enqueue(encoder.encode(fallbackText[i]));
+          await new Promise(r => setTimeout(r, 10)); // simulated typing
+        }
+        controller.close();
+      }
+    });
+    return new StreamingTextResponse(stream);
   }
 
   const { messages } = await req.json();

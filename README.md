@@ -3,11 +3,21 @@
 # 🧠 NAKASHIMA-TSUBAKI COMMAND CENTER
 ### *The World's First Cognitive Cyber-Physical AI Platform for Industrial Re-Platforming*
 
+![Nakashima-Tsubaki Command Center](public/docs/tsubaki_banner_top_zrt219.png)
+
 [![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=for-the-badge&logo=vercel)](https://tsubaki-nakashima-ai-mdm6h8td5-zrt219s-projects.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![Gemini](https://img.shields.io/badge/Powered%20By-Gemini%202.5-4285F4?style=for-the-badge&logo=google)](https://deepmind.google/technologies/gemini/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+<br/>
+
+<div align="center">
+  <img src="public/docs/simulator_animation.gif" alt="Nakashima Simulator Demo" width="800" style="border-radius: 12px; border: 1px solid #333;" />
+</div>
+
+<br/>
 
 > **"The convergence of AI cognition, deterministic digital twinning, and cryptographic provenance — built for the precision manufacturing industry of 2026."**
 
@@ -166,6 +176,22 @@ The overview module integrates live telemetry from up to 48 concurrent sensor ch
 - **Health score composite** weighted by the OEE formula: `OEE = Availability × Performance × Quality`
 - **Event stream** showing the last 100 immutable ledger events
 
+
+#### Architecture Flow
+```mermaid
+graph TD
+    subgraph Edge Devices
+        S1[Vibration Sensor] -->|100Hz MQTT| Gateway
+        S2[Temp Sensor] -->|10Hz MQTT| Gateway
+        S3[Acoustic Sensor] -->|High-Freq| Gateway
+    end
+    Gateway[Edge Gateway Node] -->|WebSocket WSS| Redis[(In-Memory Redis)]
+    Redis --> WebGL[Three.js Spindle Render]
+    Redis --> Sparkline[Time-Series Sparklines]
+    Redis --> OEE[OEE Calculation Engine]
+    OEE --> Overview[Dashboard UI]
+```
+
 **Academic Foundation:** This module is grounded in Lo (2024) — *"Digital Twins of Cyber-Physical Systems in Smart Manufacturing"* — which established the architectural requirements for real-time digital twin synchronization. The study demonstrated that sub-100ms telemetry refresh rates are achievable with modern edge computing architectures and are sufficient for predictive maintenance decision-making.
 
 ---
@@ -185,6 +211,33 @@ The roadmap implements a **three-phase adoption model** derived from Smith (2025
 | Phase 3 | **Autonomous Mode** | AI actuates within deterministic bounds | AI-primary |
 
 The platform is currently designed to operate in **Phase 2 (Advisory Mode)** by default, with the governance engine preventing any Phase 3 actuation unless explicit HITL sign-off has been cryptographically recorded on the ledger.
+
+
+#### Adoption State Machine
+```mermaid
+stateDiagram-v2
+    [*] --> Phase1_ShadowMode
+    state Phase1_ShadowMode {
+        Log[Log Telemetry]
+        AI[AI Generates Output]
+        NoAct[NO Actuation Allowed]
+    }
+    Phase1_ShadowMode --> Phase2_AdvisoryMode: >90 Days Baseline
+    state Phase2_AdvisoryMode {
+        AIPrompt[AI Proposes Action]
+        Human[Human Verification]
+        Action[Actuation]
+        AIPrompt --> Human: Req Approval
+        Human --> Action: Cryptographic Sign-Off
+    }
+    Phase2_AdvisoryMode --> Phase3_AutonomousMode: Governance Unlock
+    state Phase3_AutonomousMode {
+        AIAct[AI Direct Actuation]
+        Bounds[Deterministic Safety Bounds]
+        AIAct --> Bounds
+        Bounds --> Act[Machine Execution]
+    }
+```
 
 **Academic Foundation:** Miller (2024) — *"Shadow Mode Testing for Autonomous IIoT Agents"* — provided the framework for parallel-running AI models against production systems before gradual responsibility handoff. The study showed that a minimum 90-day shadow period is required to build statistically significant performance baselines.
 
@@ -212,6 +265,25 @@ The platform is currently designed to operate in **Phase 2 (Advisory Mode)** by 
 
 4. **Generation:** Gemini 2.5 Flash synthesizes the retrieved knowledge and sensor data into a human-readable **Evidence Packet** for the operator.
 
+
+#### RAG Data Pipeline
+```mermaid
+flowchart LR
+    subgraph Data Sources
+        PDFs[Academic PDFs] --> Parser[PDF Extract]
+        Manuals[Machine Manuals] --> Parser
+    end
+    Parser --> Chunks[Text Chunking]
+    Chunks --> Embedding[Embedding Model]
+    Embedding --> VectorDB[(Vector DB)]
+    
+    UserQuery[User/System Query] --> QueryEmbed[Query Embedding]
+    QueryEmbed --> VectorDB
+    VectorDB -->|Top K Results| Context[Context Synthesis]
+    Context --> LLM[Gemini 2.5]
+    LLM --> Response[Augmented Response]
+```
+
 **Academic Foundation:**
 - **Gupta, R. (2024)** — *"RAG in Manufacturing: Grounding LLMs with Maintenance SOPs"* — demonstrated a 67% reduction in operator decision latency when RAG-augmented LLMs were deployed versus traditional manual SOP lookup.
 - **Lee, J. (2024)** — *"Predictive Maintenance using pgvector and Semantic Search"* — established that vector databases can retrieve semantically relevant maintenance procedures with >94% relevance@5 accuracy for industrial equipment failure modes.
@@ -223,7 +295,7 @@ The platform is currently designed to operate in **Phase 2 (Advisory Mode)** by 
 
 **Purpose:** Real-time, high-fidelity digital replica of physical manufacturing assets, synchronized at up to 100Hz.
 
-![Digital Twin Telemetry](public/docs/04_digital_twin_telemetry.png)
+![Digital Twin Telemetry](public/docs/digital_twin_animation.gif)
 
 The digital twin implementation achieves:
 - **100Hz telemetry refresh** for vibration signature analysis
@@ -247,6 +319,19 @@ Vibration Amplitude (mm/s)
 ```
 
 The digital twin monitors the P-F interval continuously, allowing maintenance interventions to be scheduled before the functional failure point.
+
+
+#### Cyber-Physical Sync
+```mermaid
+graph TD
+    Physical[Physical CNC Machine] -- Sensor Data --> DAQ[Data Acquisition]
+    DAQ -- 100Hz Stream --> TwinEngine[Digital Twin Engine]
+    TwinEngine -- Transforms --> 3DModel[Three.js Cyber Representation]
+    TwinEngine -- Analyzes --> PFInterval{P-F Curve Check}
+    PFInterval -- Potential Failure --> Alert[Predictive Alert]
+    PFInterval -- Healthy --> Log[State Ledger]
+    3DModel --> UI[React Canvas UI]
+```
 
 **Academic Foundation:**
 - **Wang, Z. (2025)** — *"Double-Edge-Assisted Computation Offloading and Resource Allocation"* — provided the computational framework for running physics simulation workloads at the edge, eliminating cloud round-trip latency.
@@ -290,6 +375,23 @@ A typical ledger entry:
 }
 ```
 
+
+#### Ledger Transaction Flow
+```mermaid
+sequenceDiagram
+    participant Sensor
+    participant Edge
+    participant SmartContract
+    participant IPFS
+    
+    Sensor->>Edge: Telemetry Hash
+    Edge->>IPFS: Store Raw Data Payload
+    IPFS-->>Edge: Returns CID
+    Edge->>SmartContract: Anchor CID + Timestamp + Signature
+    SmartContract-->>Edge: TxHash Confirmed
+    Edge->>UI: Update Ledger Dashboard
+```
+
 **Academic Foundation:**
 - **Garcia, M. (2024)** — *"Distributed Ledger Technologies for Supply Chain Provenance"* — established the cryptographic framework for immutable manufacturing audit trails, showing 99.97% tamper-detection accuracy.
 - **Zhao, Y. (2024)** — *"Immutable Append-Only Architectures for Factory Audits"* — demonstrated that append-only ledger architectures reduce audit preparation time by 83% in ISO-certified manufacturing environments.
@@ -318,6 +420,20 @@ Every approval is:
 3. Immutably linked to the AI recommendation that triggered it
 
 This creates a **complete accountability chain** — regulators, insurers, and quality auditors can trace every action from raw sensor data to human decision to physical outcome.
+
+
+#### HITL Decision Matrix
+```mermaid
+flowchart TD
+    Anomaly[Anomaly Detected] --> AI[AI Agent Analysis]
+    AI --> Proposal[Draft Mitigation Strategy]
+    Proposal --> UI[Display to Operator]
+    UI -->|Human Reviews| Decision{Approved?}
+    Decision -- Yes --> Sign[Apply Crypto Signature]
+    Sign --> PLC[Send to PLC / Actuator]
+    Decision -- No --> Reject[Log Rejection + Reason]
+    Reject --> FineTune[Model Reinforcement Loop]
+```
 
 **Academic Foundation:**
 - **Smith, A. (2025)** — *"Human-in-the-Loop (HITL) Paradigms for Autonomous Machining"* — provided the three-tier risk classification matrix that the platform's approval system is based on.
@@ -352,6 +468,28 @@ const POLICY_MATRIX = {
 
 The engine evaluates every AI recommendation against these policies in **<1ms** before it is ever presented to an operator for approval.
 
+
+#### Deterministic Bounds Checking
+```mermaid
+graph TD
+    AI[AI Decision Output] --> Parser[Action Parser]
+    Parser --> Policy[Governance Engine]
+    
+    subgraph Safety Bounds
+        Policy --> Spindle{RPM < 8000?}
+        Policy --> Temp{Temp < 95°C?}
+        Policy --> Axis{Z-Axis Limit?}
+    end
+    
+    Spindle -- Pass --> Temp
+    Temp -- Pass --> Axis
+    Axis -- Pass --> Execute[Send to Hardware]
+    
+    Spindle -- Fail --> Block[HARD REJECT]
+    Temp -- Fail --> Block
+    Axis -- Fail --> Block
+```
+
 **Academic Foundation:**
 - **Nakamoto et al. (2025)** — *"Smart Contract Governance for Cyber-Physical Systems"* — provided the theoretical foundation for deterministic policy enforcement in cyber-physical control loops.
 - **Schneier, B. (2025)** — *"Zero-Trust Security Models in 6G Manufacturing"* — established the zero-trust architecture principles that the governance layer enforces.
@@ -382,6 +520,24 @@ The platform bridges **Levels 3-5**, providing:
 - AI reasoning and RAG knowledge retrieval at Level 5
 - HITL-gated southbound setpoint adjustments back to Level 2
 
+
+#### Purdue Model Bridge
+```mermaid
+graph TD
+    subgraph L0-L1: Physical & Control
+        Sensors --> PLC[Programmable Logic Controllers]
+    end
+    subgraph L2-L3: Supervisory & Operations
+        PLC --> SCADA[SCADA / HMI]
+        SCADA --> MES[Manufacturing Execution System]
+    end
+    subgraph L4-L5: Enterprise & Cloud
+        MES --> DMZ[Industrial DMZ]
+        DMZ --> Cloud[Cognitive AI Cloud]
+    end
+    Cloud -.->|Advisory/Control via Bridge| DMZ
+```
+
 **Academic Foundation:**
 - **Williams, T. (2023)** — *"The Purdue Enterprise Reference Architecture in Industry 4.0"* — provided the definitive mapping of the Purdue model to modern cloud-native industrial architectures.
 - **Clark, R. (2023)** — *"Overcoming Vendor Lock-in with Composable Edge Infrastructure"* — demonstrated how open-standard protocols (OPC UA, MQTT Sparkplug B) enable vendor-neutral Purdue implementations.
@@ -409,6 +565,23 @@ Where:
 - **Z-score anomaly detection** triggering alerts at 2σ deviations
 - **Rolling baseline** computed over 30/60/90-day windows
 - **Pareto analysis** of the top failure contributors
+
+
+#### OEE Calculation Graph
+```mermaid
+flowchart LR
+    UpTime[Uptime Data] --> Avail[Availability Calc]
+    Cycle[Cycle Time Data] --> Perf[Performance Calc]
+    Defects[Defect Count] --> Qual[Quality Calc]
+    
+    Avail --> OEE{OEE Engine}
+    Perf --> OEE
+    Qual --> OEE
+    
+    OEE --> Score[76.5% Overall Score]
+    Score --> Threshold{< 80% ?}
+    Threshold -- Yes --> Alert[Trigger Maintenance Agent]
+```
 
 **Academic Foundation:**
 - **Patel, V. (2023)** — *"Mitigation of Catastrophic Resonance via Predictive AI"* — demonstrated a 23% improvement in OEE through vibration-based predictive maintenance using ML anomaly detection.
@@ -440,6 +613,19 @@ The system maintains a defect taxonomy:
 └── Assembly Errors
     ├── Missing Component
     └── Incorrect Orientation
+```
+
+
+#### Edge Vision QA
+```mermaid
+flowchart TD
+    Camera[Industrial Camera 4K] --> PreProc[Image Pre-Processing]
+    PreProc --> EdgeInference[Edge Vision Model]
+    EdgeInference --> Box[Bounding Box / Segmentation]
+    Box --> Score{Confidence > 95%?}
+    Score -- Yes --> Pass[Part Approved]
+    Score -- No --> Inspect[Flag for Human Inspection]
+    Inspect --> UI[QA Dashboard Alert]
 ```
 
 **Academic Foundation:**
@@ -479,6 +665,21 @@ Each agent can:
 - Publish findings to the orchestrator agent via function calling
 - Trigger HITL approval workflows for recommendations above risk threshold
 - Anchor their reasoning chain to the cryptographic ledger
+
+
+#### Multi-Agent Swarm Topology
+```mermaid
+graph TD
+    Main[Orchestrator Agent] --> RAG[Research/RAG Agent]
+    Main --> Vision[Vision/QA Agent]
+    Main --> Control[Control/PLC Agent]
+    
+    RAG -.->|Context| Main
+    Vision -.->|Visual Anomalies| Main
+    Control -.->|Hardware Limits| Main
+    
+    Main --> Synthesize[Synthesized Strategy]
+```
 
 **Academic Foundation:**
 - **White, S. (2024)** — *"Multi-Agent LangChain Graphs in Robotics Orchestration"* — provided the graph-based multi-agent orchestration pattern that the Cognitive Swarm implements.
@@ -1089,6 +1290,8 @@ MIT License — Copyright © 2026 Nakashima-Tsubaki Project
 ---
 
 <div align="center">
+
+![Nakashima Precision Network](public/docs/tsubaki_banner_bottom_zrt219.png)
 
 **Built at the frontier of Industrial AI × Cognitive Architecture × Cryptographic Provenance**
 

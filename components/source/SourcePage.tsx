@@ -23,7 +23,7 @@ const sourceGroups = [
     cards: [
       {
         title: "Industrial precision manufacturing framing",
-        url: "https://github.com/zrt219/tsubaki-nakashima-ai",
+        url: "https://github.com/zrt219/nakashima-tsubaki",
         claimSupported:
           "Explains the target domain: precision balls, rollers, blowers, quality checks, and deployment risk.",
         limitation:

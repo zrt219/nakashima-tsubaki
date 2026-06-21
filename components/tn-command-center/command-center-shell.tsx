@@ -195,7 +195,7 @@ function CommandHeader({ utilityActions }: { utilityActions?: ReactNode }) {
             <span className="text-cyan-100 drop-shadow-[0_0_4px_rgba(0,212,255,0.5)]">q-hold sim v1.0</span>
           </motion.div>
           <motion.a 
-            href="https://github.com/zrt219" 
+            href="https://github.com/zrt219/nakashima-tsubaki" 
             target="_blank" 
             rel="noopener noreferrer"
             variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.6 } } }}
